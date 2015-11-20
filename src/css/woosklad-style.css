@@ -1,0 +1,48 @@
+#auth {
+	margin-bottom: 30px;
+}
+.form-table td {
+	padding-right:50px;
+	vertical-align: top;
+}
+.form-table select, .form-table input[type=text], .form-table input[type=password] {
+	width:200px;
+}
+.form-table th {
+	width:300px;
+	padding-right:20px;
+}
+#stores label {
+	width:200px;
+}
+#stores input[type=text] {
+	width:50px;
+}
+
+form {
+	margin-bottom: 30px;
+}
+.progress-bar-striped:not(.progress-bar-danger, .progress-bar-success ) {
+	background-color: rgb(0, 145, 205);
+}
+#settings th img {
+	float:right;
+	margin: 0 -24px 0 0;
+	vertical-align: top;
+	cursor: help;
+	line-height:1;
+}
+#settings th label {
+	float:left;
+}
+#settings a {
+	font-size:10px;
+	float:left;
+}
+#progress-sync{
+	margin-bottom: 15px;
+}
+#attent {
+	font-size:16px;
+	color: red;
+}
