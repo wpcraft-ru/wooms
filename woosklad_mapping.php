@@ -25,19 +25,19 @@
 		$attributes = array();
 		if ($msattr) {
 			foreach ($msattr as $ms) {
-				$attributes[(string)$ms['name']] = (string)$ms->uuid;
+				$attributes[strtoupper((string)$ms['name'])] = (string)$ms->uuid;
 			}
 		}
 		$wcattr = wc_get_attribute_taxonomies();
 		foreach ($wcattr as $wc) {
-			if (!array_key_exists($wc->attribute_label, $attributes)){
-				$attributes[$wc->attribute_label] = '';
+			if (!array_key_exists(strtoupper($wc->attribute_label), $attributes)){
+				$attributes[strtoupper($wc->attribute_label)] = '';
 			}
 			$opt_name = 'woosklad_attribute_'.$wc->attribute_name;
-			update_option($opt_name, $attributes[$wc->attribute_label]);
+			update_option($opt_name, $attributes[strtoupper($wc->attribute_label)]);
 		}
 		return $attributes;
-		echo "<pre>"; print_r($attributes); echo "</pre>";
+		//echo "<pre>"; print_r($attributes); echo "</pre>";
 	}
 	
 	function get_id_by_uuid($uuid) {
@@ -81,39 +81,4 @@
 		ksort($priority_stores);
 		return $priority_stores;
 	}
-	
-	/*function save_good_uuid($uuid, $code) {
-		global $wpdb;
-		$id = $wpdb->get_var($wpdb->prepare("
-				SELECT post_id FROM $wpdb->postmeta 
-				WHERE meta_key = '_sku' AND meta_value='%s'", $code));
-		if ($id) {
-			update_post_meta($id, '_woosklad_good_uuid', $uuid);
-			update_post_meta($id, '_woosklad_consignment_uuid', '');
-		}
-		//else echo $code."<br />";
-	}
-	
-	function save_consignment_uuid($gooduuid, $uuid, $code) {
-		update_option('woosklad_download_cons', $code);
-		global $wpdb;
-		if ($code) {
-			$id = $wpdb->get_var($wpdb->prepare("
-				SELECT post_id FROM $wpdb->postmeta 
-				WHERE meta_key = '_sku' AND meta_value='%s'", $code));
-		}
-		else {
-			$id = $wpdb->get_var($wpdb->prepare("
-				SELECT post_id FROM $wpdb->postmeta meta
-				JOIN $wpdb->posts post ON post.ID = meta.post_id
-				WHERE meta.meta_key = '_woosklad_good_uuid' AND meta.meta_value = '%s'
-				AND post.post_type='product'", $gooduuid));
-		}
-		if ($id) {
-			update_post_meta($id, '_woosklad_good_uuid', $gooduuid);
-			update_post_meta($id, '_woosklad_consignment_uuid', $uuid);
-		}
-		//echo $id." ".$code." ".$gooduuid."<br />";
-	}*/
-	
 ?>

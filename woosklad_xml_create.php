@@ -17,10 +17,21 @@
 		$xml = '<goodFolder archived="false" productCode="" name="'.$name.'" ';
 		if ($parent) $xml .= 'parentUuid = "'.$parent.'" ';
 		$xml .= '>';
+		if (get_option('woosklad_category_'.$id.'_uuid')) $xml .= '<uuid>'.get_option('woosklad_category_'.$id.'_uuid').'</uuid>';
 		$xml .= '<code>Категория '.$id.'</code>';
 		$xml .= '</goodFolder>';
 		//echo "<pre>"; print_r(simplexml_load_string($xml)); echo "</pre>";
 		return $xml;
+	}
+	
+	function get_parent_category($categories) {
+		$parents = array();
+		foreach ($categories as $cat) {
+			if (!in_array($cat->parent, $parents)) $parents[] = $cat->parent;
+		}
+		$i = 0; 
+		while (!in_array($categories[$i]->term_id, $parents)) return $categories[$i++]->term_id;
+		return $categories[count($categories)-1]->term_id;
 	}
 	
 	function create_good_xml($id) {
@@ -39,8 +50,9 @@
 		//echo $uuid."<br />";
 		$categories = get_the_terms($id, 'product_cat');
 		put_category_identity($categories);
-		$parentUuid = get_option('woosklad_category_'.$categories[0]->term_id.'_uuid') ? 
-			'parentUuid="'.get_option('woosklad_category_'.$categories[0]->term_id.'_uuid').'"' : '';
+		$parent = get_parent_category($categories);
+		$parentUuid = get_option('woosklad_category_'.$parent.'_uuid') ? 
+			'parentUuid="'.get_option('woosklad_category_'.$parent.'_uuid').'"' : '';
 		
 		$xml = '<good isSerialTrackable="false" weight="'.$weight.'" salePrice="'.$salePrice.'" 
 			buyPrice="'.$buyPrice.'" name="'.$product->get_title().'" 
@@ -58,7 +70,7 @@
 		$uuid = get_post_meta($varId, '_woosklad_feature_uuid', true);
 		if ($uuid) $xml .= '<uuid>'.$uuid.'</uuid>';
 		
-		$code = get_post_meta($goodId, '_sku', true)."-".$varId;
+		$code = get_post_meta($varId, '_sku', true) ? get_post_meta($varId, '_sku', true) : get_post_meta($goodId, '_sku', true)."_".$varId;
 		$xml .= '<code>'.$code.'</code>';
 		
 		$product = new WC_Product($goodId);
@@ -68,14 +80,18 @@
 			//if (!get_option("woosklad_attribute_$attr")) put_attribute_identity();
 			$attrUuid = get_option("woosklad_attribute_$attr");
 			if ($attrUuid) {
-				$attrValue = get_post_meta($varId,'attribute_'.$key, true);
-				//echo "attr ".$attr." uuid ".$attrUuid." val ".$attrValue."<br/>"; 
+				$attrSlug = get_post_meta($varId,'attribute_'.$key, true);
+				$attrValue = get_term_by('slug', $attrSlug, $value['name']);
+				//echo "attr ".$value['name']." uuid ".$attrUuid." val ".$attrValue->name."<br/>"; 
 				
 				$uuid = get_post_meta($varId, '_woosklad_attr_'.$attrUuid, true); //если обновляем
 				
-				$xml .= '<attribute metadataUuid="'.$attrUuid.'" valueString="'.$attrValue.'">';
+				$xml .= '<attribute metadataUuid="'.$attrUuid.'" valueString="'.$attrValue->name.'">';
 				if ($uuid) $xml .= '<uuid>'.$uuid.'</uuid>';
 				$xml .= '</attribute>';
+			} else {
+				update_option('woosklad_error', current_time('mysql').' Невозможно выгрузить вариации. Проверьте все ли атрибуты добавлены как характеристики на Мой Склад и синхрониируйте информацию.');
+				exit;
 			}
 		}
 		$xml .= '</feature>';
@@ -101,14 +117,14 @@
 	function create_order_position_xml($item, $order_id, $status, $store, &$items_id) {
 		$item_id = $item['variation_id'] ? $item['variation_id'] : $item['product_id'];
 		$old_items_id = get_post_meta($order_id, '_woosklad_store_item_count', true);
-		
+                
 		$old_count = 0;
-		if (array_key_exists($item_id, $old_items_id))
+                if (array_key_exists($item_id, $old_items_id))
 			if (array_key_exists($store, $old_items_id[$item_id])) 
 				$old_count = $old_items_id[$item_id][$store];
-		//echo "old ".$old_count."<br />";	
+			//echo "old ".$old_count."<br />";	
 			
-			if ($old_items_id && ($status == 'cancelled' || $status == 'failed' || $status == 'completed')) {
+			if ($old_items_id && ($status == 'cancelled' || $status == 'failed' || $status == 'completed' || $status == 'refunded')) {
 				$items_id[$item_id][$store]=$old_count;
 				$items_id[$item_id]['stock']=$old_items_id[$item_id]['stock'];
 				$quantity = $old_count;
@@ -116,17 +132,21 @@
 			else {			
 				$count_store = (int)get_post_meta($item_id, '_woosklad_stock_'.$store, true) + $old_count;
 			//echo "count_store ".$count_store."<br />";	
-				$quantity = $count_store < $items_id[$item_id]['stock'] ? $count_store : $items_id[$item_id]['stock'];
+				//$quantity = $count_store < $items_id[$item_id]['stock'] ? $count_store : $items_id[$item_id]['stock'];
+                                $quantity = $items_id[$item_id]['stock'];
 				$items_id[$item_id][$store] = $quantity;
 				$items_id[$item_id]['stock'] -=  $quantity;
 			}
-		
+
+                        //update_option('woosklad_error', current_time('mysql')." ".$old_count);
+
+                        
 		if ($quantity > 0) {
-			$xml = '<customerOrderPosition ';
+                        $xml = '<customerOrderPosition ';
 			$xml .= 'discount="'.number_format((($item['line_subtotal']-$item['line_total'])/($item['line_subtotal']/100)),1,'.','').'" ';
 			$xml .= 'quantity="'.number_format($quantity, 1, '.', '').'" ';
 			if (!get_post_meta($item_id, '_woosklad_good_uuid', true)) {
-				//get_uuid_by_name($item['name']);
+				
 				return 0;
 			}
 			if (get_post_meta($item_id, '_woosklad_good_uuid', true)) {
@@ -144,10 +164,10 @@
 			$xml .= '<basePrice sum="'.number_format((100*$item['line_subtotal']/$item['qty']),1,'.','').'" sumInCurrency="'.number_format((100*$item['line_subtotal']/$item['qty']),1,'.','').'" />';
 			$xml .= '<price sum="'.number_format((100*$item['line_total']/$item['qty']),1,'.','').'" sumInCurrency="'.number_format((100*$item['line_total']/$item['qty']),1,'.','').'" />';
 			
-			if ($status != 'cancelled' && $status != 'failed')
+			if ($status != 'cancelled' && $status != 'failed' && $status != 'refunded' && $status != 'processing')
 				$xml .= '<reserve>'.number_format($quantity,1,'.','').'</reserve>';
 			$xml .= '</customerOrderPosition>';
-			echo "<pre>"; print_r(simplexml_load_string($xml)); echo "</pre>";
+			//echo "<pre>"; print_r(simplexml_load_string($xml)); echo "</pre>";
 		}
 		return $xml;
 	}
@@ -156,33 +176,43 @@
 		$order = new WC_Order($id);
 		//echo "<pre>"; print_r($order); echo "</pre>";
 		$sourceUuid = get_option('woosklad_agent_uuid');
-		$targetUuid = get_option('woosklad_company_uuid');
-		
-		$stateUuid = get_option('woosklad_states_'.$order->get_status().'_uuid');
-		if (!$stateUuid) {
-			update_states_identity();
-			$stateUuid = get_option('woosklad_states_'.$order->get_status().'_uuid');
+		if (!$sourceUuid) {
+			$sourceUuid = get_option('woosklad_save_agent');
+			$sourceUuid = $sourceUuid[0];
 		}
-		
+		$targetUuid = get_option('woosklad_company_uuid');
+		if (!$targetUuid) {
+			$targetUuid = get_option('woosklad_save_company');
+			$targetUuid = $targetUuid[0];
+		}
+		$stateUuid = get_option('woosklad_states_'.$order->get_status().'_uuid');
+
 		$name = get_post_meta($order->id, '_woosklad_order_name', true);
 		if (!$name) $name = "wc".$order->id."_".$index;
-		
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>';
 		$xml .= '<customerOrder vatIncluded="false" ';
-		$xml .= 'applicable="true" payerVat="false" ';  
-		if ($stateUuid) $xml .= 'stateUuid="'.$stateUuid.'" ';		
+		$xml .= 'applicable="true" payerVat="false" ';
+		if ($stateUuid) $xml .= 'stateUuid="'.$stateUuid.'" ';
 		if ($sourceUuid) $xml .= 'sourceAgentUuid="'.$sourceUuid.'" ';
-		else return 0;
+		else {
+			update_option('woosklad_error', current_time('mysql').' При выгрузке заказа произошла ошибка.
+				Проверьте существование организаций и контрагентов в Мой Склад и синхронизируйте информацию.');
+			return 0;
+		}
 		if ($targetUuid) $xml .= 'targetAgentUuid="'.$targetUuid.'" ';
-		else return 0;
-		
+		else {
+			update_option('woosklad_error', current_time('mysql').' При выгрузке заказа произошла ошибка.
+				Проверьте существование контрагентов и организаций в Мой Склад и синхронизируйте информацию.');
+			return 0;
+		}
+
 		if ($storeUuid) $xml .= 'sourceStoreUuid="'.$storeUuid.'" ';
 		if ($name) $xml .= 'name="'.$name.'"';
 		$xml .= '>';
-		
-		if (get_post_meta($order->id, '_woosklad_order_uuid_'.$storeUuid,true)) 
+
+		if (get_post_meta($order->id, '_woosklad_order_uuid_'.$storeUuid,true))
 			$xml .= '<uuid>'.get_post_meta($order->id, '_woosklad_order_uuid_'.$storeUuid,true).'</uuid>';
-		
+
 		$description = create_description_xml($order);
 		if ($description) $xml .= "<description>$description</description>";
 		$items = $order->get_items(); $item_ch = false;
@@ -191,12 +221,13 @@
 			if (!array_key_exists($item_id, $items_id)) $items_id[$item_id]['stock'] = (int)$item['qty'];
 			$item_xml = create_order_position_xml($item, $order->id, $order->get_status(), $storeUuid, $items_id);
 			//echo "<pre>"; print_r(simplexml_load_string($item_xml)); echo "</pre>";
-			
-			if ($item_xml) { $xml .= $item_xml; $item_ch = true;} 
+
+			if ($item_xml) { $xml .= $item_xml; $item_ch = true; }
 		}
 		$xml .= '</customerOrder>';
-		echo "<pre>"; print_r(simplexml_load_string($xml)); echo "</pre>";
-		if ($item_ch) return $xml;
-		return '';
+		//echo "<pre>"; print_r(simplexml_load_string($xml)); echo "</pre>";
+
+		if ($item_ch) return $xml; // WTF?
+		return $xml;
 	}
 ?>

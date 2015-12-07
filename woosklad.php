@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WooSklad
-Plugin URI: 
+Plugin URI:
 Description: This plugin integrates WooCommerce and MoySklad. This plugin can update balances in woocommerce from moysklad and update orders in moysklad from woocommerce.
 Author: Systemo
 Version: 1.0
@@ -12,15 +12,22 @@ require_once('woosklad_moysklad.php');
 require_once('woosklad_mapping.php');
 require_once('woosklad_xml_create.php');
 require_once('woosklad_update.php');
-require_once('woosklad-synchronization.php');
+require_once('woosklad_synchronization.php');
+require_once('woosklad_init.php');
 
+///МЕНЮ///
 add_action('admin_menu', 'woosklad_menu', 12);
-
 function woosklad_menu() {
-	$page = add_menu_page('Настройки интеграции Woocommerce и Мой Склад', 'Мой Склад', 'manage_options', __FILE__, 'woosklad_page'); 
+	$page = add_menu_page('Настройки интеграции Woocommerce и Мой Склад', 'Мой Склад', 'edit_others_posts', 'woosklad_menu', 'woosklad_page');
 	add_action('admin_print_scripts-'.$page, 'woosklad_scripts');
 }
-
+///ДОСТУП///
+add_filter( 'option_page_capability_woosklad_menu', 'my_page_capability' );
+add_filter( 'option_page_capability_woosklad', 'my_page_capability' );
+function my_page_capability( $capability ) {
+	return 'edit_others_posts';
+}
+///СКРИПТЫ///
 function woosklad_scripts() {
 	wp_enqueue_script('bootstrap', plugins_url( '/src/js/bootstrap.js', __FILE__ ), array( 'jquery' ));
 	wp_enqueue_script( 'woosklad-settings', plugins_url( '/src/js/woosklad-settings.js', __FILE__ ), array( 'jquery', 'bootstrap') );
@@ -45,154 +52,53 @@ add_action('wp_ajax_woosklad-update-goods', 'upload_goods');
 add_action('wp_ajax_woosklad-goods-progress', 'goods_progress');
 
 add_action('wp_ajax_woosklad-synchronization', 'start_synchronization');
+add_action('wp_ajax_woosklad-first-sync', 'first_synch');
 add_action('wp_ajax_woosklad-sync-progress','sync_progress');
 
+add_action('wp_ajax_woosklad-reset-opt', 'reset_option');
 
+///НАСТРОЙКИ///
 add_action('admin_init', 'create_options');
-function create_options() {	
+function create_options() {
 	register_setting('woosklad', 'woosklad_login');
 	register_setting('woosklad', 'woosklad_password');
-	
+
 	register_setting('woosklad', 'woosklad_order_time');
 	register_setting('woosklad', 'woosklad_company_uuid');
 	register_setting('woosklad', 'woosklad_agent_uuid');
 	register_setting('woosklad', 'woosklad_stores');
 	register_setting('woosklad', 'woosklad_priority');
-	
+
 	if (!get_option('woosklad_last_order_update')) add_option('woosklad_last_order_update','','','no');
 	if (!get_option('woosklad_updated_order')) add_option('woosklad_updated_order','','','no');
 	if (!get_option('woosklad_total_order')) add_option('woosklad_total_order','','','no');
-	if (!get_option('woosklad_shipment_uuid')) add_option('woosklad_shipment_uuid','','','no');
+	//if (!get_option('woosklad_shipment_uuid')) add_option('woosklad_shipment_uuid','','','no');
 
 	register_setting('woosklad', 'woosklad_stock_time');
-	
+
 	if (!get_option('woosklad_last_stock_update')) add_option('woosklad_last_stock_update','','','no');
 	if (!get_option('woosklad_updated_stock')) add_option('woosklad_updated_stock','','','no');
 	if (!get_option('woosklad_all_stock')) add_option('woosklad_all_stock');
 	if (!get_option('woosklad_total_stock')) add_option('woosklad_total_stock','','','no');
-	
+
 	register_setting('woosklad', 'woosklad_good_time');
-	
+
 	if (!get_option('woosklad_error')) add_option('woosklad_error','','','no');
 }
 
-
-function save_stock($cron = false) {
-	$stores = get_priority_stores(); $all = array();
-	$data = array();
-	foreach ($stores as $key=>$value) {
-		$info = get_stock($result, $value);
-		if ($info == 200) {
-		$all = array_merge($all, json_decode($result)); 
-		//echo "<pre>"; print_r($all); echo "</pre>";
-		$data[] = array('count'=>count($all), 'uuid'=>$value);
-		}
-		else {
-			update_option('woosklad_total_stock', 0);
-			$data = array('result'=>'error', 'message'=>'Остатки не были загружены. Проверьте правильность подключения');
-			if (!$cron) {
-				echo json_encode($data);
-				wp_die();
-			}
-			else exit;
-		}
-	}
-	update_option('woosklad_all_stock', $all);
-	update_option('woosklad_count_on_store', $data);
-	update_option('woosklad_index_store', 0);
-	update_option('woosklad_total_stock', count($all));
-	update_option('woosklad_updated_stock', 0);		$data = array('result'=>'OK');
-	if (!$cron) {
-		echo json_encode($data);
-		wp_die();
-	}
-}
-	
-function download_stock($cron = false) {
-	$start = current_time('mysql');
-	$total = get_option('woosklad_total_stock');
-	update_option('woosklad_start_cons_download', 0);
-	for ($i=0; $i<$total; $i+=75) {
-		update_stock($i);
-	}
-	update_option('woosklad_last_stock_update', $start);
-	update_empty_stock();
-	if (!$cron) { wp_die();}
-}
-			
-function stock_progress() {
-	if ( ! wp_verify_nonce($_POST['security'], 'stock-progress')) {
-		die(json_encode(array('result' => 'error')));
-		}
-		if (get_option('woosklad_error')) {
-			$data = array('result'=>'error', 'message'=>get_option('woosklad_error'));
-			}
-			else {
-				$data = array('result'=>'OK', 'count'=>get_option('woosklad_updated_stock'), 'total'=>get_option('woosklad_total_stock'),'last_update'=>get_option('woosklad_last_stock_update'));
-		}
-	echo json_encode($data);
-	wp_die();
-}
-	
-function start_orders() {
-	update_option('woosklad_total_order', get_orders_count());
-	update_option('woosklad_updated_order',0);
-	echo json_encode(array('result'=>'OK'));
-	wp_die();
-}
-	
-function upload_orders($cron = false) {
-	$start =  current_time('mysql');
-	get_orders(); 
-	update_option('woosklad_last_order_update', $start);
-	if (!$cron) { wp_die();}
-}
-	
-	function order_progress() {
-		if ( ! wp_verify_nonce( $_POST['security'], 'order-progress' ) ) {
-			die(json_encode(array('result' => 'error')));
-			}
-			$data = array('result'=>'OK', 'count'=>get_option('woosklad_updated_order'), 'total'=>get_option('woosklad_total_order'),'last_update'=>get_option('woosklad_last_order_update'));
-			echo json_encode($data);
-	wp_die();
-	}
-	
-	function start_goods() {
-		update_option('woosklad_total_good', get_items_count());
-		update_option('woosklad_updated_good', 0);
-		echo json_encode(array('result'=>'OK'));
-		wp_die();
-	}
-	
-	function upload_goods($cron = false) {
-		$start =  current_time('mysql');
-		get_items(); 
-		update_option('woosklad_last_items_update', $start);
-		if (!$cron) { wp_die();}
-	}
-	
-	function goods_progress() {
-		$data = array('result'=>'OK', 
-		'count'=>get_option('woosklad_updated_good'), 
-		'total'=>get_option('woosklad_total_good'),
-		'last_update'=>get_option('woosklad_last_items_update'));
-		echo json_encode($data);
-		wp_die();
-	}
-	
+///КРОН///
 	add_filter( 'cron_schedules', 'cron_stock_schedules' );
-	add_filter( 'cron_schedules', 'cron_order_schedules' );
-	add_filter( 'cron_schedules', 'cron_good_schedules' );
 	function cron_stock_schedules($schedules) {
 		if (get_option('woosklad_stock_time')) {
 			$schedules['stock'] = array(
-				'interval' =>  get_option('woosklad_old_stock_time'),
+				'interval' => get_option('woosklad_old_stock_time'),
 				'display' => __( 'Загрузка остатков' )
 				);
 		}
 		return $schedules;
 	}
-	
+
+	add_filter( 'cron_schedules', 'cron_order_schedules' );
 	function cron_order_schedules($schedules) {
 		if (get_option('woosklad_order_time')) {
 			$schedules['order'] = array(
@@ -202,7 +108,8 @@ function upload_orders($cron = false) {
 		}
 		return $schedules;
 	}
-			
+
+	add_filter( 'cron_schedules', 'cron_good_schedules' );
 	function cron_good_schedules($schedules) {
 		if (get_option('woosklad_good_time')) {
 			$schedules['good'] = array(
@@ -212,140 +119,172 @@ function upload_orders($cron = false) {
 		}
 		return $schedules;
 	}
-			
-	function woosklad_update_stock() { 
+
+	add_action('woosklad_stock_hook', 'woosklad_update_stock');
+	function woosklad_update_stock() {
 		save_stock(true); download_stock(true);
 	}
-	
-	function woosklad_update_order() { 
+
+	add_action('woosklad_order_hook', 'woosklad_update_order');
+	function woosklad_update_order() {
 		update_option('woosklad_total_order', get_orders_count());
-		update_option('woosklad_updated_order',0);
+		update_option('woosklad_updated_order', 0);
 		upload_orders(true);
 	}
-	
-	function woosklad_update_good() { 
+
+	add_action('woosklad_good_hook', 'woosklad_update_good');
+	function woosklad_update_good() {
 		update_option('woosklad_total_good', get_items_count());
 		update_option('woosklad_updated_good', 0);
 		upload_goods(true);
 	}
-	
-	add_action('woosklad_stock_hook', 'woosklad_update_stock');
-	add_action('woosklad_order_hook', 'woosklad_update_order');
-	add_action('woosklad_good_hook', 'woosklad_update_good');
-	
-	add_action('woosklad_consignment_hook', 'first_synch');
-	function first_synch() {
-		$time = current_time('mysql');
-		save_sklad_list('Warehouse', 'Склады', 'stores');
-		save_sklad_list('Company', 'Контрагенты', 'agents');
-		save_sklad_list('MyCompany', 'Компании', 'company');
-		update_option('woosklad_sync_result', 'Выгрузка статусов');
-		sleep(1);
-		put_states_identity();
-		update_option('woosklad_sync_result', 'Синхронизация атрибутов');
-		put_attribute_identity();
-		
-		update_option('woosklad_sync_result', 'Синхронизация завершена');
-		update_option('woosklad_last_sync_update', $time);
+
+///УДАЛЕНИЕ///
+	add_action( 'before_delete_post', 'save_variation_uuid', 0, 1 );
+	add_action( 'deleted_post', 'delete_variation', 10, 1 );
+	function save_variation_uuid($postid) {
+		$type = get_post_type($postid);
+		if ($type == 'product_variation') {
+			$uuid = get_post_meta($postid, '_woosklad_feature_uuid', true);
+			update_option('woosklad_deleted_type', $uuid);
+		}
 	}
-		
-	function start_synchronization() {
-		update_option('woosklad_sync_result','Загрузка справочников');
-		first_synch();
-		echo json_encode(array('result'=>'OK'));
-		wp_die();
+
+	function delete_variation($postid) {
+		$type = get_post_type($postid);
+		if ($type == 'product_variation') {
+			$uuid = get_option('woosklad_deleted_type');
+			$result = delete_type_uuid('Feature', $uuid);
+			//update_option('woosklad_delete_result', json_decode($result));
+			if ($result) echo "<pre>"; print_r ($result); echo "</pre>";
+		}
+
 	}
-		
-	function sync_progress() {
-		echo json_encode(array('result'=>'OK', 'progress' => get_option('woosklad_sync_result'), 'last_update' => get_option('woosklad_last_sync_update')));
-		wp_die();
-	}
-		
-function woosklad_page() { 
-	$stores = get_option('woosklad_save_stores'); 
-	$agents = get_option('woosklad_save_agents'); 
+///СОХРАНЕНИЕ///
+ add_action('save_post', 'save_to_sklad', 30, 3);
+ function save_to_sklad($post_id, $post)
+ {
+	 if ($post->post_status == 'publish' && $post->post_type == 'product') update_goods(array($post_id));
+	 if ($post->post_type == 'shop_order' && $post->post_type != 'trash' && $post->post_type != 'auto-draft'
+			&& $post->post_type != 'draft' && $post->post_type != 'future' && $post->post_type != 'pending')
+			update_orders(array($post_id));
+ }
+///СТРАНИЦА///
+function woosklad_page() {
+
+	/*if (isset($_REQUEST) && $_REQUEST['settings-updated']) {
+		update_user_meta( get_current_user_id(), '_woosklad_login', get_option('woosklad_login'));
+		update_user_meta( get_current_user_id(), '_woosklad_password', get_option('woosklad_password') );
+	}*/
+	//echo "<pre> Result: "; print_r($_REQUEST); echo "</pre>";
+	$stores = get_option('woosklad_save_stores');
+	$agents = get_option('woosklad_save_agents');
 	$comps = get_option('woosklad_save_company');
 	$prior = get_option('woosklad_priority');
 	$select_store = get_option('woosklad_stores');
-	
+
 	$schedules = wp_get_schedules();
-	if (!get_option('woosklad_stock_time') || get_option('woosklad_stock_time') == 0) {
+
+	// cron синхронизация остатков
+	if (!get_option('woosklad_stock_time') OR null)
+	{
 		$next = wp_next_scheduled('woosklad_stock_hook');
 		if ($next) wp_unschedule_event($next, 'woosklad_stock_hook');
 	}
-	else {
-		$time = get_option('woosklad_stock_time');
-		if ($time<5) update_option('woosklad_stock_time',5);
-		$time = get_option('woosklad_stock_time')*60;
-		if ($schedules['stock']['interval'] != $time) {
+	else
+	{
+		$get_stock_time = get_option('woosklad_stock_time');
+		if ($get_stock_time <= 5) {
+			update_option('woosklad_stock_time', 5);
+			$time = 5*60;
+		} else {
+			$time = get_option('woosklad_stock_time')*60;
+		}
+		//if ($schedules['stock']['interval'] != $time) {
 			update_option('woosklad_old_stock_time',$time);
-			apply_filters( 'cron_schedules', 'cron_stock_schedules' );
+			//apply_filters( 'cron_schedules', 'cron_stock_schedules' );
 			$next = wp_next_scheduled('woosklad_stock_hook');
 			if ($next) wp_unschedule_event($next, 'woosklad_stock_hook');
 			wp_schedule_event(time()+$time, 'stock', 'woosklad_stock_hook');
-		}	
+		//}
 	}
-	if (!get_option('woosklad_order_time')){
-		$next =  wp_next_scheduled('woosklad_order_hook');
+
+	// cron синхронизация заказов
+	if (!get_option('woosklad_order_time') OR null)
+	{
+		$next = wp_next_scheduled('woosklad_order_hook');
 		if ($next) wp_unschedule_event($next, 'woosklad_order_hook');
 	}
-	else {
-		$time = get_option('woosklad_order_time'); 
-		if ($time<5) update_option('woosklad_order_time',5);
-		$time = get_option('woosklad_order_time')*60;
-		if ($schedules['order']['interval'] != $time) {
-			update_option('woosklad_old_order_time',$time);
-			apply_filters( 'cron_schedules', 'cron_order_schedules' );
-			$next =  wp_next_scheduled('woosklad_order_hook');
-			if ($next) wp_unschedule_event($next, 'woosklad_order_hook');
-			wp_schedule_event(time()+$time, 'order', 'woosklad_order_hook');
+	else
+	{
+		$get_order_time = get_option('woosklad_order_time');
+		if ($get_order_time <= 5) {
+			update_option('woosklad_order_time', 5);
+			$time = 5*60;
+		} else {
+			$time = get_option('woosklad_order_time')*60;
 		}
+		//if ($schedules['order']['interval'] != $time) {
+			update_option('woosklad_old_order_time', $time);
+			//apply_filters( 'cron_schedules', 'cron_order_schedules' );
+			$next = wp_next_scheduled('woosklad_order_hook');
+			if ($next) wp_unschedule_event($next, 'woosklad_order_hook');
+			wp_schedule_event( time()+$time, 'order', 'woosklad_order_hook');
+		//}
 	}
-	if (!get_option('woosklad_good_time')){
-		$next =  wp_next_scheduled('woosklad_good_hook');
+
+	// cron синхронизация товаров
+	if (!get_option('woosklad_good_time') OR null)
+	{
+		$next = wp_next_scheduled('woosklad_good_hook');
 		if ($next) wp_unschedule_event($next, 'woosklad_good_hook');
 	}
-	else {
-		$time = get_option('woosklad_good_time'); 
-		if ($time<5) update_option('woosklad_good_time',5);
-		$time = get_option('woosklad_good_time')*60;
-		if ($schedules['good']['interval'] != $time) {
-			update_option('woosklad_old_good_time',$time);
-			apply_filters( 'cron_schedules', 'cron_good_schedules' );
+	else
+	{
+		$get_good_time = get_option('woosklad_good_time');
+		if ($get_good_time <= 5) {
+			update_option('woosklad_good_time', 5);
+			$time = 5*60;
+		} else {
+			$time = get_option('woosklad_good_time')*60;
+		}
+		//if ($schedules['good']['interval'] != $time) {
+			update_option('woosklad_old_good_time', $time);
+			//apply_filters( 'cron_schedules', 'cron_good_schedules' );
 			$next =  wp_next_scheduled('woosklad_good_hook');
 			if ($next) wp_unschedule_event($next, 'woosklad_good_hook');
-			wp_schedule_event(time()+$time, 'good', 'woosklad_good_hook');
-		}
+			wp_schedule_event( time()+$time, 'good', 'woosklad_good_hook');
+		//}
 	}
-	
-	
+
+
 	if (get_option('woosklad_error')) {
 ?>
 		<div id="error_message" class='error'><p><?php echo get_option('woosklad_error'); ?></p></div>
 <?php 	update_option('woosklad_error','');
-	}	
+	}
 	else { ?>
 		<div id="error_message" class='error hidden'></div>
 <?php } ?>
-		<div class="wrap">
+		<div class="wrap"><?php //echo "<pre>"; print_r( _get_cron_array() ); echo "</pre>"; //TODO удалить?>
 			<h2><?php echo get_admin_page_title() ?></h2>
-			<div id="attent"> Важно! Для корректной загрузки остатков и выгрузки заказов необходимо производить 
-				синхронизацию информации при первом подключении к аккаунту "Мой Склад", а также при изменении в "Мой Склад" списка контрагентов, 
-				складов и организаций. Для корректной выгрузки вариаций товара необходимо в "Мой Склад" создать тестовый товар с модификацией, 
+			<div id="attent"> Важно! Для корректной загрузки остатков и выгрузки заказов необходимо производить
+				синхронизацию информации при первом подключении к аккаунту "Мой Склад", а также при изменении в "Мой Склад" списка контрагентов,
+				складов и организаций. Для корректной выгрузки вариаций товара необходимо в "Мой Склад" создать тестовый товар с модификацией,
 				включающей все характеристики (атрибуты) товара, и выполнить синхронизацию.
 				Запустить синхронизацию можно внизу страницы.</div>
 			<form  action="options.php" method="POST">
 				<h3>Авторизация в "Мой Склад"</h3>
 				<?php settings_fields( 'woosklad' ); ?>
-				
+
 				<table class="form-table" id="auth">
 					<tr>
 						<th><label for="woosklad_login">Логин</label></th>
-						<td><input name="woosklad_login" type="text" value="<?php echo get_option( 'woosklad_login' ) ?>" /></td>
+						<td><input name="woosklad_login" type="text" value="<?php echo get_option('woosklad_login') /*get_user_meta( get_current_user_id(), '_woosklad_login',true )*/ ?>" /></td>
 					</tr>
 					<tr>
 						<th><label for="woosklad_password">Пароль</label></th>
-						<td><input name="woosklad_password" type="password" value="<?php echo get_option( 'woosklad_password' ) ?>" /></td>
+						<td><input name="woosklad_password" type="password" value="<?php echo get_option('woosklad_password')/*get_user_meta( get_current_user_id(), '_woosklad_password', true )*/ ?>" /></td>
 					</tr>
 				</table>
 				<table class="form-table" id="settings">
@@ -356,7 +295,7 @@ function woosklad_page() {
 								<tr>
 									<th>
 										<label for="woosklad_stock_time">Интервал загрузки остатков в минутах</label>
-										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 											title="Интервал между автоматическими загрузками данных. Чтобы отменить автозагрузку, оставьте это поле пустым." height="16px" width="16px"/>
 									</th>
 									<td><input name="woosklad_stock_time" type="text" value="<?php echo get_option( 'woosklad_stock_time' )?>" /></td>
@@ -364,7 +303,7 @@ function woosklad_page() {
 								<tr>
 									<th>
 										<label for="woosklad_good_time">Интервал выгрузки товаров в минутах</label>
-										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 											title="Интервал между автоматическими загрузками данных. Чтобы отменить автозагрузку, оставьте это поле пустым." height="16px" width="16px"/>
 									</th>
 									<td><input name="woosklad_good_time" type="text" value="<?php echo get_option( 'woosklad_good_time' )?>" /></td>
@@ -372,7 +311,7 @@ function woosklad_page() {
 								<tr>
 									<th>
 										<label for="woosklad_order_time">Интервал выгрузки заказов в минутах</label>
-										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 											title="Интервал между автоматическими выгрузками данных. Чтобы отменить автовыгрузку, оставьте это поле пустым." height="16px" width="16px"/>
 									</th>
 									<td><input name="woosklad_order_time" type="text" value="<?php echo get_option( 'woosklad_order_time' )?>" /></td>
@@ -380,16 +319,18 @@ function woosklad_page() {
 								<tr>
 									<th>
 										<label for="woosklad_agent_uuid">Контрагент</label>
-										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 											title="Контрагент, подставляемый в заказ покупателя." height="16px" width="16px"/>
 									</th>
-									<td><select name="woosklad_agent_uuid"> 
-<?php 									$agent_uuid = get_option('woosklad_agent_uuid');
-									
-										foreach ($agents as $key=>$value) { 
+									<td><select name="woosklad_agent_uuid">
+<?php
+ 									$agent_uuid = get_option('woosklad_agent_uuid');
+
+										foreach ($agents as $key=>$value) {
 											$selected = $agent_uuid==$key ? 'selected' : '';
 ?>
-											<option value="<?php echo $key?>" <?php echo $selected ?>><?php echo $value?></option>	
+
+											<option value="<?php echo $key?>" <?php echo $selected ?>><?php echo $value?></option>
 <?php 									} ?>
 										</select>
 									</td>
@@ -397,17 +338,17 @@ function woosklad_page() {
 								<tr>
 									<th>
 										<label for="woosklad_company_uuid">Организация</label>
-										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+										<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 										title="Организация, от имени которой будут создаваться заказы." height="16px" width="16px"/>
 									</th>
-									<td><select name="woosklad_company_uuid"> 
+									<td><select name="woosklad_company_uuid">
 <?php 									$company_uuid = get_option('woosklad_company_uuid');
-										
-										foreach ($comps as $key=>$value) { 
+
+										foreach ($comps as $key=>$value) {
 											$selected = $company_uuid==$key ? 'selected' : '';
 ?>
-											<option value="<?php echo $key?>" <?php echo $selected ?>><?php echo $value?></option>	
-<?php 									} 
+											<option value="<?php echo $key?>" <?php echo $selected ?>><?php echo $value?></option>
+<?php 									}
 ?>
 										</select>
 									</td>
@@ -417,13 +358,13 @@ function woosklad_page() {
 						<td></td>
 						<td>
 							<h3>Настройка складов
-								<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip" 
+								<img src="<?php echo plugins_url('/src/img/help.png', __FILE__); ?>" data-toggle="tooltip"
 								title="Выбор складов, с которых будет произведена выгрузка остатков, установка приоритетов." height="16px" width="16px"/>
 							</h3>
 							<table class="form-table" id="stores">
-<?php 
+<?php
 								$i = 0;
-								if ($stores)
+								if ($stores && $stores!=1)
 								foreach ($stores as $key=>$value) {
 									if ($select_store)
 										$checked = in_array($key, $select_store) ? 'checked' : '';
@@ -432,12 +373,11 @@ function woosklad_page() {
 										<td><input type="checkbox" name="woosklad_stores[]" value="<?php echo $key ?>" <?php echo $checked ?>></td>
 										<td><label><?php echo $value?></label></td>
 										<td><input type="text" name="woosklad_priority[]" value="<?php echo $prior[$i] ?>"></td>
-										
 									</tr>
-<?php 
+<?php
 									$i++;
 								}
-?>								
+?>
 							</table>
 						</td>
 					</tr>
@@ -471,11 +411,11 @@ function woosklad_page() {
 							</div>
 						</div>
 						<div class="">Последняя загрузка произошла в <span id="last_time_stock"><?php echo get_option('woosklad_last_stock_update'); ?></span></div>
-						
+
 					</td>
 				</tr>
-				
-			
+
+
 				<tr>
 					<td>
 						<h3>Выгрузка товаров в МойСклад</h3>
@@ -489,7 +429,6 @@ function woosklad_page() {
 							</div>
 						</div>
 						<div class="">Последняя выгрузка произошла в <span id="last_time_good"><?php echo get_option('woosklad_last_items_update'); ?></span></div>
-					
 					</td>
 					<td>
 						<h3>Синхронизация информации</h3>
@@ -504,33 +443,18 @@ function woosklad_page() {
 					</td>
 				</tr>
 			</table>
+			<table class="form-table" id="download">
+				<tr>
+					<td>
+						<h3>Сброс настроек</h3>
+						<p>Сбрасывает настройки плагина и историю синхронизаций</p>
+						<p class="submit">
+							<input type="submit" name="submit" id="reset_option" class="button button-primary" value="Сбросить настройки">
+						</p>
+					</td>
+				</tr>
+			</table>
 		</div>
-<?php 
-//update_goods(array(92));
-//update_orders(array(320));
-
-//get_items();
-//$p = get_priority_stores();
-//echo "<pre>"; print_r($p); echo "</pre>";
-//save_stock();
-//update_variation(array(200),92);
-//update_goods(array(305));
-//get_variation();
-//put_attribute_identity();
-//wc_ms_attribute_identity();
-//upload_orders();
-//$result = put_update_type('CustomerOrder', $order);
-//update_states_identity();
-//download_stock();
-//update_stock(0);
-//
-//consignment_uuid();
-//get_consignment_uuid(0);
-//get_goods_uuid();
-//update_consignments();
-//update_consignment_uuid();
-//update_option('woosklad_good_uuids', "Consignment");
-//get_moysklad_information("Consignment", "list", 0,5);
-//get_orders();
+<?php
 }
 ?>

@@ -2,6 +2,8 @@
 	function get_moysklad_information($type, $uuid = 'list', $start=0, $count=1000) {
 		$type .= "/".$uuid;
 		
+		/*$login = get_user_meta( get_current_user_id(), '_woosklad_login',true );
+		$password = get_user_meta( get_current_user_id(), '_woosklad_password', true );*/
 		$login = get_option('woosklad_login');
 		$password = get_option('woosklad_password');
 		
@@ -20,11 +22,13 @@
 		if ($info['http_code'] == 200) {
 			return simplexml_load_string($result);
 		}
-		else echo "<pre>"; print_r($result); echo "</pre>";
+		//else echo "<pre>"; print_r($result); echo "</pre>";
 		return 0;
 	}
 	
 	function get_stock(&$result, $uuid='') {
+		/*$login = get_user_meta( get_current_user_id(), '_woosklad_login',true );
+		$pass = get_user_meta( get_current_user_id(), '_woosklad_password', true );*/
 		$login = get_option('woosklad_login');
 		$pass = get_option('woosklad_password');
 		
@@ -41,15 +45,18 @@
 		
 		$result = curl_exec($ch);
 		$info = curl_getinfo ($ch);
+		//echo "<pre> Result: "; print_r($info); echo "</pre>";
 		curl_close($ch);
 		
 		return $info['http_code'];
 	}
 	
 	function put_update_type($type, $xml) {
+		/*$login = get_user_meta( get_current_user_id(), '_woosklad_login',true );
+		$pass = get_user_meta( get_current_user_id(), '_woosklad_password', true );*/
 		$login = get_option('woosklad_login');
 		$pass = get_option('woosklad_password');
-
+		
 		$sock = fsockopen("ssl://online.moysklad.ru", 443, $errno, $errstr, 30);
  
 		if (!$sock) die("$errstr ($errno)\n");
@@ -69,7 +76,7 @@
  
 		while (!feof($sock))
 			$body.= fgets($sock, 4096);
- 
+		//echo "<pre> Result: "; print_r($sock); echo "</pre>";
 		fclose($sock);
 		sleep(1);
 		if ($body)
@@ -78,9 +85,10 @@
 	}
 	
 	function delete_type_uuid($type, $uuid) {
+		/*$login = get_user_meta( get_current_user_id(), '_woosklad_login',true );
+		$pass = get_user_meta( get_current_user_id(), '_woosklad_password', true );*/
 		$login = get_option('woosklad_login');
 		$pass = get_option('woosklad_password');
-
 		$sock = fsockopen("ssl://online.moysklad.ru", 443, $errno, $errstr, 30);
  
 		if (!$sock) die("$errstr ($errno)\n");
@@ -103,7 +111,7 @@
  
 		fclose($sock);
 		sleep(1);
-		update_option('woosklad_result_body', simplexml_load_string($body));
+		//update_option('woosklad_result_body', simplexml_load_string($body));
 		if ($body)
 			return simplexml_load_string($body);
 		return 0;

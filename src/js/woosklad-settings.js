@@ -1,6 +1,10 @@
 (function($){
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
+	$('#reset_option').click(function () {
+		$.post(ajaxurl, {action: "woosklad-reset-opt" });
+		setTimeout(function() {window.location.reload();}, 1000);
+	});
 	$('#update_stock').click(function (e) {
 		e.preventDefault();
 		$('#progress-stock').parent().removeClass('hidden');
@@ -24,11 +28,12 @@ $(document).ready(function() {
 					
 				}
 				if (response.result == 'error') {
-					$('#progress-stock').text = response.message;
+					$('#progress-stock').text('Ошибка');
 					$('#progress-stock').addClass('progress-bar-danger');
 					$('#progress-stock').removeClass('progress-bar-striped');
 					$('#progress-stock').removeClass('active');
 					$('#progress-stock').width('100%');
+					alert(response.message);
 				}
             },
             'json'
@@ -38,7 +43,7 @@ $(document).ready(function() {
 	$('#update_orders').click(function (e) {
 		e.preventDefault();
 		$('#progress-order').parent().removeClass('hidden');
-		
+		$('#progress-order').addClass('active');
 		$.post(ajaxurl,
             {
                 action: "woosklad-start-orders"
@@ -59,7 +64,7 @@ $(document).ready(function() {
 	$('#update_goods').click(function (e) {
 		e.preventDefault();
 		$('#progress-good').parent().removeClass('hidden');
-		
+		$('#progress-good').addClass('active');
 		$.post(ajaxurl,
             {
                 action: "woosklad-start-goods"
@@ -80,13 +85,18 @@ $(document).ready(function() {
 	$('#sync_info').click(function (e) {
 		e.preventDefault();
 		$('#progress-sync').parent().removeClass('hidden');
+		$('#progress-sync').addClass('active');
 		$.post(ajaxurl,
             {
                 action: "woosklad-synchronization"
-            },
-            function(response){
+            }, function(response){
 				if (response.result == 'OK') {
 					sync_progress();
+					$.post(ajaxurl,
+						{
+							action: "woosklad-first-sync"
+						}
+					);
 				}
             },
             'json'
@@ -160,9 +170,13 @@ function order_progress(){
 				}
 				
 			}
-			if (response.error == 'error') {
-				$('#error_message').text = response.message;
-				$('#error_message').removeClass('hidden');
+			if (response.result == 'error') {
+				$('#progress-order').text('Ошибка');
+				$('#progress-order').addClass('progress-bar-danger');
+				$('#progress-order').removeClass('progress-bar-striped');
+				$('#progress-order').removeClass('active');
+				$('#progress-order').width('100%');
+				alert(response.message);
 			}
 		},
 		'json'
@@ -200,9 +214,13 @@ function good_progress(){
 				}
 				
 			}
-			if (response.error == 'error') {
-				$('#error_message').text = response.message;
-				$('#error_message').removeClass('hidden');
+			if (response.result == 'error') {
+				$('#progress-good').text('Ошибка');
+				$('#progress-good').addClass('progress-bar-danger');
+				$('#progress-good').removeClass('progress-bar-striped');
+				$('#progress-good').removeClass('active');
+				$('#progress-good').width('100%');
+				alert(response.message);
 			}
 		},
 		'json'
@@ -212,8 +230,7 @@ function good_progress(){
 function sync_progress() {
 	$.post(ajaxurl,
 		{
-			action: "woosklad-sync-progress",
-			security: woosklad.order_progress
+			action: "woosklad-sync-progress"
 		},
 		function(response){
 			console.log(response);
@@ -222,6 +239,14 @@ function sync_progress() {
 				$('#last_time_sync').text(response.last_update);
 				if (response.progress != 'Синхронизация завершена') setTimeout(sync_progress, 300);
 				else $('#progress-sync').removeClass('active');
+			}
+			if (response.result == 'error') {
+				$('#progress-sync').text('Ошибка');
+				$('#progress-sync').addClass('progress-bar-danger');
+				$('#progress-sync').removeClass('progress-bar-striped');
+				$('#progress-sync').removeClass('active');
+				$('#progress-sync').width('100%');
+				alert(response.message);
 			}
 		},
 		'json'
