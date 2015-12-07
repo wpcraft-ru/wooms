@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="46e0e2ba-ff5a-4488-b2c8-587adec400e4" name="Tactical Rock" url="http://p332832.ftp.ihc.ru">
+        <fileTransfer host="p332832.ftp.ihc.ru" port="21" password="dfebdff9dfcedfccdfcddfc2df9bdf98df99df9e" username="p332832_test">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
