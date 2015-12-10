@@ -10,18 +10,15 @@ class MSSProductsImport
 {
   function __construct()
   {
-    add_action('add_section_mss_tool', array($this, 'add_section_mss_tool_callback'));
     add_action('add_section_mss_tool', array($this, 'test'));
+    add_action('add_section_mss_tool', array($this, 'add_section_mss_tool_callback'));
 
     add_action('wp_ajax_mss_product_import', array($this,'mss_product_import_ajax_callback'));
     add_action('wp_ajax_nopriv_mss_product_import', array($this,'mss_product_import_ajax_callback'));
   }
 
   function test(){
-
-
     ?>
-      <hr>
       <hr>
     <?php
   }
@@ -65,6 +62,10 @@ class MSSProductsImport
       $productCode = (string)$good['productCode']; //артикул продукта
       $salePrice = (string)$good['salePrice']; //цена продукта
       $updated = (string)$good['updated']; //дата обновления
+      $parentUuid = (string)$good['parentUuid']; //дата обновления
+
+      //$groupUuid = (string)$good->groupUuid; //идентификатор группы
+
 
       //описание продукта $description
       if(isset($good['description'])){
@@ -119,6 +120,18 @@ class MSSProductsImport
         update_post_meta($post_id, 'mss_code', $code);
         update_post_meta($post_id, '_regular_price', $salePrice);
 
+        //если есть uuid группы, то присваиваем категорию продуктов
+        if(isset($parentUuid)){
+
+          //set_transient('test', "5 " . $parentUuid, 777);
+          $term_id = get_term_id_by_uuid_mss($parentUuid);
+
+          //Если соответствующую рубрику нашли, то присваиваем продукту категорию
+          if(isset($term_id)){
+            wp_set_post_terms( $post_id, $term_id, 'product_cat', false );
+          }
+
+        }
       }
 
       $i++;
@@ -156,12 +169,12 @@ class MSSProductsImport
     ?>
     <section id="mss-product-import-wrapper">
       <header>
-        <hr>
         <h2>Импорт товаров из МойСклад на сайт</h2>
       </header>
       <div class="instruction">
         <p>Обработка импортирует товары из МойСклад в WooCommerce</p>
         <p>Обязательно условие - наличие уникального артикула. Если его нет, то импорт не происходит.</p>
+        <p>Все новые товары сохраняются как черновики. Их публикация должна быть выполнена вручную</p>
 
       </div>
       <button id="mss-product-import" class="button button-small">Запустить импорт</button>
