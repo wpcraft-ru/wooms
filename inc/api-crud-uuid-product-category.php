@@ -8,35 +8,26 @@ UUID это идентификатор группы в МойСклад, кот�
 
 //добавляем uuid МС для категории продуктов WC
 function update_uuid_product_category_mss($term_id, $uuid){
-  $data = get_option('uuid_product_category_mss');
-  if($data) {
-    $data[$term_id] = $uuid;
-  } else {
-    $data = array();
-    $data[$term_id] = $uuid;
-  }
-  update_option( 'uuid_product_category_mss', $data, false );
+
+  update_term_meta( $term_id, 'uuid_product_category_mss', $uuid );
+
 
 }
 
 //удаляем uuid МС для категории продуктов WC
 function delete_uuid_product_category_mss($term_id){
-  $data = get_option('uuid_product_category_mss');
-  if($data)
-    unset($data[$term_id]);
 
-  update_option( 'uuid_product_category_mss', $data, false );
+  delete_term_meta( $term_id, 'uuid_product_category_mss' );
 
 }
 
 //получает uuid МС для категории продуктов WC
 //Возвращает значение uuid для term_id
 function get_uuid_product_category_mss($term_id){
-  $data = get_option('uuid_product_category_mss');
-  if($data[$term_id])
-    return $data[$term_id];
 
-  return false;
+  $data = get_term_meta( $term_id, 'uuid_product_category_mss', true );
+
+  return $data;
 }
 
 
@@ -44,12 +35,11 @@ function get_uuid_product_category_mss($term_id){
 //Возвращает значение term_id для uuid
 // $term_id = get_term_id_by_uuid_mss($uuid);
 function get_term_id_by_uuid_mss($uuid){
-  $data = get_option('uuid_product_category_mss');
-  $key = array_search ($uuid, $data); //находи ключ содержаний term_id по значению uuid
-  if($key)
-    return $key;
+  global $wpdb;
+  $data =  $wpdb->get_results("SELECT term_id FROM $wpdb->termmeta WHERE meta_value = '" . $uuid . "' LIMIT 1");
+  $data = $data[0]->term_id;
 
-  return false;
+  return $data;
 }
 
 

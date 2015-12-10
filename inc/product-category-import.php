@@ -117,8 +117,15 @@ class MSSProductsCatImport
     ?>
     <section id="mss-product-cat-import">
       <header>
+        <hr>
         <h2>Импорт категорий товаров из МойСклад на сайт</h2>
       </header>
+      <div class="instruction">
+        <p>Эта обработка импортирует группы МойСклад в категории продуктов WooCommerce.</p>
+        <p>Если нет то создает новую категорию продуктов.</p>
+        <p>Записывает в мету термина uuid_product_category_mss идентификатор из группы МойСклад (uuid).</p>
+        <p>Пытается связать группу по имени и если находит то связывает их через запись uuid.</p>
+      </div>
       <button class="button button-small">Импортировать</button>
 
       <div class="status-wrapper hide-if-js">

@@ -18,6 +18,8 @@ class MSSProductsImport
   }
 
   function test(){
+
+
     ?>
       <hr>
       <hr>
@@ -77,7 +79,7 @@ class MSSProductsImport
       //
       //Условия обработки
       //
-      
+
       if(empty($productCode)) continue; //Если у товара нет артикула то пропуск обработки
 
 
@@ -154,8 +156,14 @@ class MSSProductsImport
     ?>
     <section id="mss-product-import-wrapper">
       <header>
+        <hr>
         <h2>Импорт товаров из МойСклад на сайт</h2>
       </header>
+      <div class="instruction">
+        <p>Обработка импортирует товары из МойСклад в WooCommerce</p>
+        <p>Обязательно условие - наличие уникального артикула. Если его нет, то импорт не происходит.</p>
+
+      </div>
       <button id="mss-product-import" class="button button-small">Запустить импорт</button>
       <br>
       <div class="status-wrapper hide-if-js">
