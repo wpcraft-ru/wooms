@@ -2,10 +2,11 @@
 
 
 
-
+  
 /**
  * Экспорт продуктов из сайта в МойСклад
  */
+
 class MSSProductsImport
 {
   function __construct()
@@ -23,7 +24,7 @@ class MSSProductsImport
     <?php
   }
 
-
+    
   //Запуск обработки экспорта товаров
   function mss_product_import_ajax_callback(){
 
@@ -37,7 +38,7 @@ class MSSProductsImport
     $login = get_option('mss_login_s');
     $pass = get_option('mss_pass_s');
 
-
+      
     $url = 'https://online.moysklad.ru/exchange/rest/ms/xml/Good/list?start=' . $start . '&count=' . $count;
     $args = array(
         'headers' => array(
@@ -45,7 +46,7 @@ class MSSProductsImport
         )
     );
 
-
+    
     //Запрос и получение XML-ответа
     $data_remote = wp_remote_get( $url, $args );
     $body = wp_remote_retrieve_body($data_remote);
@@ -75,7 +76,7 @@ class MSSProductsImport
       }
 
       $code = (string)$good->code; //код продукта в МойСклад
-      $data[] = $code;
+      
 
       //
       //Условия обработки
@@ -106,12 +107,12 @@ class MSSProductsImport
           'post_status'   => 'draft',
           "post_type" => 'product',
         );
-
+        
         // Вставляем запись в базу данных
         $post_id = wp_insert_post( $post_data );
         // Присваиваем артикул
         update_post_meta($post_id, '_sku', $productCode);
-
+        
       }
 
       //Если есть ИД поста, то выполнить доп обработки
@@ -119,7 +120,8 @@ class MSSProductsImport
         update_post_meta($post_id, 'mss_updated', $updated);
         update_post_meta($post_id, 'mss_code', $code);
         update_post_meta($post_id, '_regular_price', $salePrice);
-
+        update_post_meta($post_id, '_price', $salePrice); //Присвоили значение  для вывода цены в списке всех продуктов
+        
         //если есть uuid группы, то присваиваем категорию продуктов
         if(isset($parentUuid)){
 
@@ -129,6 +131,7 @@ class MSSProductsImport
           //Если соответствующую рубрику нашли, то присваиваем продукту категорию
           if(isset($term_id)){
             wp_set_post_terms( $post_id, $term_id, 'product_cat', false );
+
           }
 
         }
@@ -136,7 +139,13 @@ class MSSProductsImport
 
       $i++;
 
-    } //цикл обработки данных
+    } 
+      
+    
+     
+    
+        
+    //цикл обработки данных
 
     //берем значение счетчика импорта продуктов.
     //Если есть то прибавляем число текущих итераций
@@ -157,7 +166,7 @@ class MSSProductsImport
       set_transient('mss_product_import_result', "работа закончилась", 777);
 
     }
-    set_transient('test', "адрес последнего запроса = " . $url, 777);
+    set_transient('test', " ПРИВЕТ = " . $url, 777);
 
     wp_send_json_success(current_time('mysql'));
 

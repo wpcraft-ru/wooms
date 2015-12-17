@@ -143,8 +143,8 @@ class MSSProductsCatImport
               $('#mss-product-cat-import .status-wrapper').show();
 
               var data = {
-          			action: 'mss_product_cat_import',
-          		};
+                action: 'mss_product_cat_import',
+              };
               $.getJSON(ajaxurl, data, function(response){
                 //по результату запроса подменяем текст в статусе на сонове вернувшихся данных
                 $('#mss-product-cat-import .first-result').text('успех = ' + response.success + ' (' + response.data + ')');
