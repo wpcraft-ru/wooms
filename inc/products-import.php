@@ -58,7 +58,7 @@ class MSSProductsImport
       //Получаем данные для работы с продуктом
       $name = (string)$good['name']; //имя продукта
       $productCode = (string)$good['productCode']; //артикул продукта
-      $salePrice = (string)$good['salePrice']; //цена продукта
+      $salePrice = (string)$good['salePrice']/100; //цена продукта
       $updated = (string)$good['updated']; //дата обновления
       $parentUuid = (string)$good['parentUuid']; //дата обновления
 
@@ -102,7 +102,7 @@ class MSSProductsImport
         $post_data = array(
           'post_title'    => wp_strip_all_tags( $name ),
           'post_content'  => $description,
-          'post_status'   => 'draft',
+          'post_status'   => 'publish',
           "post_type" => 'product',
         );
 
@@ -182,7 +182,7 @@ class MSSProductsImport
       <div class="instruction">
         <p>Обработка импортирует товары из МойСклад в WooCommerce</p>
         <p>Обязательно условие - наличие уникального артикула. Если его нет, то импорт не происходит.</p>
-        <p>Все новые товары сохраняются как черновики. Их публикация должна быть выполнена вручную</p>
+        <!-- <p>Все новые товары сохраняются как черновики. Их публикация должна быть выполнена вручную</p> -->
 
       </div>
       <button id="mss-product-import" class="button button-small">Запустить импорт</button>
