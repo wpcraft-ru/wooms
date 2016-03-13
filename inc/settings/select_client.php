@@ -21,7 +21,7 @@ class MSSClientSelect
       */
       add_settings_section(
         $id = 'mss_client_section_s',
-        $title = 'Клиент',
+        $title = 'Клиент для заказа',
         $callback = array($this, 'section_callback'),
         $page = 'mss_menu_settings'
       );
@@ -31,6 +31,7 @@ class MSSClientSelect
     ?>
       <p>Настройка параметров клиента.<br>
         Нужно ввести uuid клиента который будет подставляться в заказ из справочника МойСклад</p>
+        <p>Нужно открыть карточку соответствующего клиента и взять параметр id из ссылки. <br/>Например online.moysklad.ru/app/#Company/view?id=754e2f4e-0537-11e5-90a2-8ecb001c4383, uuid будет 754e2f4e-0537-11e5-90a2-8ecb001c4383</p>
     <?php
   }
 
@@ -40,7 +41,8 @@ class MSSClientSelect
 
     register_setting(
       $settings_fields_key = 'mss_options',
-      $name = 'mss_client' );
+      $name = 'mss_client'
+    );
 
     add_settings_field(
       $id = 'mss_client_field_s',
@@ -56,10 +58,11 @@ class MSSClientSelect
     $setting_name = 'mss_client';
   	$setting_value = get_option( $setting_name );
 
-
+    //echo '234' . $setting_value;
     ?>
-      <div class="mss_client_wrapper">
-        <input id="<?php echo $setting_name; ?>" type="text" name="<?php echo $setting_name ?>" value="<?php echo $setting_value ?>">
+
+      <div class="<?php echo $setting_name ?>_wrapper">
+        <input type="text" name="<?php echo $setting_name ?>" value="<?php echo $setting_value ?>">
 
       </div>
     <?php

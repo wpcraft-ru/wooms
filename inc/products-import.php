@@ -8,18 +8,13 @@ class MSSProductsImport
 {
   function __construct()
   {
-    add_action('add_section_mss_tool', array($this, 'test'));
     add_action('add_section_mss_tool', array($this, 'add_section_mss_tool_callback'));
 
     add_action('wp_ajax_mss_product_import', array($this,'mss_product_import_ajax_callback'));
     add_action('wp_ajax_nopriv_mss_product_import', array($this,'mss_product_import_ajax_callback'));
   }
 
-  function test(){
-    ?>
-      <hr>
-    <?php
-  }
+
 
 
   //Запуск обработки экспорта товаров
@@ -134,6 +129,9 @@ class MSSProductsImport
           }
 
         }
+
+        wp_update_post( array('ID'  => $post_id )); //обновление поста
+        update_post_meta($post_id, '_visibility', 'visible'); //Указываем видимость продукта
       }
 
       $i++;

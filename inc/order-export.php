@@ -10,18 +10,13 @@ class MSSOrderExport {
 
   function __construct()
   {
-    add_action('add_section_mss_tool', array($this, 'test'));
     add_action('add_section_mss_tool', array($this, 'add_section_mss_tool_callback'));
 
     add_action('wp_ajax_' . $this->ajax_tag, array($this,'ajax_callback'));
     add_action('wp_ajax_nopriv_' . $this->ajax_tag, array($this,'ajax_callback'));
   }
 
-  function test(){
-    ?>
-      <hr>
-    <?php
-  }
+
 
 
   //Запуск обработки через AJAX
@@ -97,7 +92,7 @@ class MSSOrderExport {
 
 
   /*
-  * Генерация XML для заказа
+  * Генерация XML для передачи заказа в МойСклад
   * return xml
   */
   function mss_create_xml_order($id){
@@ -112,8 +107,9 @@ class MSSOrderExport {
     $targetAgentUuid = get_option('mss_my_company'); //идентификатор организации
     $uuid = get_post_meta($id, 'uuid', true); //получаем uuid если он есть
 
-    $moment = "2011-06-27T06:27:00+04:00";
-    $name = "0001";
+    //$moment = "2011-06-27T06:27:00+04:00";
+    $moment = date("Y-m-d\TH:i:s+04:00", strtotime($order->order_date));
+    $name = "WP-".$id;
 
     $description_data = '';
     $description_data .= 'Дата заказа: ' . $order->order_date;
@@ -163,8 +159,8 @@ class MSSOrderExport {
         $vat = "18";
         $quantity = $item['qty']; //"4.0";quantity
 
-        $sumInCurrency = $product->price;
-        $sum = $product->price;
+        $sumInCurrency = $product->price*100;
+        $sum = $product->price*100;
 
         set_transient('test', '3:'.print_r($item, true), 777);
 

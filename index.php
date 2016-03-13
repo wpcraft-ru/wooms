@@ -18,6 +18,7 @@ require_once('inc/xml-sync.php');
 require_once('inc/api-crud-uuid-product-category.php');
 require_once('inc/product-category-import.php');
 require_once('inc/products-import.php');
+require_once('inc/products-images-import.php');
 require_once('inc/variation-import.php');
 require_once('inc/order-export.php');
 require_once('inc/products-delete-all.php');

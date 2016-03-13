@@ -49,8 +49,9 @@ class SettingsMoySkladS {
   function mss_menu_settings_callback() {
      ?>
      <div class="wrap">
+         <?php screen_icon(); ?>
          <h1>Настройки МойСклад</h1>
-         <p>Инструменты <a href='<?php echo admin_url("tools.php?page=mss-tools");  ?>'>тут</a></p>
+         <p>Инструменты для синхронизации <a href='<?php echo admin_url("tools.php?page=mss-tools");  ?>'>тут</a></p>
          <form action="options.php" method="POST">
              <?php settings_fields( $option_group = 'mss_options' ); ?>
              <?php do_settings_sections( $page = 'mss_menu_settings' ); ?>
