@@ -22,10 +22,10 @@ class MSSProductsImportImages
     //Запуск обработки
     function ajax_callback(){
 
-      set_transient( 'mss_product_images_import_start', current_time('mysql'), 60); //ставим отметку на 60 секунд по запуску обновления данных
+      set_transient( 'mss_product_images_import_start', current_time('mysql'), 600); //ставим отметку на 60 секунд по запуску обновления данных
 
       $start = 0; //ставим позицию старта забора данных по умолчанию
-      $count = 50; //ставим число одновременно запрашиваемых данных для забора
+      $count = 10; //ставим число одновременно запрашиваемых данных для забора
       if(isset($_REQUEST['start'])) $start = $_REQUEST['start']; //если в запросе передали параметр старта позиций, то присваиваем его в $start
 
       //Подготовка данных для запроса
@@ -35,75 +35,134 @@ class MSSProductsImportImages
 
 
       //$url = 'https://online.moysklad.ru/exchange/rest/ms/xml/Good/list?start=' .  . '&count=' . ;
-      $url = 'https://online.moysklad.ru/api/remap/1.0/entity/product?limit=' . $count . '&offset=' . $start;
+      //$url = 'https://online.moysklad.ru/api/remap/1.0/entity/product?limit=' . $count . '&offset=' . $start;
+
+      //получаем путь типа https://online.moysklad.ru/exchange/rest/ms/xml/Good/list?fileContent=true&start=0&count=10
+      $url = 'https://online.moysklad.ru/exchange/rest/ms/xml/Good/list?fileContent=true&start=' . $start . '&count=' . $count;
+
       $args = array(
           'headers' => array(
               'Authorization' => 'Basic ' . base64_encode( $login . ':' . $pass )
           )
       );
 
-      //set_transient( 'test', $url, 600); //ставим отметку на 60 секунд по запуску обновления данных
 
 
       //Запрос, получение и обработка ответа
       $data_remote = wp_remote_get( $url, $args );
       $body = wp_remote_retrieve_body($data_remote);
-      $json  = json_decode($body);
+      $xml  = new SimpleXMLElement($body);
 
 
       $data = array();
-      $i = 0;
+      $i = 0; //счетички итераций
+      $ir = 0; //счетчик результативных итераций
 
-      foreach($json->rows as $good) {
-
-          $post_isset = get_posts(array(
-            'post_type' => 'product',
-            'numberposts' => 1,
-            'post_status' => 'any',
-            'meta_key' => 'uuid',
-            'meta_value' => '51a3fc72-1f2e-11e5-90a2-8ecb001fb6f0'//$good->id
-          ));
-
-          if(isset($post_isset[0]->ID))
-            set_transient( 'test', '7-' . print_r($post_isset[0]->ID, true), 600); //ставим отметку на 60 секунд по запуску обновления данных
-
-
-
-          //Картинка
-          $img_url = $good->image->meta->href;
-
-
-
-
-          if(isset($img_url1)){
-
-            $tmp = media_sideload_image( $img_url );
-
-            if( is_wp_error( $tmp ) )
-            	wp_send_json_success($tmp->get_error_messages());
-            else
-            	echo $tmp; // выведет: /tmp/wp-header-logo.tmp
-
-            /* делаем что-либо с файлом ... */
-
-            // удаляем временный файл
-            @unlink( $tmp );
-          }
-
-
-
-          //set_transient( 'test', '5-' . print_r($img_url, true), 600); //ставим отметку на 60 секунд по запуску обновления данных
-
-
+      foreach($xml->good as $good) {
         $i++;
+
+        $uuid = (string)$good->uuid; //uuid продукта в МойСклад
+        $img_uuid = (string)$good->images->image[0]->uuid; //получаем uuid первой картинки
+
+        //запрос постов с нужным uuid
+        $post_current_src = get_posts(array(
+          'post_type' => 'product',
+          'numberposts' => 1,
+          'post_status' => 'any',
+          'meta_key' => 'uuid',
+          'meta_value' => $uuid
+        ));
+
+        //Если пост нашли с нужным uuid то определяем id поста $post_current_id, иначе пропуск
+        if(isset($post_current_src)) {
+            $post_current_id = $post_current_src[0]->ID;
+        } else {
+          continue;
+        }
+
+        //запрос медиа с нужным uuid
+        $media_current_src = get_posts(array(
+          'post_type' => 'attachment',
+          'numberposts' => 1,
+          'post_status' => 'any',
+          'meta_key' => 'uuid',
+          'meta_value' => $img_uuid
+        ));
+
+        //Если нашли медиа с нужным uuid то пропуск, тк не нужно загружать еще раз один и тот же файл
+        if(isset($media_current_src[0])) {
+          continue;
+        }
+
+        //получаем файл, сохраняем в библиотеку и привязываем к продукту
+
+        $img_filename = (string)$good->images->image[0]['filename']; //артикул продукта
+        $img_name = (string)$good->images->image[0]['name']; //артикул продукта
+        $img_base64 = (string)$good->images->image[0]->contents; //получаем код первой картинки
+
+        $upload_dir = wp_upload_dir();
+        $upload_path = str_replace( '/', DIRECTORY_SEPARATOR, $upload_dir['path'] ) . DIRECTORY_SEPARATOR;
+
+        $decoded = base64_decode( $img_base64 );
+        $filename = $img_filename;
+
+        //получаем уникальное имя файла с учетом времени
+        $hashed_filename  = md5( $filename . microtime() ) . '_' . $filename;
+
+        //сохраняем файл из строки в папку
+        $image_upload = file_put_contents( $upload_path . $hashed_filename, $decoded );
+
+        //определяем mime тип по имени файла
+        $filetype = wp_check_filetype( $img_filename );
+
+        // @new
+        $file             = array();
+        $file['error']    = '';
+        $file['tmp_name'] = $upload_path . $hashed_filename;
+        $file['name']     = $hashed_filename;
+        $file['type']     = $filetype['type'];
+        $file['size']     = filesize( $upload_path . $hashed_filename );
+
+        // upload file to server
+        // @new use $file instead of $image_upload
+        //$file_return      = wp_handle_sideload( $file, array( 'test_form' => false ) );
+        $img_id = media_handle_sideload( $file, $post_current_id, $desc = $img_name, $post_data = array() );
+        if(empty($img_id)) wp_send_json_success('ошибка сохранения картинки'); //если картинка не сохранилась, то продолжить
+
+        //добавляем uuid картинки, чтобы проверять ее наличие в будущих синхронизациях
+        update_post_meta( $post_id = $img_id, $meta_key = 'uuid', $meta_value = $img_uuid );
+
+        //устанавливаем картинку как миниатюра для продукта
+        set_post_thumbnail( $post_current_id, $img_id );
+
+        $ir++;
 
       }
 
+      //set_transient( 'test', '1-' . print_r($i, true), 600); //ставим отметку на 60 секунд по запуску обновления данных
+      set_transient( 'test', print_r($url, true), 600); //ставим отметку на 60 секунд по запуску обновления данных
 
 
+      $ir_count = get_transient('mss_count_ir');
+      if(isset($ir_count)) {
+        set_transient('mss_count_i', $ir_count + $ir, 1111);
+      } else {
+        set_transient('mss_count_i', $ir, 1111);
+      }
 
+      //Если данные еще есть, то запускаем новую итерацию
+      if($i >0) {
+        $start = $start + $count;
+        $url = admin_url('admin-ajax.php?action=mss_product_images_import&start=' . $start);
+        $url_result = wp_remote_get($url);
+      } else {
+        set_transient('mss_result_msg', "работа закончилась", 777);
 
-      wp_send_json_success(current_time('mysql'));
+      }
+
+      $data_success = current_time('mysql');
+      //$data_success = print_r($img_id, true);
+      wp_send_json_success($data_success);
 
     }
 
@@ -130,9 +189,8 @@ class MSSProductsImportImages
           <strong>Статус работы:</strong>
           <ul>
             <li>Результат первой итерации: <span class="mss_first_result">отсутствует</span></li>
-            <li>Старт работы: <span class="mss_start_result">ждем данные</span></li>
-            <li>Число итераций за последнюю минуту: <span class="mss_countr_result">ждем данные</span></li>
-            <li>Число успешных итераций: <span class="mss_count_result">ждем данные</span></li>
+            <li>Старт работы: <span class="mss_product_images_import_start">ждем данные</span></li>
+            <li>Число успешных итераций: <span class="mss_count_i">ждем данные</span></li>
             <li>Результат: <span class="mss_result_msg">ждем данные</span></li>
 
 
@@ -204,10 +262,10 @@ class HAPI_MSSProductsImportImages {
       }
 
       $data['test'] = get_transient( 'test' );
+      $data['mss_count_i'] = get_transient( 'mss_count_i');
 
-      $data['count_product_import'] = get_transient( 'count_product_import');
-      $data['mss_new_product_count'] = get_transient( 'mss_new_product_count');
-      $data['mss_product_import_result'] = get_transient( 'mss_product_import_result');
+      $data['mss_product_images_import_start'] = get_transient( 'mss_product_images_import_start');
+      $data['mss_result_msg'] = get_transient( 'mss_result_msg');
 
       return $data;
     }
@@ -239,9 +297,10 @@ class HAPI_MSSProductsImportImages {
 
                   //Добавляем тестовое сообщение. Используется для отладки
                   $('#mss_product_import_images_wrapper .mss_test_msg').text(data['test']);
-                  $('#mss_product_import_images_wrapper .mss_first_result').text(data['count_product_import']);
-                  $('#mss_product_import_images_wrapper .mss_new_product_count-result').text(data['mss_new_product_count']);
-                  $('#mss_product_import_images_wrapper .mss_product_import_result-result').text(data['mss_product_import_result']);
+                  $('#mss_product_import_images_wrapper .mss_product_images_import_start').text(data['mss_product_images_import_start']);
+                  $('#mss_product_import_images_wrapper .mss_result_msg').text(data['mss_result_msg']);
+                  $('#mss_product_import_images_wrapper .mss_count_i').text(data['mss_count_i']);
+
 
                   return;
                 });
