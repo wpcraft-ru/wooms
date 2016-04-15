@@ -1,5 +1,35 @@
 <?php
 
+add_action('init','test_load');
+function test_load(){
+
+  /*
+  $login = get_option('mss_login_s');
+    $pass = get_option('mss_pass_s');
+  $url = 'https://online.moysklad.ru/exchange/rest/ms/xml/Feature/list?start=' . 7 . '&count=' . 10;
+
+    $args = array(
+        'headers' => array(
+            'Authorization' => 'Basic ' . base64_encode( $login . ':' . $pass )
+        )
+    );
+
+
+    //Запрос и получение XML-ответа
+    $data_remote = wp_remote_get( $url, $args );
+    $body = wp_remote_retrieve_body($data_remote);
+    $xml  = new SimpleXMLElement($body);
+    foreach($xml->feature as $item_feature) {
+      foreach($item_feature->attribute as $item_attribute){
+         $valueString = (string)$item_attribute['valueString'];
+         $test=explode(':', $valueString);
+         echo str_replace(' ','',$test[1]);
+         if(empty($test[1])){echo str_replace(' ','',$valueString);}
+      }
+    }
+*/
+}
+
 /* Загрузка вариаций из МойСклад в WooCommerce
 пример url https://online.moysklad.ru/exchange/rest/ms/xml/EmbeddedEntityMetadata/list
 Если feature="true"  то это вариация
@@ -93,18 +123,18 @@ class MSSVariationImport
         $product_by_uuid = $product_by_uuid_good[0];
 
 
-        $product_id = $product_by_uuid_good->ID;
+        $product_id = $product_by_uuid->ID;
         $product = new WC_Product( $product_id );
 
         //Делаем товар вариативным
         wp_set_object_terms( $product_id, 'variable', 'product_type' );
-
+        $attributes=array();
 
         foreach($item_feature->attribute as $item_attribute){
 
 
             $valueString = (string)$item_attribute['valueString']; //Название модификации
-            $metadataUuid = (string)$item_attribute['metadataUuid']; //индентификатор модификации
+            $metadataUuid = (string)$item_attribute['metadataUuid']; //идентификатор модификации
             $uuid_attribute = (string)$item_attribute->uuid; //uuid модификации продукта в МойСклад
 
             //Получить id атрибута по uuid модификации
@@ -113,8 +143,10 @@ class MSSVariationImport
             foreach($mss_am as $key => $value) {
 
               if(empty($value)) continue;
+              $uuids=explode(',', (string)$value);
+              
 
-              if((string)$value == $metadataUuid) $id_pa = $key;
+              if(in_array($metadataUuid, $uuids)) $id_pa = $key;
 
               set_transient('test', '6: ' . print_r( $id_pa, true), 777);
 
@@ -122,40 +154,29 @@ class MSSVariationImport
 
             $data[] = $metadataUuid . ', ' . $valueString;
 
-            //
-            //$id_pa = array_search($metadataUuid, $mss_am);
-            //if(! empty($id_pa))
+            global $wpdb;
+            $attr_names=$wpdb->get_results('SELECT attribute_name FROM wp_woocommerce_attribute_taxonomies WHERE attribute_id='.$id_pa);
+            $attr_name='pa_'.$attr_names[0]->attribute_name;
+            $attr_parts=explode(':', $valueString);
+            $attr_value=str_replace(' ','',$attr_parts[1]);
+            
+            if(empty($attr_parts[1])){$attr_value=str_replace(' ','',$valueString);}
+            wp_set_object_terms( $product_id,$attr_value, $attr_name);
 
+            $thedata = array($attr_name=>array('name'=>$attr_name,'value'=>'','is_visible' => '1','is_variation' => '1','is_taxonomy' => '1'));
+            $attr_meta_value=get_post_meta($product_id,'_product_attributes',true);
+            if(!empty($attr_meta_value)){
+              $thedata=array_merge($attr_meta_value,$thedata);
+            }
+            
+            update_post_meta( $product_id,'_product_attributes',$thedata);
 
-
-
-
-
-
-
-
-
-
-            //Получить ключ таксономии по id атрибута
-
-
-
-            //wp_set_object_terms( $product_id, 'XL', 'pa_size' );
-
-
-            $r++;
-
-        } //endforeach $item_feature->attribute
-
-
-
-
-        //получить вариацию продукта по uuid модификации товара МойСклад
+            //получить вариацию продукта по uuid модификации товара МойСклад
         $product_var_by_uuid = get_posts('post_status=any&post_type=product_variation&numberposts=1&meta_key=uuid&meta_value=' . $uuid);
 
 
         //Если  продукт для вариации есть, то создать под него вариацию
-        if(empty($product_var_by_uuid[0])) continue; //Если нет продукта в базе для вариации то пропуск обработки
+        //if(empty($product_var_by_uuid[0])) continue; //Если нет продукта в базе для вариации то пропуск обработки
 
 
         if(isset($product_var_by_uuid[0])) {
@@ -173,20 +194,29 @@ class MSSVariationImport
             'guid' => home_url() . '/product_variation/' . 'product-' . $product_id . '-variation'
           );
 
-          //$product_var_id = wp_insert_post($new_product);
+          $product_var_id = wp_insert_post($new_product);
         }
+        $price=get_post_meta($product_id,'_price',true);
+        $price=empty($price)?0:$price;
+        $regular_price=get_post_meta($product_id,'_regular_price',true);
+        $regular_price=empty($regular_price)?0:$regular_price;
 
-
-      	update_post_meta($product_var_id, 'attribute_color', $color);
-      	update_post_meta($product_var_id, '_price', 100);
-      	update_post_meta($product_var_id, '_regular_price', 100);
-      	update_post_meta($product_var_id, '_sku', $post_name);
+        if(!empty($attr_name) && !empty($attr_value)){
+          update_post_meta($product_var_id, 'attribute_'.$attr_name, $attr_value);
+        }
+        update_post_meta($product_var_id, '_price', $price);
+        update_post_meta($product_var_id, '_regular_price', $regular_price);
+        update_post_meta($product_var_id, '_sku', $post_name);
         update_post_meta($product_var_id, 'uuid', $uuid);
 
-      	update_post_meta($product_var_id, '_virtual', 'no');
-      	update_post_meta($product_var_id, '_downloadable', 'no');
-      	update_post_meta($product_var_id, '_manage_stock', 'no');
-      	update_post_meta($product_var_id, '_stock_status', 'instock');
+        update_post_meta($product_var_id, '_virtual', 'no');
+        update_post_meta($product_var_id, '_downloadable', 'no');
+        update_post_meta($product_var_id, '_manage_stock', 'no');
+        update_post_meta($product_var_id, '_stock_status', 'instock');
+            
+            $r++;
+
+        } //endforeach $item_feature->attribute
 
     } //endforeach $xml->feature
 
@@ -210,7 +240,7 @@ class MSSVariationImport
     ?>
     <section id="mss-variation-import-wrapper">
       <header>
-        <h2>Импорт вариаций: из системы МойСклад на сайт</h2>
+        <h2>Вариации продуктов: МойСклад > WooCommerce</h2>
       </header>
       <div class="instruction">
         <p>Обработка импортирует модификации из МойСклад в атрибуты WooCommerce.</p>
