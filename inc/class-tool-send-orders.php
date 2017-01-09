@@ -3,70 +3,22 @@
 /**
  * Send orders to MoySklad
  */
-class woomss_tool_send_orders_to_moysklad {
-
-  public $url;
-  public $slug = 'woomss_tool_send_orders_to_moysklad';
-  public $btn_text = 'Отправить заказы в МойСклад';
-
-
+class woomss_tool_send_orders_to_moysklad extends woomss_import {
 
   function __construct(){
-
-    $this->url = $_SERVER['REQUEST_URI'];
-
-    add_action( 'woomss_tool_actions_btns', [$this, 'woomss_tool_actions_btns_callback'], $priority = 20, $accepted_args = 1 );
-
-    add_action( 'woomss_tool_actions', [$this, 'woomss_tool_actions_cb'], $priority = 10, $accepted_args = 1 );
+    parent::__construct();
+    $this->section_title = __('Передача заказов');
+    $this->section_exerpt = __('Берем 5 новых заказов и передаем в МойСклад');
+    $this->slug = 'woomss-order-to-moysklad';
+    $this->slug_action = 'woomss-order-to-moysklad-do';
 
   }
 
 
-  function woomss_tool_actions_cb(){
+  function load_data(){
+    echo '<p>load data start...</p>';
 
-    if( empty($_GET['a']) or $_GET['a'] != $this->slug)
-      return;
-
-    echo '<hr/>';
-
-
-    $url_get = 'https://online.moysklad.ru/api/remap/1.1/entity/variant/';
-
-    $username = get_option( 'woomss_login' );
-    $password = get_option( 'woomss_pass' );
-
-    $args = array(
-        'headers' => array(
-            'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password )
-        )
-      );
-
-
-    $response = wp_remote_get( $url_get, $args );
-    $body = $response['body'];
-
-    $data = json_decode( $body, true );
-    $data = $data['rows'];
-
-    foreach ($data as $key => $value) {
-
-      printf('<h2>%s</h2>', $value['name']);
-      printf('<p>id: %s</p>', $value['id']);
-      printf('<pre>%s</pre>', print_r($value, true));
-
-    }
-
-
-    echo '<p>end job</p>';
-  }
-
-
-  function woomss_tool_actions_btns_callback(){
-      printf(
-        '<section><a href="%s" class="button">%s</a></section>',
-        add_query_arg('a', $this->slug, $this->url),
-        $this->btn_text
-      );
+    
   }
 
 
