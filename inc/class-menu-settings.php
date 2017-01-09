@@ -28,7 +28,7 @@ class woomss {
     add_settings_field(
       $id = 'woomss_login',
       $title = 'Логин (admin@...)',
-      $callback = [$this, 'display_woomss_login'],
+      $callback = [$this, 'woomss_login_display'],
       $page = 'mss-settings',
       $section = 'woomss_section_login'
     );
@@ -36,7 +36,7 @@ class woomss {
     add_settings_field(
       $id = 'woomss_pass',
       $title = 'Пароль',
-      $callback = [$this, 'display_woomss_pass'],
+      $callback = [$this, 'woomss_pass_display'],
       $page = 'mss-settings',
       $section = 'woomss_section_login'
     );
@@ -44,13 +44,35 @@ class woomss {
     register_setting('woomss_section_login', 'woomss_login');
     register_setting('woomss_section_login', 'woomss_pass');
 
+
+    add_settings_section(
+    	'woomss_section_other',
+    	'Дополнительные опции',
+    	null,
+    	'mss-settings'
+    );
+
+    add_settings_field(
+      $id = 'woomss_debug',
+      $title = 'Режим отладки',
+      $callback = [$this, 'woomss_debug_display'],
+      $page = 'mss-settings',
+      $section = 'woomss_section_other'
+    );
+
+    register_setting('woomss_section_other', 'woomss_debug');
+
   }
 
-  function display_woomss_pass(){
+  function woomss_debug_display(){
+    printf('<input type="checkbox" name="woomss_debug" value="1" %s />', checked( 1, get_option('woomss_debug'), false ));
+  }
+
+  function woomss_pass_display(){
     printf('<input type="password" name="woomss_pass" value="%s"/>',get_option('woomss_pass'));
   }
 
-  function display_woomss_login(){
+  function woomss_login_display(){
     printf('<input type="text" name="woomss_login" value="%s"/>',get_option('woomss_login'));
   }
 
@@ -61,11 +83,15 @@ class woomss {
       <h1>Настройки интеграции МойСклад</h1>
       <?php
         settings_fields( 'woomss_section_login' );
+        settings_fields( 'woomss_section_other' );
         do_settings_sections( 'mss-settings' );
         submit_button();
       ?>
     </form>
+
+
     <?php
+    printf('<p><a href="%s">Управление синхронизацией</a></p>', admin_url('tools.php?page=moysklad'));
   }
 
 
