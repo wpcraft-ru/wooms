@@ -17,7 +17,7 @@ class woomss_import {
       $this->section_exerpt = __('Excerpt for section and simple instruction');
       $this->slug = 'woomss_import';
       $this->slug_action = 'woomss_import_do';
-      $this->btn_text = __('Do it!');
+      $this->btn_text = __('Старт');
 
 
       $this->url = $_SERVER['REQUEST_URI'];

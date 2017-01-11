@@ -196,6 +196,11 @@ class woomss_tool_products_import extends woomss_import {
     * @return
     */
     private function save_image_product_from_moysklad($data_ms, $product_id){
+
+      if( get_option( 'woomss_img' ) != 1){
+        return;
+      }
+
       if ( is_array( $data_ms ) ) {
 
   			if ( isset( $data_ms['meta']['href'] ) and ! $this->is_image_save($product_id, $data_ms['meta']['href']) ) {
@@ -222,9 +227,10 @@ class woomss_tool_products_import extends woomss_import {
   			set_post_thumbnail( $product_id, $attachment_id );
 
   		} else {
-  			delete_post_meta( $product_id, '_thumbnail_id' );
-  			update_post_meta( $product_id, '_product_image_gallery', '' );
-        printf('<p>Removed images for product id: %s</p>', $product_id);
+        if(get_option( 'woomss_img' )){
+          delete_post_meta( $product_id, '_thumbnail_id' );
+          printf('<p>Removed images for product id: %s</p>', $product_id);
+        }
   		}
     }
 

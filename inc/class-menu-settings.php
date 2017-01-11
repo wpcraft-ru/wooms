@@ -53,6 +53,14 @@ class woomss {
     );
 
     add_settings_field(
+      $id = 'woomss_img',
+      $title = 'Обновлять картинку',
+      $callback = [$this, 'woomss_img_display'],
+      $page = 'mss-settings',
+      $section = 'woomss_section_other'
+    );
+
+    add_settings_field(
       $id = 'woomss_debug',
       $title = 'Режим отладки',
       $callback = [$this, 'woomss_debug_display'],
@@ -60,8 +68,14 @@ class woomss {
       $section = 'woomss_section_other'
     );
 
+    register_setting('woomss_section_other', 'woomss_img');
     register_setting('woomss_section_other', 'woomss_debug');
 
+  }
+
+
+  function woomss_img_display(){
+    printf('<input type="checkbox" name="woomss_img" value="1" %s />', checked( 1, get_option('woomss_img'), false ));
   }
 
   function woomss_debug_display(){
