@@ -56,8 +56,6 @@ class woomss_tool_import_variaints extends woomss_import {
         continue;
       }
 
-      printf('<p>for product id: %s, name: %s</p>', $product_id, get_the_title( $product_id ));
-      printf('<p><a href="%s">edit link</a></p>', get_edit_post_link( $product_id, '' ));
 
 
       $product_type = get_the_terms( $product_id, 'product_type' );
@@ -79,53 +77,35 @@ class woomss_tool_import_variaints extends woomss_import {
   }
 
 
+
   function save_variations_data($product_id = 0, $data_variation){
 
     if(empty($product_id))
       return;
 
-      echo '<hr>';
-      // printf('<pre>%s</pre>', print_r($data_variation, true));
+    printf('<p>for product id: %s, name: %s</p>', $product_id, get_the_title( $product_id ));
+    printf('<p><a href="%s">edit link</a></p>', get_edit_post_link( $product_id, '' ));
 
-    // var_dump($data_variation);
-    echo '<hr>';
-
+    // printf('<hr><pre>%s</pre><hr>', print_r($data_variation, true));
 
     $product = wc_get_product($product_id);
 
     $characteristics = $data_variation['characteristics'];
 
-    //Check and save characteristics as attributes with variation tag
-    foreach ($characteristics as $characteristic) {
-      $key_pa = 'pa_' . $characteristic['id'];
+    printf('<p># try update characteristics. count: %s</p>', count($characteristics));
+    $this->save_characteristics_as_attributes($product_id, $characteristics);
 
-      $attributes = $product->get_attributes();
-      //Если нет атрибута соответствующего характеристике то создаем таковой
-      if(empty($attributes[$key_pa])){
-        $attributes[$key_pa] = array(
-          'name' => htmlspecialchars(stripslashes($characteristic['name'])),
-          'value' => htmlspecialchars(stripslashes($characteristic['value'])),
-          'position' => 0,
-          'is_visible' => 0,
-          'is_variation' => 1,
-          'is_taxonomy' => 0
-        );
-
-        //Add $attributes
-        update_post_meta($product_id, '_product_attributes', $attributes);
-
-        printf('<p>+ Add attribute is_variation: %s</p>', $characteristic['name']);
-      }
-    }
 
     if ( $product->is_type( 'variable' ) && $product->has_child() ) {
       $variations = $product->get_children();
     }
 
+    printf('<p># Check and get isset variation for %s</p>', $data_variation['id']);
+
     //Isset variation?
     $check_variations = get_posts( array(
       'meta_key' => 'woomss_id',
-      'meta_value' => htmlspecialchars(stripslashes($data_variation['id'])),
+      'meta_value' => esc_textarea($data_variation['id']),
       'include' => $variations,
       'post_parent'  => $product_id,
       'post_type' => 'product_variation'
@@ -135,7 +115,7 @@ class woomss_tool_import_variaints extends woomss_import {
     if( empty($check_variations) ){
 
       //create variation from data
-      $variation_post_title = htmlspecialchars(stripslashes($data_variation['name']));
+      $variation_post_title = esc_textarea($data_variation['name']);
 
 			$new_variation = array(
 				'post_title'   => $variation_post_title,
@@ -148,24 +128,33 @@ class woomss_tool_import_variaints extends woomss_import {
 
 			$variation_id = wp_insert_post( $new_variation );
 
-      update_post_meta( $variation_id, 'woomss_id', htmlspecialchars(stripslashes($data_variation['id'])) );
+      update_post_meta( $variation_id, 'woomss_id', esc_textarea($data_variation['id']) );
 
-      $key_pa = 'pa_' . htmlspecialchars(stripslashes($characteristic['id']));
-      update_post_meta( $variation_id, $key_pa, htmlspecialchars(stripslashes($characteristic['value'])) );
+      // $key_pa = 'pa_' . esc_textarea($characteristic['id']);
+      // update_post_meta( $variation_id, $key_pa, esc_textarea($characteristic['value']) );
 
 
       printf('<p>+ Added variation: %s</p>', $data_variation['name']);
 
 
     } else {
-      //update variation
-
-      //Get variation data
+      //Get variation id
       $variation_id = $check_variations[0]->ID;
       $variation = $product->get_child($variation_id);
 
-      var_dump($variation_id);
+      printf('<p>- Isset variation: %s</p>', $variation_id);
 
+    }
+
+    printf('<p># Try update data for variation %s</p>', $variation_id);
+
+    foreach ($characteristics as $characteristic) {
+      $attribute_key           = 'attribute_' . sanitize_title( $characteristic['name'] );
+      if( update_post_meta( $variation_id, $attribute_key, $characteristic['value']) ){
+        printf('<p>+ Update attribute key: %s</p>', $attribute_key);
+      } else {
+        printf('<p>- Attribute key isset: %s</p>', $attribute_key);
+      }
     }
 
     $status_update = wc_update_product_stock_status( $variation_id, 'instock' );
@@ -183,5 +172,60 @@ class woomss_tool_import_variaints extends woomss_import {
   }
 
 
+    /**
+     * Save attributes after check from data MS
+     *
+     * @param integer $product_id
+     * @return return type
+     */
+    function save_characteristics_as_attributes($product_id, $characteristics){
+
+          $product = wc_get_product($product_id);
+
+
+          //Check and save characteristics as attributes with variation tag
+          foreach ($characteristics as $characteristic) {
+
+
+            $key_pa = 'pa_' . $characteristic['id'];
+            $attributes = $product->get_attributes();
+
+            $saved_value = $product->get_attribute( $key_pa );
+
+            if(empty($saved_value)){
+              $attributes[$key_pa] = array(
+                'name' => esc_textarea($characteristic['name']),
+                'value' => esc_textarea($characteristic['value']),
+                'position' => 0,
+                'is_visible' => 0,
+                'is_variation' => 1,
+                'is_taxonomy' => 0
+              );
+              printf('<p>+ Attribute "%s". Added with value: %s</p>', $characteristic['name'], $characteristic['value']);
+              //Save $attributes in metafield
+              update_post_meta($product_id, '_product_attributes', $attributes);
+
+
+            } else {
+              //Если атрибут есть, но значение не совпадает
+
+              $values_array = array_map('trim', explode("|", $saved_value));
+
+              if ( ! in_array(esc_textarea($characteristic['value']), $values_array) ){
+                $attributes[$key_pa]['value'] .= ' | ' . esc_textarea($characteristic['value']);
+                printf('<p>+ Attribute "%s". Saved value: %s</p>', $characteristic['name'], $attributes[$key_pa]['value']);
+
+                //Save $attributes in metafield
+                update_post_meta($product_id, '_product_attributes', $attributes);
+
+              }
+            }
+
+
+            // printf('<hr><pre>%s</pre><hr>', print_r($att, true));
+
+
+          }
+    }
 
 } new woomss_tool_import_variaints;
