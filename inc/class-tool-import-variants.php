@@ -51,20 +51,24 @@ class woomss_tool_import_variaints extends woomss_import {
 
       $product_id = intval(wc_get_product_id_by_sku($article));
 
-      printf('<p><a href="%s">edit link</a></p>', get_edit_post_link( $product_id, '' ));
-
       if(empty($product_id)){
+        echo '<p>no found products</p>';
         continue;
       }
 
-      $product = wc_get_product($product_id);
-      $product_type = get_the_terms( $product->id, 'product_type' );
+      printf('<p>for product id: %s, name: %s</p>', $product_id, get_the_title( $product_id ));
+      printf('<p><a href="%s">edit link</a></p>', get_edit_post_link( $product_id, '' ));
+
+
+      $product_type = get_the_terms( $product_id, 'product_type' );
+
+      //Convert product type from array as string
       if( ! empty($product_type)){
         $product_type = $product_type[0]->name;
       }
 
       if($product_type != 'variable'){
-        wp_set_object_terms( $product->id, 'variable', 'product_type' );
+        wp_set_object_terms( $product_id, 'variable', 'product_type' );
         printf('<p>+ Set product as: %s</p>', 'variable');
       }
 
@@ -80,9 +84,14 @@ class woomss_tool_import_variaints extends woomss_import {
     if(empty($product_id))
       return;
 
-    $product = wc_get_product($product_id);
+      echo '<hr>';
+      // printf('<pre>%s</pre>', print_r($data_variation, true));
 
-    $attributes = $product->get_attributes();
+    // var_dump($data_variation);
+    echo '<hr>';
+
+
+    $product = wc_get_product($product_id);
 
     $characteristics = $data_variation['characteristics'];
 
@@ -90,6 +99,7 @@ class woomss_tool_import_variaints extends woomss_import {
     foreach ($characteristics as $characteristic) {
       $key_pa = 'pa_' . $characteristic['id'];
 
+      $attributes = $product->get_attributes();
       //Если нет атрибута соответствующего характеристике то создаем таковой
       if(empty($attributes[$key_pa])){
         $attributes[$key_pa] = array(
@@ -115,13 +125,15 @@ class woomss_tool_import_variaints extends woomss_import {
     //Isset variation?
     $check_variations = get_posts( array(
       'meta_key' => 'woomss_id',
-      'meta_value' => htmlspecialchars(stripslashes($characteristic['id'])),
+      'meta_value' => htmlspecialchars(stripslashes($data_variation['id'])),
       'include' => $variations,
+      'post_parent'  => $product_id,
       'post_type' => 'product_variation'
     ));
 
 
     if( empty($check_variations) ){
+
       //create variation from data
       $variation_post_title = htmlspecialchars(stripslashes($data_variation['name']));
 
@@ -130,18 +142,16 @@ class woomss_tool_import_variaints extends woomss_import {
 				'post_content' => '',
 				'post_status'  => 'publish',
 				'post_author'  => get_current_user_id(),
-				'post_parent'  => $product->id,
+				'post_parent'  => $product_id,
 				'post_type'    => 'product_variation'
 			);
 
 			$variation_id = wp_insert_post( $new_variation );
 
-      update_post_meta( $variation_id, 'woomss_id', htmlspecialchars(stripslashes($characteristic['id'])) );
+      update_post_meta( $variation_id, 'woomss_id', htmlspecialchars(stripslashes($data_variation['id'])) );
 
-      foreach ($characteristics as $characteristic) {
-        $key_pa = 'pa_' . $characteristic['id'];
-        update_post_meta( $variation_id, $key_pa, htmlspecialchars(stripslashes($characteristic['value'])) );
-      }
+      $key_pa = 'pa_' . htmlspecialchars(stripslashes($characteristic['id']));
+      update_post_meta( $variation_id, $key_pa, htmlspecialchars(stripslashes($characteristic['value'])) );
 
 
       printf('<p>+ Added variation: %s</p>', $data_variation['name']);
@@ -150,23 +160,19 @@ class woomss_tool_import_variaints extends woomss_import {
     } else {
       //update variation
 
-      var_dump($check_variations);
-
-      $variation_id = $check_variations; //???
+      //Get variation data
+      $variation_id = $check_variations[0]->ID;
       $variation = $product->get_child($variation_id);
+
+      var_dump($variation_id);
+
     }
 
+    $status_update = wc_update_product_stock_status( $variation_id, 'instock' );
+    printf('<p>+ Stock status update: %s</p>', 'ok');
 
 
-    var_dump($check_variations);
-
-    // printf('<pre>%s</pre>', print_r($characteristics, true));
-    // printf('<pre>%s</pre>', print_r($attributes, true));
-
-
-
-
-    printf('<pre>%s</pre>', print_r($data_variation, true));
+    // printf('<pre>%s</pre>', print_r($data_variation, true));
 
 
     $product = (array)$product;

@@ -2,7 +2,7 @@
 /*
 Plugin Name: WooCommerce + MoySklad
 Description: Integration for WooCommerce and MoySklad (moysklad.ru) via REST API (class woomss)
-Version: 0.4
+Version: 0.5
 */
 
 require_once 'inc/abstract-import.php';
