@@ -67,6 +67,7 @@ class woomss_tool_import_variaints extends woomss_import {
 
       if($product_type != 'variable'){
         wp_set_object_terms( $product_id, 'variable', 'product_type' );
+        
         printf('<p>+ Set product as: %s</p>', 'variable');
       }
 
