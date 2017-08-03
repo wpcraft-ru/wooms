@@ -14,10 +14,10 @@ class woomss_tool_products_import {
     function load_data($value, $key, $data){
 
       if( ! empty($value['archived']))
-        continue;
+        return;
 
       if( empty($value['article']))
-        continue;
+        return;
 
       $product_id = wc_get_product_id_by_sku($value['article']);
 
@@ -53,7 +53,6 @@ class woomss_tool_products_import {
           update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );
         }
 
-        printf('<p>+ Добавлен продукт в базу: %s</p>', $post_id);
     }
 
     /**
@@ -67,13 +66,11 @@ class woomss_tool_products_import {
 
         $product = wc_get_product($product_id);
 
-        printf('<p><strong># data updating for product id: %s</strong> <a href="%s">(edit link)</a></p>', $product_id, get_edit_post_link($product_id, ''));
 
         //save data of source
         $now = date("Y-m-d H:i:s");
         update_post_meta($product_id, 'woomss_data_of_source', print_r($data_of_source, true));
         update_post_meta($product_id, 'woomss_updated_timestamp', $now);
-        printf('<p>+ Save source data in meta field "woomss_data_of_source" at time: %s</p>', $now);
 
 
         if( isset($data_of_source['name']) and $data_of_source['name'] != $product->get_title() ){
@@ -82,9 +79,6 @@ class woomss_tool_products_import {
             'post_title'  =>  $data_of_source['name']
           ));
 
-          printf('<p>+ Update title: %s</p>', $data_of_source['name']);
-        } else {
-          printf('<p>- Title no updated</p>');
         }
 
         if( isset($data_of_source['description']) and empty($product->post->post_content) ){
@@ -92,17 +86,8 @@ class woomss_tool_products_import {
             'ID'          =>  $product_id,
             'post_content'  =>  $data_of_source['description']
           ));
-          printf('<p>+ Update post content: %s</p>', $product_id);
-        } else {
-          printf('<p>- Content no updated</p>');
         }
 
-        //Image product update or rest
-        if(isset($data_of_source['image'])){
-          $this->save_image_product_from_moysklad($data_of_source['image'], $product_id);
-        } else {
-          $this->save_image_product_from_moysklad(null, $product_id);
-        }
 
         //Price Retail 'salePrices'
         if(isset($data_of_source['salePrices'][0]['value'])){
@@ -112,9 +97,6 @@ class woomss_tool_products_import {
             update_post_meta( $product->id, '_regular_price', $price_source );
             update_post_meta( $product->id, '_price', $price_source );
 
-            printf('<p>+ Update product price: %s</p>', $price_source);
-          } else {
-            printf('<p>- No update product price: %s</p>', $price_source);
           }
         }
 
@@ -129,7 +111,6 @@ class woomss_tool_products_import {
 
         if(get_option('woomss_debug')){
           unset($data_of_source['description']);
-          printf('<pre>%s</pre>', print_r($data_of_source, true));
 
         }
 
@@ -168,15 +149,10 @@ class woomss_tool_products_import {
           //Add as post meta
           update_post_meta($product_id, '_product_attributes', $product_attributes_v2);
 
-          printf('<p>+ Updated product attributes: %s</p>', count($product_attributes_v2));
-        } else {
-          printf('<p>- Product attributes not updated: %s</p>', count($product_attributes_v1));
-
         }
 
       } else {
         delete_post_meta( $product_id, '_product_attributes' );
-        printf('<p>+ Deleted attributes for product</p>');
 
       }
 
