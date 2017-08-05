@@ -70,17 +70,19 @@ class woomss_tool_products_import {
         //save data of source
         $now = date("Y-m-d H:i:s");
         update_post_meta($product_id, 'woomss_data_of_source', print_r($data_of_source, true));
+
+        //the time stamp for database cleanup by cron
         update_post_meta($product_id, 'woomss_updated_timestamp', $now);
 
-
+        //update title
         if( isset($data_of_source['name']) and $data_of_source['name'] != $product->get_title() ){
           wp_update_post( array(
             'ID'          =>  $product_id,
             'post_title'  =>  $data_of_source['name']
           ));
-
         }
 
+        //update description
         if( isset($data_of_source['description']) and empty($product->post->post_content) ){
           wp_update_post( array(
             'ID'          =>  $product_id,
@@ -100,14 +102,13 @@ class woomss_tool_products_import {
           }
         }
 
-        // Update data of attributes
-        if(isset($data_of_source['attributes'])){
-          $this->update_attributes( $product_id, $data_of_source['attributes'] );
-        }
-
+        //update post
         wp_update_post( array(
           'ID' =>  $product_id
         ));
+
+        $product->set_status('publish');
+        $product->save();
 
         if(get_option('woomss_debug')){
           unset($data_of_source['description']);
@@ -117,46 +118,5 @@ class woomss_tool_products_import {
     }
 
 
-    /**
-     * Updating attributes for product
-     *
-     * @param $product_id - id product
-     * @param $attributes - array of attributes
-     * @return return type
-     */
-    public function update_attributes($product_id, $attributes){
-
-      if(is_array($attributes)){
-        $product = wc_get_product($product_id);
-
-        $product_attributes_v1 = get_post_meta($product_id, '_product_attributes', true);
-        $product_attributes_v2 = array();
-
-        foreach ($attributes as $key => $attribute) {
-          //Type attribute
-          $product_attributes_v2[$attribute['id']] = array(
-              //Make sure the 'name' is same as you have the attribute
-              'name' => htmlspecialchars(stripslashes($attribute['name'])),
-              'value' => $attribute['value'],
-              'position' => 0,
-              'is_visible' => 0,
-              'is_variation' => 0,
-              'is_taxonomy' => 0
-          );
-        }
-
-        if($product_attributes_v1 != $product_attributes_v2) {
-          //Add as post meta
-          update_post_meta($product_id, '_product_attributes', $product_attributes_v2);
-
-        }
-
-      } else {
-        delete_post_meta( $product_id, '_product_attributes' );
-
-      }
-
-      return true;
-    }
 
 } new woomss_tool_products_import;

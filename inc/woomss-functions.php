@@ -1,6 +1,24 @@
 <?php
 
 
+function wooms_get_data_by_url($url = ''){
+
+	if(empty($url)){
+		return false;
+	}
+
+	$args = array(
+			'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) )
+			)
+		);
+
+	$response = wp_remote_get( $url, $args );
+	$body = $response['body'];
+
+	return json_decode( $body, true );
+
+}
 
 
 
