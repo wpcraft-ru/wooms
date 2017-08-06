@@ -19,6 +19,7 @@ class woomss {
   function settings_init(){
 
 
+
     add_settings_section(
     	'woomss_section_login',
     	'Данные для доступа МойСклад',

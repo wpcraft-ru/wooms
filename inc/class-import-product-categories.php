@@ -1,16 +1,12 @@
 <?php
 
-
 /**
  * Import Product Categories from MoySklad
  */
-class WooMS_Import_Product_Categories
-{
+class WooMS_Import_Product_Categories {
 
-  function __construct()
-  {
+  function __construct() {
     //do_action('wooms_product_import_row', $value, $key, $data);
-
     add_action('wooms_product_import_row', [$this, 'load_data'], 100, 3);
   }
 
@@ -33,8 +29,6 @@ class WooMS_Import_Product_Categories
       }
     }
 
-
-
   }
 
   function update_category($url){
@@ -50,17 +44,12 @@ class WooMS_Import_Product_Categories
         'archived' => $data['archived'],
       ];
 
-
       if(isset($data['productFolder']['meta']['href'])){
         $url_parent = $data['productFolder']['meta']['href'];
         if($term_id_parent = $this->update_category($url_parent)){
           $new['parent_id'] = intval($term_id_parent);
-
-
         }
       }
-
-
 
       $args = array(
       	'description' => '',
@@ -69,7 +58,6 @@ class WooMS_Import_Product_Categories
       if(isset($new['parent_id'])){
         $args['parent'] = $new['parent_id'];
       }
-
 
 
       $term_id = wp_insert_term( $term = $new['name'], $taxonomy = 'product_cat', $args );

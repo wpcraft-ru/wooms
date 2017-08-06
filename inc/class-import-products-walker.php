@@ -23,16 +23,20 @@ class WooMS_Product_Import_Walker {
     <a href="<?php echo add_query_arg('a', 'wooms_products_start_import', admin_url('tools.php?page=moysklad')) ?>" class="button">Старт импорта продуктов</a>
     <?php
 
-    echo get_transient('wooms_last_url');
+    printf('<div class="updated"><p>Если параметры ссылки изменяются при каждм обновлении страницы значит работа идет: %s</p></div>', get_transient('wooms_last_url'));
   }
 
   function ui_action(){
     if(! empty($_GET['a'] and $_GET['a'] == 'wooms_products_start_import')){
 
-      $url = add_query_arg('action', 'wooms_walker_import', admin_url('admin-ajax.php'));
+      $args =[
+        'action' => 'wooms_walker_import',
+        'batch' => '1',
+      ];
+      $url = add_query_arg($args, admin_url('admin-ajax.php'));
       wp_remote_get($url);
 
-      printf( '<p>Импорт запущен. Запрос: %s</p>', $url);
+      printf( '<p>Импорт запущен.</p><p><small>Запрос: %s</small></p>', $url);
 
     }
   }

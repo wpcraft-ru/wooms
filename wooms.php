@@ -1,0 +1,40 @@
+<?php
+/*
+Plugin Name: WooMS
+Description: Integration for WooCommerce and MoySklad (moysklad.ru) via REST API (wooms)
+Plugin URI: https://wpcraft.ru/product/wooms/
+Author: WPCraft
+Author URI: https://wpcraft.ru/
+Version: 0.9.1
+*/
+
+
+
+require_once 'inc/class-import-products-walker.php';
+require_once 'inc/class-import-products.php';
+require_once 'inc/class-import-product-categories.php';
+require_once 'inc/class-menu-settings.php';
+require_once 'inc/class-menu-tool.php';
+
+
+/**
+* Helper functio for get data from moysklad.ru 
+*/
+function wooms_get_data_by_url($url = ''){
+
+	if(empty($url)){
+		return false;
+	}
+
+	$args = array(
+			'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) )
+			)
+		);
+
+	$response = wp_remote_get( $url, $args );
+	$body = $response['body'];
+
+	return json_decode( $body, true );
+
+}
