@@ -47,31 +47,6 @@ class woomss {
 
 
 
-    add_settings_section(
-    	'woomss_section_other',
-    	'Дополнительные опции',
-    	null,
-    	'mss-settings'
-    );
-
-    register_setting('mss-settings', 'woomss_img');
-    add_settings_field(
-      $id = 'woomss_img',
-      $title = 'Обновлять картинку',
-      $callback = [$this, 'woomss_img_display'],
-      $page = 'mss-settings',
-      $section = 'woomss_section_other'
-    );
-
-    register_setting('mss-settings', 'woomss_debug');
-    add_settings_field(
-      $id = 'woomss_debug',
-      $title = 'Режим отладки',
-      $callback = [$this, 'woomss_debug_display'],
-      $page = 'mss-settings',
-      $section = 'woomss_section_other'
-    );
-
   }
 
   function woomss_pass_display(){
@@ -82,14 +57,6 @@ class woomss {
     printf('<input type="text" name="woomss_login" value="%s"/>',get_option('woomss_login'));
   }
 
-
-  function woomss_img_display(){
-    printf('<input type="checkbox" name="woomss_img" value="1" %s />', checked( 1, get_option('woomss_img'), false ));
-  }
-
-  function woomss_debug_display(){
-    printf('<input type="checkbox" name="woomss_debug" value="1" %s />', checked( 1, get_option('woomss_debug'), false ));
-  }
 
 
   function mss_settings_callback(){
@@ -107,6 +74,8 @@ class woomss {
 
     <?php
     printf('<p><a href="%s">Управление синхронизацией</a></p>', admin_url('tools.php?page=moysklad'));
+    printf('<p><a href="%s" target="_blank">Расширенная версия с дополнительными возможностями</a></p>', "https://wpcraft.ru/product/wooms-extra/");
+    printf('<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru");
   }
 
 

@@ -27,10 +27,16 @@ class woomss_tool {
 
   function ui_management_page_callback(){
 
-    echo '<h1>Управление МойСклад</h1>';
+    ?>
+    <h1>Управление МойСклад</h1>
 
-    printf('<p><a href="%s" target="_blank">Вход в МойСклад</a></p>', 'https://online.moysklad.ru/app/');
+    <p>
+      <a href="<?php echo admin_url('options-general.php?page=mss-settings') ?>">Настройки</a>
+      <span> | </span>
+      <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
+    </p>
 
+    <?php
     if(empty($_GET['a'])){
 
       do_action('woomss_tool_actions_btns');

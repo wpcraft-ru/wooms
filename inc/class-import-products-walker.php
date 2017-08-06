@@ -7,43 +7,98 @@
 class WooMS_Product_Import_Walker {
 
   function __construct(){
+
     add_action('woomss_tool_actions_btns', [$this, 'ui']);
     add_action('woomss_tool_actions', [$this, 'ui_action']);
 
     add_action('wp_ajax_nopriv_wooms_walker_import', [$this, 'walker']);
     add_action('wp_ajax_wooms_walker_import', [$this, 'walker']);
+
+    add_action( 'admin_notices', [$this, 'notice'] );
+
+    add_action( 'admin_init', array($this, 'settings_init'), $priority = 100, $accepted_args = 1 );
+
   }
+
+  function settings_init(){
+    register_setting('mss-settings', 'wooms_check_security_disable');
+    add_settings_field(
+      $id = 'wooms_check_security_disable',
+      $title = 'Отключить проверку безопасности AJAX',
+      $callback = [$this, 'wooms_check_security_disable_display'],
+      $page = 'mss-settings',
+      $section = 'woomss_section_login'
+    );
+  }
+
+  function wooms_check_security_disable_display(){
+    $option_name = 'wooms_check_security_disable';
+    printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option($option_name), false ));
+    ?>
+
+    <p><small>По умолчанию опция галочка должна быть снята. Включать ее можно только тем кто понимает что делает для целей отладки и разработки фоновых задач</small></p>
+    <?php
+
+  }
+
+  function notice() {
+
+    $screen = get_current_screen();
+
+    if($screen->base != 'tools_page_moysklad'){
+      return;
+    }
+
+    if(empty(get_transient('wooms_start_timestamp'))){
+      return;
+    }
+
+    ?>
+    <div class="update-nag">
+      <p><strong>Сейчас выполняется пакетная обработка данных в фоне.</strong></p>
+      <p>Отметка времени о последней итерации: <?php echo get_transient('wooms_start_timestamp') ?></p>
+      <p>Ссылка на последний запрос в очереди: <?php echo get_transient('wooms_last_url') ?></p>
+    </div>
+    <?php
+  }
+
 
   function ui(){
 
     ?>
     <h2>Импорт продуктов</h2>
-    <p>Обработка запускает импорт продуктов</p>
+    <p>Нажмите на кнопку ниже, чтобы запустить импорт продуктов вручную</p>
 
     <a href="<?php echo add_query_arg('a', 'wooms_products_start_import', admin_url('tools.php?page=moysklad')) ?>" class="button">Старт импорта продуктов</a>
     <?php
 
-    printf('<div class="updated"><p>Если параметры ссылки изменяются при каждм обновлении страницы значит работа идет: %s</p></div>', get_transient('wooms_last_url'));
   }
 
   function ui_action(){
-    if(! empty($_GET['a'] and $_GET['a'] == 'wooms_products_start_import')){
+    if(isset($_GET['a']) and $_GET['a'] == 'wooms_products_start_import'){
 
       $args =[
         'action' => 'wooms_walker_import',
         'batch' => '1',
+        'nonce' => wp_create_nonce('wooms-nonce')
+
       ];
       $url = add_query_arg($args, admin_url('admin-ajax.php'));
       wp_remote_get($url);
 
-      printf( '<p>Импорт запущен.</p><p><small>Запрос: %s</small></p>', $url);
+      printf( '<p>Импорт запущен. Вы можете вернуться на шаг назад, чтобы увидеть сообщение о статусе и прогрессе.</p><p><small>Запрос: %s</small></p>', $url);
 
     }
   }
 
   function walker(){
 
-    $iteration = 10;
+
+    if(empty(get_option('wooms_check_security_disable'))){
+      check_ajax_referer( 'wooms-nonce', 'nonce' );
+    }
+
+    $iteration = apply_filters('wooms_iteration_size', 5);
 
     if( empty($_GET['count'])){
       $count = $iteration;
@@ -65,12 +120,15 @@ class WooMS_Product_Import_Walker {
     $url_get = add_query_arg($args_ms_api, 'https://online.moysklad.ru/api/remap/1.1/entity/product/');
 
     try {
+        set_transient('wooms_start_timestamp', date("Y-m-d H:i:s"), 60*10);
 
         $data = wooms_get_data_by_url( $url_get );
         $rows = $data['rows'];
 
         if(empty($rows)){
           //If no rows, that send 'end' and stop walker
+
+          delete_transient('wooms_start_timestamp');
           wp_send_json(['end waler', $data]);
         }
 
@@ -82,18 +140,34 @@ class WooMS_Product_Import_Walker {
         if( isset($_GET['batch'])){
           $args = [
             'action' => 'wooms_walker_import',
+            'nonce' => wp_create_nonce('wooms-nonce'),
             'batch' => 1,
             'count' => $iteration,
             'offset' => $offset + $iteration,
           ];
           $url = add_query_arg('action', 'wooms_walker_import', add_query_arg($args,admin_url('admin-ajax.php')) );
           set_transient('wooms_last_url', $url, 60*60);
-          wp_remote_get($url);
+
+          $args = [
+            'timeout'     => 30
+          ];
+
+          $check = wp_remote_get($url,$args);
+
+          if(is_wp_error($check)){
+            set_transient('woomss_error_background', "Ошибка запроса: " . $url, 60*60);
+            throw new Exception('Ошибка запроса пакетной операции. Ссылка: ' . $url);
+          }
+
+          // wp_send_json($check);
+
         }
 
         wp_send_json($data);
 
     } catch (Exception $e) {
+
+      delete_transient('wooms_start_timestamp');
       wp_send_json_error( $e->getMessage() );
     }
 
