@@ -5,7 +5,9 @@ Description: Integration for WooCommerce and MoySklad (moysklad.ru) via REST API
 Plugin URI: https://wpcraft.ru/product/wooms/
 Author: WPCraft
 Author URI: https://wpcraft.ru/
-Version: 0.9.1
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Version: 0.9.2
 */
 
 
@@ -18,7 +20,7 @@ require_once 'inc/class-menu-tool.php';
 
 
 /**
-* Helper functio for get data from moysklad.ru 
+* Helper functio for get data from moysklad.ru
 */
 function wooms_get_data_by_url($url = ''){
 

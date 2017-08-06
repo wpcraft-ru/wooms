@@ -42,7 +42,6 @@ class WooMS_Product_Import_Walker {
   }
 
   function walker(){
-    // wp_mail( $to = 'yumashev@fleep.io', $subject='test', $message='ddd' );
 
     $iteration = 10;
 
@@ -67,7 +66,7 @@ class WooMS_Product_Import_Walker {
 
     try {
 
-        $data = $this->get_data_by_url( $url_get );
+        $data = wooms_get_data_by_url( $url_get );
         $rows = $data['rows'];
 
         if(empty($rows)){
@@ -97,25 +96,6 @@ class WooMS_Product_Import_Walker {
     } catch (Exception $e) {
       wp_send_json_error( $e->getMessage() );
     }
-
-  }
-
-  function get_data_by_url($url = ''){
-
-    if(empty($url)){
-      return false;
-    }
-
-    $args = array(
-        'headers' => array(
-            'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) )
-        )
-      );
-
-    $response = wp_remote_get( $url, $args );
-    $body = $response['body'];
-
-    return json_decode( $body, true );
 
   }
 
