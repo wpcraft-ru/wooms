@@ -15,8 +15,32 @@ class WooMS_Product_Import_Walker {
     add_action('wp_ajax_wooms_walker_import', [$this, 'walker']);
 
     add_action( 'admin_notices', [$this, 'notice'] );
+    add_action( 'admin_notices', [$this, 'error_notice'] );
 
     add_action( 'admin_init', array($this, 'settings_init'), $priority = 100, $accepted_args = 1 );
+
+  }
+
+  function error_notice(){
+
+    $screen = get_current_screen();
+
+    if($screen->base != 'tools_page_moysklad'){
+      return;
+    }
+
+    if(empty(get_transient('woomss_error_background'))){
+      return;
+    }
+
+    ?>
+    <div class="update-nag">
+      <p><strong>Обработка заверишлась с ошибкой.</strong></p>
+      <p>Данные: <?php echo get_transient('woomss_error_background') ?></p>
+    </div>
+    <?php
+
+
 
   }
 
@@ -77,6 +101,9 @@ class WooMS_Product_Import_Walker {
   function ui_action(){
     if(isset($_GET['a']) and $_GET['a'] == 'wooms_products_start_import'){
 
+      delete_transient('wooms_start_timestamp');
+
+
       $args =[
         'action' => 'wooms_walker_import',
         'batch' => '1',
@@ -98,7 +125,7 @@ class WooMS_Product_Import_Walker {
       check_ajax_referer( 'wooms-nonce', 'nonce' );
     }
 
-    $iteration = apply_filters('wooms_iteration_size', 5);
+    $iteration = apply_filters('wooms_iteration_size', 3);
 
     if( empty($_GET['count'])){
       $count = $iteration;
@@ -148,11 +175,15 @@ class WooMS_Product_Import_Walker {
           $url = add_query_arg('action', 'wooms_walker_import', add_query_arg($args,admin_url('admin-ajax.php')) );
           set_transient('wooms_last_url', $url, 60*60);
 
-          $args = [
-            'timeout'     => 30
+          $args_remote = [
+            'timeout'   => apply_filters('wooms_request_timeout', 55)
           ];
 
-          $check = wp_remote_get($url,$args);
+          $check = wp_remote_get($url,$args_remote);
+
+          if(is_wp_error($check)){
+            $check = wp_remote_get($url,$args_remote);
+          }
 
           if(is_wp_error($check)){
             set_transient('woomss_error_background', "Ошибка запроса: " . $url, 60*60);
