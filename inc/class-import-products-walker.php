@@ -125,7 +125,7 @@ class WooMS_Product_Import_Walker {
       check_ajax_referer( 'wooms-nonce', 'nonce' );
     }
 
-    $iteration = apply_filters('wooms_iteration_size', 3);
+    $iteration = apply_filters('wooms_iteration_size', 10);
 
     if( empty($_GET['count'])){
       $count = $iteration;
