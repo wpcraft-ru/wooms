@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: WooMS
-Description: Integration for WooCommerce and MoySklad (moysklad.ru) via REST API (wooms)
+Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
 Plugin URI: https://wpcraft.ru/product/wooms/
 Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 0.9.3
+Version: 0.9.4
 */
 
 

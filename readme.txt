@@ -1,9 +1,9 @@
 === WooMS ===
 Contributors: casepress
-Donate link: https://wpcraft.ru
+Donate link: https://wpcraft.ru/product/wooms-extra/
 Tags: moysklad, woocommerce, sync, integration
-Requires at least: 3.0.1
-Tested up to: 3.9
+Requires at least: 4.0
+Tested up to: 4.8
 Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -12,16 +12,17 @@ MoySklad (moysklad.ru) and WooCommerce - sync, integration, connection
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Интеграция приложения МойСклад (торговля, опт, розница, склад, производство, CRM) и WooCommerce (WordPress)
 
-Features:
+Особенности:
 
-*   Sync product from MS to WooCommerce
-*   Sync categories
-*   Simple settings
+*   Синхронизация товаров по протоколу JSON REST API
+*   Загрузка категорий
+*   Простые настройки
+
+Для больших возможностей можно приобрести расширенную версию https://wpcraft.ru/product/wooms-extra/
 
 
 == Installation ==
@@ -30,7 +31,7 @@ This section describes how to install the plugin and get it working.
 
 e.g.
 
-1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
+1. Upload plugin to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Go to Settings / MoySklad and setup
 1. Got to Tools / MoySklad and run sync
