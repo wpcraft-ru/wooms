@@ -43,5 +43,5 @@ e.g.
 
 == Changelog ==
 
-= 1.0 =
-* Init
+= 0.9.6 =
+* Add supervisor 
