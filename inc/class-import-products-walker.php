@@ -77,10 +77,14 @@ class WooMS_Product_Import_Walker {
       return;
     }
 
+    $time_string = get_transient('wooms_start_timestamp');
+    $time = strtotime($time_string);
+    $diff_minutes = round(($time - strtotime('-5 minutes'))/60, 2);
+
     ?>
     <div class="update-nag">
       <p><strong>Сейчас выполняется пакетная обработка данных в фоне.</strong></p>
-      <p>Отметка времени о последней итерации: <?php echo get_transient('wooms_start_timestamp') ?></p>
+      <p>Отметка времени о последней итерации: <?php echo $time_string ?>, количество прошедших минут: <?php echo $diff_minutes ?></p>
       <p>Ссылка на последний запрос в очереди: <?php echo get_transient('wooms_last_url') ?></p>
     </div>
     <?php
@@ -147,7 +151,7 @@ class WooMS_Product_Import_Walker {
     $url_get = add_query_arg($args_ms_api, 'https://online.moysklad.ru/api/remap/1.1/entity/product/');
 
     try {
-        set_transient('wooms_start_timestamp', date("Y-m-d H:i:s"), 60*10);
+        set_transient('wooms_start_timestamp', date("Y-m-d H:i:s"), 60*30);
 
         $data = wooms_get_data_by_url( $url_get );
         $rows = $data['rows'];
@@ -189,8 +193,6 @@ class WooMS_Product_Import_Walker {
             set_transient('woomss_error_background', "Ошибка запроса: " . $url, 60*60);
             throw new Exception('Ошибка запроса пакетной операции. Ссылка: ' . $url);
           }
-
-          // wp_send_json($check);
 
         }
 

@@ -12,12 +12,12 @@ class WooMS_Walker_Cron {
 
     add_action( 'admin_init', array($this, 'settings_init'), $priority = 100, $accepted_args = 1 );
 
-    add_action('wooms_import_walker_cron', [$this, 'start_waler_by_cron']);
+    add_action('wooms_import_walker_cron', [$this, 'start_walker_by_cron']);
 
   }
 
 
-  function start_waler_by_cron(){
+  function start_walker_by_cron(){
 
     if( ! empty(get_transient('wooms_start_timestamp')) ){
       return;
