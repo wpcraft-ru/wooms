@@ -25,15 +25,13 @@ class WooMS_Import_Supervisor {
       $time_2 = strtotime('-5 minutes');
       $diff = ($time_1 - $time_2)/60;
 
-      if($diff < -5){
+      if($diff < 0){
 
         if($url = get_transient('wooms_last_url')){
           wp_remote_get($url);
 
         }
-
-      } 
-
+      }
   }
 
 
