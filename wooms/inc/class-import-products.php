@@ -27,6 +27,8 @@ class woomss_tool_products_import {
         $this->add_product($value);
       }
 
+      do_action('wooms_product_update', $product_id, $value, $data);
+
     }
 
     /**
