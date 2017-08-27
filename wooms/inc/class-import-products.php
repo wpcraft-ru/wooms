@@ -46,6 +46,10 @@ class woomss_tool_products_import {
           'post_status'   => 'draft'
         );
 
+        if( ! apply_filters('wooms_add_product', true, $data_source)){
+          return false;
+        }
+
         // Вставляем запись в базу данных
         $post_id = wp_insert_post( $post_data );
 
@@ -75,6 +79,8 @@ class woomss_tool_products_import {
 
         //the time stamp for database cleanup by cron
         update_post_meta($product_id, 'woomss_updated_timestamp', $now);
+
+        update_post_meta($product_id, 'wooms_id', $data_of_source['id']);
 
         //update title
         if( isset($data_of_source['name']) and $data_of_source['name'] != $product->get_title() ){

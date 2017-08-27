@@ -42,10 +42,12 @@ class woomss_tool {
       do_action('woomss_tool_actions_btns');
 
     } else {
+
       printf('<a href="%s">Вернуться...</a>', remove_query_arg( 'a', $this->url));
+      do_action('woomss_tool_actions');
+
     }
 
-    do_action('woomss_tool_actions');
   }
 
 
