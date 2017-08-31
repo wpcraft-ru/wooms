@@ -51,7 +51,7 @@ class WooMS_Product_Import_Walker {
       $title = 'Отключить проверку безопасности AJAX',
       $callback = [$this, 'wooms_check_security_disable_display'],
       $page = 'mss-settings',
-      $section = 'woomss_section_login'
+      $section = 'woomss_section_other'
     );
   }
 

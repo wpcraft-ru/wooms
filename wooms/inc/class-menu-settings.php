@@ -14,6 +14,17 @@ class woomss {
     });
 
     add_action( 'admin_init', array($this, 'settings_init'), $priority = 10, $accepted_args = 1 );
+    add_action( 'admin_init', array($this, 'settings_init_other'), $priority = 10, $accepted_args = 1 );
+  }
+
+  function settings_init_other(){
+
+        add_settings_section(
+        	'woomss_section_other',
+        	'Прочие настройки',
+        	null,
+        	'mss-settings'
+        );
   }
 
   function settings_init(){

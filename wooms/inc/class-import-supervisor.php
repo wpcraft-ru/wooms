@@ -57,7 +57,7 @@ class WooMS_Import_Supervisor {
       $title = 'Выключить супервайзера бота',
       $callback = [$this, 'woomss_walker_supervisor_disabled_display'],
       $page = 'mss-settings',
-      $section = 'woomss_section_login'
+      $section = 'woomss_section_other'
     );
 
   }
