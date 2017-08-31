@@ -16,19 +16,43 @@ class woomss_tool_products_import {
       if( ! empty($value['archived']))
         return;
 
-      if( empty($value['article']))
-        return;
+      if( empty( get_option('wooms_use_uuid') ) ){
+        if( empty($value['article'])){
+          return;
+        }
+      }
 
-      $product_id = wc_get_product_id_by_sku($value['article']);
+      if( ! empty($value['article'])){
+        $product_id = wc_get_product_id_by_sku($value['article']);
+      } else {
+        $product_id = '';
+      }
 
       if( intval($product_id) ){
         $this->update_product($product_id, $value);
+      } elseif( $product_id = $this->get_product_id_by_uuid($value['id']) ) {
+
+        $this->update_product($product_id, $value);
       } else {
-        $this->add_product($value);
+
+        $product_id = $this->add_product($value);
+        $this->update_product($product_id, $value);
       }
 
       do_action('wooms_product_update', $product_id, $value, $data);
 
+    }
+
+
+    function get_product_id_by_uuid($uuid){
+
+      $posts = get_posts('post_type=product&meta_key=wooms_id&meta_value='.$uuid);
+
+      if(empty($posts[0]->ID)){
+        return false;
+      } else {
+        return $posts[0]->ID;
+      }
     }
 
     /**
@@ -53,12 +77,19 @@ class woomss_tool_products_import {
         // Вставляем запись в базу данных
         $post_id = wp_insert_post( $post_data );
 
-        $product = wc_get_product($post_id);
+        // $product = wc_get_product($post_id);
 
-        if( isset($data_source['article']) ){
-          update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );
+        if(empty($post_id)){
+          return false;
         }
 
+        update_post_meta( $post_id, $meta_key = 'wooms_id', $meta_value = $data_source['id'] );
+
+        if( isset($data_source['article']) ){
+            update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );
+        }
+
+        return $post_id;
     }
 
     /**
@@ -75,27 +106,21 @@ class woomss_tool_products_import {
 
         //save data of source
         $now = date("Y-m-d H:i:s");
-        update_post_meta($product_id, 'woomss_data_of_source', print_r($data_of_source, true));
+        update_post_meta($product_id, 'wooms_data_of_source', print_r($data_of_source, true));
 
         //the time stamp for database cleanup by cron
-        update_post_meta($product_id, 'woomss_updated_timestamp', $now);
+        update_post_meta($product_id, 'wooms_updated_timestamp', $now);
 
         update_post_meta($product_id, 'wooms_id', $data_of_source['id']);
 
         //update title
         if( isset($data_of_source['name']) and $data_of_source['name'] != $product->get_title() ){
-          wp_update_post( array(
-            'ID'          =>  $product_id,
-            'post_title'  =>  $data_of_source['name']
-          ));
+          $product->set_name( $data_of_source['name'] );
         }
 
         //update description
-        if( isset($data_of_source['description']) and empty($product->post->post_content) ){
-          wp_update_post( array(
-            'ID'          =>  $product_id,
-            'post_content'  =>  $data_of_source['description']
-          ));
+        if( isset($data_of_source['description']) and empty($product->get_description()) ){
+          $product->set_description($data_of_source['description']);
         }
 
 
@@ -104,16 +129,14 @@ class woomss_tool_products_import {
           $price_source = floatval($data_of_source['salePrices'][0]['value']/100);
 
           if($price_source != $product->get_price()){
-            update_post_meta( $product->id, '_regular_price', $price_source );
-            update_post_meta( $product->id, '_price', $price_source );
+
+            $product->set_price( $price_source );
+            $product->set_regular_price( $price_source );
+            // update_post_meta( $product->id, '_regular_price', $price_source );
+            // update_post_meta( $product->id, '_price', $price_source );
 
           }
         }
-
-        //update post
-        wp_update_post( array(
-          'ID' =>  $product_id
-        ));
 
         $product->set_status('publish');
         $product->save();

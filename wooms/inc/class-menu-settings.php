@@ -19,12 +19,33 @@ class woomss {
 
   function settings_init_other(){
 
-        add_settings_section(
-        	'woomss_section_other',
-        	'Прочие настройки',
-        	null,
-        	'mss-settings'
-        );
+      add_settings_section(
+      	'woomss_section_other',
+      	'Прочие настройки',
+      	null,
+      	'mss-settings'
+      );
+
+      register_setting('mss-settings', 'wooms_use_uuid');
+      add_settings_field(
+        $id = 'wooms_use_uuid',
+        $title = 'Использование UUID',
+        $callback = [$this, 'display_field_wooms_use_uuid'],
+        $page = 'mss-settings',
+        $section = 'woomss_section_other'
+      );
+
+  }
+
+  function display_field_wooms_use_uuid(){
+    $option_name = 'wooms_use_uuid';
+    printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option($option_name), false ));
+    ?>
+
+    <p><small>Если товары не попадают из МойСклад на сайт - попробуйте включить эту опцию.</small></p>
+    <p><small>По умолчанию используется связь продуктов по артикулу. Это позволяет обеспечить синхронизацию без удаления всех продуктов с сайта при их наличии. Но без артикула товары не будут синхронизироваться. Если товаров на сайте нет, либо их можно удалить без вреда, то можно включить синхронизацию по UUID. В этом случае артикулы будут не нужны. <br/>При создании записи о продукте произойдет связка по UUID (meta_key = wooms_id)</small></p>
+    <?php
+
   }
 
   function settings_init(){
