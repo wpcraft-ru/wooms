@@ -7,10 +7,13 @@ class WooMS_Import_Product_Categories {
 
   function __construct() {
     //do_action('wooms_product_import_row', $value, $key, $data);
-    add_action('wooms_product_import_row', [$this, 'load_data'], 100, 3);
+    // do_action('wooms_product_update', $product_id, $value, $data);
+    add_action('wooms_product_update', [$this, 'load_data'], 100, 3);
+
+
   }
 
-  function load_data($value, $key, $data){
+  function load_data($product_id, $value, $data){
     if(empty($value['productFolder']['meta']['href'])){
       return;
     }
@@ -19,14 +22,7 @@ class WooMS_Import_Product_Categories {
 
     if( $term_id = $this->update_category($url) ){
 
-      if( empty($value['article']) ){
-        return;
-      }
-
-      if( $post_id = wc_get_product_id_by_sku($value['article']) ){
-
-        wp_set_object_terms( $post_id, $term_id, $taxonomy = 'product_cat' );
-      }
+      wp_set_object_terms( $product_id, $term_id, $taxonomy = 'product_cat' );
     }
 
   }
