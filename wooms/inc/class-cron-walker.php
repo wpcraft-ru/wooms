@@ -23,6 +23,10 @@ class WooMS_Walker_Cron {
       return;
     }
 
+    if(empty(get_transient('woomss_walker_cron_enabled'))){
+      return;
+    }
+
     $args =[
       'action' => 'wooms_walker_import',
       'batch' => '1',
@@ -46,7 +50,7 @@ class WooMS_Walker_Cron {
     register_setting('mss-settings', 'woomss_walker_cron_enabled');
     add_settings_field(
       $id = 'woomss_walker_cron_enabled',
-      $title = 'Включить синхронизацию по расписанию',
+      $title = 'Включить синхронизацию продуктов по расписанию',
       $callback = [$this, 'woomss_walker_cron_display'],
       $page = 'mss-settings',
       $section = 'wooms_section_cron'
@@ -88,6 +92,10 @@ class WooMS_Walker_Cron {
   }
 
   function cron_init(){
+
+    if(empty(get_transient('woomss_walker_cron_enabled'))){
+      return;
+    }
 
     $shedule = get_option('woomss_walker_cron_timer', 'twicedaily');
 

@@ -106,6 +106,7 @@ class WooMS_Product_Import_Walker {
     if(isset($_GET['a']) and $_GET['a'] == 'wooms_products_start_import'){
 
       delete_transient('wooms_start_timestamp');
+      delete_transient('woomss_error_background');
 
 
       $args =[
@@ -117,7 +118,7 @@ class WooMS_Product_Import_Walker {
       $url = add_query_arg($args, admin_url('admin-ajax.php'));
       wp_remote_get($url);
 
-      printf( '<p>Импорт запущен. Вы можете вернуться на шаг назад, чтобы увидеть сообщение о статусе и прогрессе.</p><p><small>Запрос: %s</small></p>', $url);
+      printf( '<p>Импорт запущен. Вы можете вернуться на шаг назад, чтобы увидеть сообщение о статусе и прогрессе.</p><p><small>Запрос: <br/>%s</small></p>', $url);
 
     }
   }
@@ -154,17 +155,28 @@ class WooMS_Product_Import_Walker {
         set_transient('wooms_start_timestamp', date("Y-m-d H:i:s"), 60*30);
 
         $data = wooms_get_data_by_url( $url_get );
-        $rows = $data['rows'];
 
-        if(empty($rows)){
+
+        if(isset($data['errors'])){
+          $error = $data['errors'][0];
+          $code = $error['code'];
+
+          if($code == 429001){
+            $msg = sprintf('Wrong username or password: %s, исправьте в <a href="%s">настройках</a>', $code, admin_url('options-general.php?page=mss-settings'));
+            throw new Exception($msg);
+          } else {
+            wp_send_json_error($data);
+          }
+        }
+
+        if(empty($data['rows'])){
           //If no rows, that send 'end' and stop walker
-
           delete_transient('wooms_start_timestamp');
           wp_send_json(['end walker', $data]);
         }
 
 
-        foreach ($rows as $key => $value) {
+        foreach ($data['rows'] as $key => $value) {
           do_action('wooms_product_import_row', $value, $key, $data);
         }
 
@@ -186,12 +198,7 @@ class WooMS_Product_Import_Walker {
           $check = wp_remote_get($url,$args_remote);
 
           if(is_wp_error($check)){
-            $check = wp_remote_get($url,$args_remote);
-          }
-
-          if(is_wp_error($check)){
-            set_transient('woomss_error_background', "Error request: " . $url, 60*60);
-            throw new Exception('Error request wp_remote_get. Link: ' . $url);
+            throw new Exception('Error. Link: ' . $url);
           }
 
         }
@@ -201,6 +208,8 @@ class WooMS_Product_Import_Walker {
     } catch (Exception $e) {
 
       delete_transient('wooms_start_timestamp');
+      set_transient('woomss_error_background', $e->getMessage(), 60*60);
+
       wp_send_json_error( $e->getMessage() );
     }
 

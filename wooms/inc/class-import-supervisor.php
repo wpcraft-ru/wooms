@@ -22,15 +22,14 @@ class WooMS_Import_Supervisor {
       }
 
       $time_1 = strtotime($time_last_start);
-      $time_2 = strtotime('-5 minutes');
+      $time_2 = strtotime('-2 minutes');
       $diff = ($time_1 - $time_2)/60;
 
       if($diff < 0){
 
-        if($url = get_transient('wooms_last_url')){
-          wp_remote_get($url);
-
-        }
+      if($url = get_transient('wooms_last_url')){
+        wp_remote_get($url);
+      }
       }
   }
 
@@ -54,7 +53,7 @@ class WooMS_Import_Supervisor {
     register_setting('mss-settings', 'woomss_walker_supervisor_disabled');
     add_settings_field(
       $id = 'woomss_walker_supervisor_disabled',
-      $title = 'Выключить супервайзера бота',
+      $title = 'Отключить супервайзера бота',
       $callback = [$this, 'woomss_walker_supervisor_disabled_display'],
       $page = 'mss-settings',
       $section = 'woomss_section_other'

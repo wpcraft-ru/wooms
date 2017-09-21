@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.4.1
+Version: 1.5
 */
 
 
@@ -19,6 +19,7 @@ require_once 'inc/class-menu-settings.php';
 require_once 'inc/class-menu-tool.php';
 require_once 'inc/class-cron-walker.php';
 require_once 'inc/class-import-supervisor.php';
+require_once 'inc/class-import-product-images.php';
 
 
 /**
