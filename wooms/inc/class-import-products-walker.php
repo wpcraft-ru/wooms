@@ -160,7 +160,7 @@ class WooMS_Product_Import_Walker {
           //If no rows, that send 'end' and stop walker
 
           delete_transient('wooms_start_timestamp');
-          wp_send_json(['end waler', $data]);
+          wp_send_json(['end walker', $data]);
         }
 
 
@@ -190,8 +190,8 @@ class WooMS_Product_Import_Walker {
           }
 
           if(is_wp_error($check)){
-            set_transient('woomss_error_background', "Ошибка запроса: " . $url, 60*60);
-            throw new Exception('Ошибка запроса пакетной операции. Ссылка: ' . $url);
+            set_transient('woomss_error_background', "Error request: " . $url, 60*60);
+            throw new Exception('Error request wp_remote_get. Link: ' . $url);
           }
 
         }

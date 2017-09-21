@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.4
+Version: 1.4.1
 */
 
 
@@ -44,7 +44,7 @@ function wooms_get_data_by_url($url = ''){
 }
 
 /**
-* Add Settings link in pligins list 
+* Add Settings link in pligins list
 */
 function wooms_plugin_add_settings_link( $links ) {
 		$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
