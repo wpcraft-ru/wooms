@@ -20,6 +20,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 *   Синхронизация товаров по протоколу JSON REST API
 *   Загрузка категорий
+*   Загрузка картинок
 *   Простые настройки
 
 
