@@ -49,12 +49,15 @@ class WooMS_Import_Product_Images {
 
     $schedules['wooms_cron_worker_images'] = array(
       'interval' => 60,
-      'display' => 'WooMS Cron Load Images'
+      'display' => 'WooMS Cron Load Images 60 sec'
     );
 
     return $schedules;
   }
 
+  /**
+  * Init Cron
+  */
   function add_cron_hook(){
     if( empty(get_option('woomss_images_sync_enabled')) ){
       return;
@@ -94,6 +97,8 @@ class WooMS_Import_Product_Images {
       return;
     }
 
+    wp_mail('yumashev@fleep.io', 'test cron', time());
+
 
     $list = get_posts('post_type=product&meta_key=wooms_url_for_get_thumbnail&meta_compare=EXISTS');
 
@@ -131,7 +136,6 @@ class WooMS_Import_Product_Images {
     }
 
   }
-
 
   /**
   * Check exist image by URL
@@ -176,8 +180,10 @@ class WooMS_Import_Product_Images {
      $info = curl_getinfo($ch); // Получим информацию об операции
      curl_close($ch);
 
-     if ( ! function_exists( 'wp_tempnam' ) )
-     		require_once( ABSPATH . 'wp-admin/includes/file.php' );
+     if ( ! function_exists( 'wp_tempnam' ) ) {
+       require_once( ABSPATH . 'wp-admin/includes/file.php' );
+       require_once( ABSPATH . 'wp-admin/includes/image.php' );
+     }
 
      $tmpfname = wp_tempnam( $file_name );
      $fh = fopen($tmpfname, 'w');
@@ -270,8 +276,6 @@ class WooMS_Import_Product_Images {
       return;
     }
 
-
-
     ?>
     <h2>Загрузка картинок</h2>
     <p>Ручная загрузка картинок по 5 штук за раз.</p>
@@ -279,9 +283,9 @@ class WooMS_Import_Product_Images {
     <?php
   }
 
-
-
-
+  /**
+  * Settings UI
+  */
   function settings_init(){
 
     register_setting('mss-settings', 'woomss_images_sync_enabled');
@@ -300,8 +304,6 @@ class WooMS_Import_Product_Images {
     $option = 'woomss_images_sync_enabled';
     printf('<input type="checkbox" name="%s" value="1" %s />', $option, checked( 1, get_option($option), false ));
   }
-
-
 
 }
 new WooMS_Import_Product_Images;

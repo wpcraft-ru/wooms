@@ -169,6 +169,7 @@ class WooMS_Product_Import_Walker
 
         case 'wooms_products_stop_import':
           set_transient('wooms_walker_stop', 1, 60*60);
+          wp_redirect(admin_url('tools.php?page=moysklad'));
           break;
       }
 
@@ -186,7 +187,8 @@ class WooMS_Product_Import_Walker
 
         if( ! empty(get_transient('wooms_walker_stop')) ){
           delete_transient('wooms_start_timestamp');
-          wp_send_json(['stoped']);
+          delete_transient('wooms_walker_stop');
+          wp_send_json(['stopped manually']);
           return;
         }
 
