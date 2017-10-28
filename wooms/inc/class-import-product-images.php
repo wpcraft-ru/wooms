@@ -97,9 +97,6 @@ class WooMS_Import_Product_Images {
       return;
     }
 
-    wp_mail('yumashev@fleep.io', 'test cron', time());
-
-
     $list = get_posts('post_type=product&meta_key=wooms_url_for_get_thumbnail&meta_compare=EXISTS');
 
     if(empty($list)){
