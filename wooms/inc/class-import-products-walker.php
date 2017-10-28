@@ -58,7 +58,7 @@ class WooMS_Product_Import_Walker
           delete_transient('wooms_count_stat');
       } else {
           $offset = intval($_GET['offset']);
-          set_transient('wooms_count_stat', $offset + $count, DAY_IN_SECONDS);
+          set_transient('wooms_count_stat', $offset + $count);
       }
 
       $args_ms_api = [
@@ -70,28 +70,27 @@ class WooMS_Product_Import_Walker
 
       try {
 
-          delete_option('wooms_end_timestamp');
+          delete_transient('wooms_end_timestamp');
 
           set_transient('wooms_start_timestamp', date("Y-m-d H:i:s"), 60*30);
 
           $data = wooms_get_data_by_url( $url_api );
 
           if (isset($data['errors'])) {
-              $error = $data['errors'][0];
-              $code = $error['code'];
+              $error_code = $data['errors'][0]["code"];
 
-              if ($code == 429001) {
-                  $msg = sprintf('Wrong username or password: %s, исправьте в <a href="%s">настройках</a>', $code, admin_url('options-general.php?page=mss-settings'));
+              if ($error_code == 1056) {
+                  $msg = sprintf('Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url('options-general.php?page=mss-settings'));
                   throw new Exception($msg);
               } else {
-                  wp_send_json_error($data);
+                  throw new Exception($error_code . ': '. $data['errors'][0]["error"]);
               }
           }
 
           if (empty($data['rows'])) {
             //If no rows, that send 'end' and stop walker
               delete_transient('wooms_start_timestamp');
-              update_option('wooms_end_timestamp', date("Y-m-d H:i:s"), 'no');
+              set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"));
               wp_send_json(['end walker', $data]);
           }
 
@@ -102,10 +101,9 @@ class WooMS_Product_Import_Walker
           if (isset($_GET['batch'])) {
               $args = [
                 'action' => 'wooms_walker_import',
-                '_wooms_nonce' => $this->wooms_nonce_create(),
                 'batch' => 1,
-                'count' => $iteration,
                 'offset' => $offset + $iteration,
+                '_wooms_nonce' => $this->wooms_nonce_create(),
               ];
 
               $url = add_query_arg($args, admin_url('admin-ajax.php') );
@@ -119,15 +117,16 @@ class WooMS_Product_Import_Walker
 
               if (is_wp_error($check) || 200 !== wp_remote_retrieve_response_code( $check )) {
                   // $check = wp_remote_get($url,$args_remote);
-                  throw new Exception('Error. Link: ' . $url);
+                  throw new Exception('Ошибка выполнения запроса. Ссылка: <br>' . $url);
               }
           }
 
           wp_send_json(array('url' => $url));
           // wp_send_json(['url' => $url, 'data' => $data]);
+
       } catch (Exception $e) {
           delete_transient('wooms_start_timestamp');
-          set_transient('woomss_error_background', $e->getMessage(), 60*60);
+          set_transient('wooms_error_background', $e->getMessage());
 
           wp_send_json_error( $e->getMessage() );
       }
@@ -161,7 +160,7 @@ class WooMS_Product_Import_Walker
           return;
       }
 
-      if(empty(get_option('wooms_end_timestamp'))){
+      if(empty(get_transient('wooms_end_timestamp'))){
         return;
       }
 
@@ -170,11 +169,11 @@ class WooMS_Product_Import_Walker
       }
 
       ?>
-      <div class="updated">
+      <div class="updated notice">
         <p><strong>Успешно завершился импорт продуктов из МойСклад</strong></p>
         <?php
           printf('<p>Количество обработанных записей в последней итерации: %s</p>', get_transient('wooms_count_stat'));
-          printf('<p>Время успешного завершения последней загрузки: %s</p>', get_option('wooms_end_timestamp'));
+          printf('<p>Время успешного завершения последней загрузки: %s</p>', get_transient('wooms_end_timestamp'));
         ?>
       </div>
       <?php
@@ -199,10 +198,10 @@ class WooMS_Product_Import_Walker
         $diff_minutes = round(($time - strtotime('-5 minutes'))/60, 2);
 
         ?>
-        <div class="updated">
+        <div class="updated notice">
           <p><strong>Сейчас выполняется пакетная обработка данных в фоне.</strong></p>
           <p>Отметка времени о последней итерации: <?php echo $time_string ?>, количество прошедших минут: <?php echo $diff_minutes ?></p>
-          <p>Ссылка на последний запрос в очереди: <?php echo get_transient('wooms_last_url') ?></p>
+          <p>Ссылка на последний запрос в очереди:<br><?php echo get_transient('wooms_last_url') ?></p>
         </div>
         <?php
     }
@@ -216,15 +215,15 @@ class WooMS_Product_Import_Walker
             return;
         }
 
-        if (empty(get_transient('woomss_error_background'))) {
+        if (empty(get_transient('wooms_error_background'))) {
             return;
         }
 
         ?>
         <div class="update-nag">
-        <p><strong>Обработка заверишлась с ошибкой.</strong></p>
-        <p>Данные: <?php echo get_transient('woomss_error_background') ?></p>
-      </div>
+          <p><strong>Обработка заверишлась с ошибкой.</strong></p>
+          <p>Данные: <?php echo get_transient('wooms_error_background') ?></p>
+        </div>
         <?php
     }
 
@@ -285,7 +284,7 @@ class WooMS_Product_Import_Walker
       switch ($action) {
         case 'wooms_products_start_import':
           delete_transient('wooms_start_timestamp');
-          delete_transient('woomss_error_background');
+          delete_transient('wooms_error_background');
 
           $args =[
             'action' => 'wooms_walker_import',
