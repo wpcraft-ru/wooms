@@ -6,11 +6,10 @@
 class WooMS_Import_Product_Categories {
 
   function __construct() {
-    //do_action('wooms_product_import_row', $value, $key, $data);
-    // do_action('wooms_product_update', $product_id, $value, $data);
+    /**
+    * Use hook: do_action('wooms_product_update', $product_id, $value, $data);
+    */
     add_action('wooms_product_update', [$this, 'load_data'], 100, 3);
-
-
   }
 
   function load_data($product_id, $value, $data){
@@ -34,8 +33,10 @@ class WooMS_Import_Product_Categories {
       return $term_id;
     } else {
 
-      $new = [
-        'id' => $data['id'],
+      $args = array();
+
+      $term_new = [
+        'wooms_id' => $data['id'],
         'name' => $data['name'],
         'archived' => $data['archived'],
       ];
@@ -43,45 +44,32 @@ class WooMS_Import_Product_Categories {
       if(isset($data['productFolder']['meta']['href'])){
         $url_parent = $data['productFolder']['meta']['href'];
         if($term_id_parent = $this->update_category($url_parent)){
-          $new['parent_id'] = intval($term_id_parent);
+          $args['parent'] = intval($term_id_parent);
         }
       }
 
-      $args = array(
-      	'description' => '',
-      );
 
-      if(isset($new['parent_id'])){
-        $args['parent'] = $new['parent_id'];
-      }
+      $term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
 
 
-      $term_id = wp_insert_term( $term = $new['name'], $taxonomy = 'product_cat', $args );
-
-      if(is_wp_error($term_id)){
-
-        if(isset($term_id->errors["term_exists"])){
-          $term_id = $term_id->error_data['term_exists'];
-          update_term_meta($term_id, 'wooms_id', $new['id']);
-        }
-
-      }
-
-      $term_id = intval($term_id);
-
-      if(empty($term_id)){
-        return false;
+      if(isset($term->errors["term_exists"])){
+        $term = get_term_by('name', $term_new['name'], 'product_cat');
+        $term_id = $term->term_id;
+      } elseif(isset($term['term_id'])){
+        $term_id = $term['term_id'];
       } else {
-        update_term_meta($term_id, 'wooms_id', $new['id']);
-        return $term_id;
+        return false;
       }
+
+      update_term_meta($term_id, 'wooms_id', $term_new['wooms_id']);
+      return $term_id;
     }
 
   }
 
-
-
-  //If isset term return term_id, else return false
+  /**
+  * If isset term return term_id, else return false
+  */
   function check_term_by_ms_id($id){
 
     $terms = get_terms('taxonomy=product_cat&meta_key=wooms_id&meta_value='.$id);

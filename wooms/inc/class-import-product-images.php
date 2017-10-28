@@ -7,7 +7,6 @@
 class WooMS_Import_Product_Images {
 
   function __construct() {
-    //do_action('wooms_product_import_row', $value, $key, $data);
 
     add_action( 'admin_init', array($this, 'settings_init'), 100 );
 
@@ -22,6 +21,28 @@ class WooMS_Import_Product_Images {
     add_action('woomss_tool_actions_btns', [$this, 'ui_for_manual_start'], 15);
     add_action('woomss_tool_actions_wooms_products_images_manual_start', [$this, 'ui_action']);
 
+  }
+
+  function load_data($product_id, $value, $data)
+  {
+    if( empty(get_option('woomss_images_sync_enabled')) ){
+      return;
+    }
+
+    //Check image
+    if(empty($value['image']['meta']['href'])){
+      return;
+    } else {
+      $url = $value['image']['meta']['href'];
+    }
+
+    //check current thumbnail. if isset - break, or add url for next downloading
+    if($id = get_post_thumbnail_id( $product_id )){
+      return;
+    } else {
+      update_post_meta($product_id, 'wooms_url_for_get_thumbnail', $url);
+      update_post_meta($product_id, 'wooms_image_data', $value['image']);
+    }
   }
 
   function add_schedule($schedules){
@@ -44,27 +65,6 @@ class WooMS_Import_Product_Images {
     }
   }
 
-  function load_data($product_id, $value, $data){
-    if( empty(get_option('woomss_images_sync_enabled')) ){
-      return;
-    }
-
-    //Check image
-    if(empty($value['image']['meta']['href'])){
-      return;
-    } else {
-      $url = $value['image']['meta']['href'];
-    }
-
-    //check current thumbnail. if isset - break, or add url for next downloading
-    if($id = get_post_thumbnail_id( $product_id )){
-      return;
-    } else {
-      update_post_meta($product_id, 'wooms_url_for_get_thumbnail', $url);
-      update_post_meta($product_id, 'wooms_image_data', $value['image']);
-    }
-
-  }
 
   /**
    * Action for UI
@@ -82,6 +82,8 @@ class WooMS_Import_Product_Images {
       foreach ($data as $key => $value) {
         printf('<p><a href="%s">ID %s</a></p>', get_edit_post_link($value),$value);
       }
+      echo "<p>Чтобы повторить загрузку - обновите страницу</p>";
+
     }
   }
 

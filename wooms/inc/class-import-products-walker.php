@@ -3,6 +3,7 @@
 /**
  * Product Import Walker
  * do_action('wooms_product_import_row', $value, $key, $data);
+ * Example url: /wp-admin/admin-ajax.php?action=wooms_walker_import&batch=1
  */
 class WooMS_Product_Import_Walker
 {
@@ -16,12 +17,12 @@ class WooMS_Product_Import_Walker
         add_action('wp_ajax_nopriv_wooms_walker_import', [$this, 'walker']);
         add_action('wp_ajax_wooms_walker_import', [$this, 'walker']);
 
-        add_action( 'wooms_walker_ui_log', [$this, 'notice'] );
-        add_action( 'wooms_walker_ui_log', [$this, 'error_notice'] );
+        add_action( 'admin_notices', [$this, 'notice'] );
+        add_action( 'admin_notices', [$this, 'error_notice'] );
+        add_action( 'admin_notices', array($this, 'notice_results') );
 
         add_action( 'admin_init', array($this, 'settings_init'), $priority = 100, $accepted_args = 1 );
 
-        add_action('admin_notices', array($this, 'notice_results') );
     }
 
     function notice_results()
@@ -276,18 +277,7 @@ class WooMS_Product_Import_Walker
         }
     }
 
-    public function walker_log( $message ) {
 
-      set_transient(
-        'wooms_walker_log',
-        sprintf(
-          "%s\n\n---\n\n%s",
-          get_transient( 'wooms_walker_log' ),
-          (string) $message
-        )
-      );
-
-    }
 }
 
 new WooMS_Product_Import_Walker;
