@@ -165,6 +165,10 @@ class WooMS_Product_Import_Walker
         return;
       }
 
+      if ( ! empty(get_transient('wooms_start_timestamp'))) {
+          return;
+      }
+
       ?>
       <div class="updated">
         <p><strong>Успешно завершился импорт продуктов из МойСклад</strong></p>
@@ -298,6 +302,8 @@ class WooMS_Product_Import_Walker
 
         case 'wooms_products_stop_import':
           set_transient('wooms_walker_stop', 1, 60*60);
+          delete_transient('wooms_start_timestamp');
+
           wp_redirect(admin_url('tools.php?page=moysklad'));
           break;
       }
