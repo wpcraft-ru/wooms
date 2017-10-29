@@ -1,7 +1,9 @@
 <?php
 
-class woomss {
-  function __construct(){
+class woomss
+{
+  function __construct()
+  {
 
     add_action('admin_menu', function () {
         add_options_page(
@@ -13,12 +15,56 @@ class woomss {
         );
     });
 
-    add_action( 'admin_init', array($this, 'settings_init'), $priority = 10, $accepted_args = 1 );
-    add_action( 'admin_init', array($this, 'settings_init_other'), $priority = 10, $accepted_args = 1 );
+    add_action( 'admin_init', array($this, 'settings_general'), $priority = 10, $accepted_args = 1 );
+    add_action( 'admin_init', array($this, 'settings_shedules'), $priority = 20, $accepted_args = 1 );
+    add_action( 'admin_init', array($this, 'settings_other'), $priority = 100, $accepted_args = 1 );
+
   }
 
 
-  function settings_init(){
+
+  function settings_shedules(){
+
+    add_settings_section(
+      'wooms_section_cron',
+      'Расписание синхронизации',
+      null,
+      'mss-settings'
+    );
+
+    register_setting('mss-settings', 'woomss_walker_cron_enabled');
+    add_settings_field(
+      $id = 'woomss_walker_cron_enabled',
+      $title = 'Включить синхронизацию продуктов по расписанию',
+      $callback = [$this, 'woomss_walker_cron_display'],
+      $page = 'mss-settings',
+      $section = 'wooms_section_cron'
+    );
+
+    register_setting('mss-settings', 'woomss_walker_cron_timer');
+    add_settings_field(
+      $id = 'woomss_walker_cron_timer',
+      $title = 'Перерыв синхронизации в часах',
+      $callback = [$this, 'woomss_walker_cron_timer_display'],
+      $page = 'mss-settings',
+      $section = 'wooms_section_cron'
+    );
+
+  }
+
+  function woomss_walker_cron_timer_display(){
+    $option_name = 'woomss_walker_cron_timer';
+    printf('<input type="number" name="%s" value="%s"  />', $option_name, get_option($option_name, 24));
+  }
+
+  function woomss_walker_cron_display(){
+    $option_name = 'woomss_walker_cron_enabled';
+    printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option($option_name), false ));
+
+  }
+
+  function settings_general()
+  {
 
     add_settings_section(
     	'woomss_section_login',
@@ -59,7 +105,7 @@ class woomss {
 
 
 
-  function settings_init_other(){
+  function settings_other(){
 
       add_settings_section(
       	'woomss_section_other',
@@ -84,7 +130,7 @@ class woomss {
     printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option($option_name), false ));
     ?>
 
-    <p><small>Если товары не попадают из МойСклад на сайт - попробуйте включить эту опцию.</small></p>
+    <p><strong>Если товары не попадают из МойСклад на сайт - попробуйте включить эту опцию.</strong></p>
     <p><small>По умолчанию используется связь продуктов по артикулу. Это позволяет обеспечить синхронизацию без удаления всех продуктов с сайта при их наличии. Но без артикула товары не будут синхронизироваться. Если товаров на сайте нет, либо их можно удалить без вреда, то можно включить синхронизацию по UUID. В этом случае артикулы будут не нужны. <br/>При создании записи о продукте произойдет связка по UUID (meta_key = wooms_id)</small></p>
     <?php
 
