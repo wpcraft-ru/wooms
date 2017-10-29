@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.6.1
+Version: 1.6.2
 */
 
 
@@ -53,6 +53,9 @@ function wooms_plugin_add_settings_link( $links ) {
 
 add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'wooms_plugin_add_settings_link' );
 
+/**
+* Log Helper
+*/
 function wooms_walker_log( $message ) {
 
 	set_transient(

@@ -20,7 +20,7 @@ class WooMS_Product_Import_Walker
 
       //Notices
       add_action( 'admin_notices', array($this, 'notice_walker') );
-      add_action( 'admin_notices', array($this, 'notice_error') );
+      add_action( 'admin_notices', array($this, 'notice_errors') );
       add_action( 'admin_notices', array($this, 'notice_results') );
 
       //Main Walker
@@ -68,6 +68,7 @@ class WooMS_Product_Import_Walker
 
           $data = wooms_get_data_by_url( $url_api );
 
+          //Check for errors and send message to UI
           if (isset($data['errors'])) {
               $error_code = $data['errors'][0]["code"];
 
@@ -203,15 +204,13 @@ class WooMS_Product_Import_Walker
 
     function notice_walker()
     {
-
         $screen = get_current_screen();
-
         if ($screen->base != 'tools_page_moysklad') {
-            return;
+          return;
         }
 
         if (empty(get_transient('wooms_start_timestamp'))) {
-            return;
+          return;
         }
 
         $time_string = get_transient('wooms_start_timestamp');
@@ -229,9 +228,8 @@ class WooMS_Product_Import_Walker
         <?php
     }
 
-    function notice_error()
+    function notice_errors()
     {
-
         $screen = get_current_screen();
 
         if ($screen->base != 'tools_page_moysklad') {

@@ -1,6 +1,6 @@
 <?php
 
-class woomss
+class WooMS_Settings
 {
   function __construct()
   {
@@ -155,7 +155,5 @@ class woomss
     printf('<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru");
   }
 
-
-
 }
-new woomss;
+new WooMS_Settings;
