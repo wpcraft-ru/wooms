@@ -123,6 +123,24 @@ class WooMS_Settings
         $section = 'woomss_section_other'
       );
 
+      register_setting('mss-settings', 'wooms_replace_title');
+      add_settings_field(
+        $id = 'wooms_replace_title',
+        $title = 'Замена заголовока при обновлении',
+        $callback = [$this, 'display_wooms_replace_title'],
+        $page = 'mss-settings',
+        $section = 'woomss_section_other'
+      );
+
+  }
+
+  function display_wooms_replace_title(){
+    $option_name = 'wooms_replace_title';
+    printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option($option_name), false ));
+    ?>
+    <p><small>Если включить опцию, то плагин будет обновлять заголовки продукта из МойСклад. Иначе при наличии заголовока он не будет обновлен.</small></p>
+    <?php
+
   }
 
   function display_field_wooms_use_uuid(){

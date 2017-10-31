@@ -115,7 +115,9 @@ class woomss_tool_products_import {
 
         //update title
         if( isset($data_of_source['name']) and $data_of_source['name'] != $product->get_title() ){
-          $product->set_name( $data_of_source['name'] );
+          if( ! empty(get_option('wooms_replace_title'))){
+            $product->set_name( $data_of_source['name'] );
+          }
         }
 
         //update description
