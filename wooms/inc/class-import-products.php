@@ -31,10 +31,8 @@ class woomss_tool_products_import {
       if( intval($product_id) ){
         $this->update_product($product_id, $value);
       } elseif( $product_id = $this->get_product_id_by_uuid($value['id']) ) {
-
         $this->update_product($product_id, $value);
       } else {
-
         $product_id = $this->add_product($value);
         $this->update_product($product_id, $value);
       }
@@ -134,8 +132,6 @@ class woomss_tool_products_import {
 
             $product->set_price( $price_source );
             $product->set_regular_price( $price_source );
-            // update_post_meta( $product->id, '_regular_price', $price_source );
-            // update_post_meta( $product->id, '_price', $price_source );
 
           }
         }

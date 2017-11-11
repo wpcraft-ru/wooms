@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.6.3
+Version: 1.6.4
 */
 
 
@@ -39,8 +39,23 @@ function wooms_get_data_by_url($url = ''){
 	$body = $response['body'];
 
 	return json_decode( $body, true );
-
 }
+
+/**
+* Get product id by UUID from metafield
+* or false
+*/
+function wooms_get_product_id_by_uuid($uuid){
+
+	$posts = get_posts('post_type=product&meta_key=wooms_id&meta_value='.$uuid);
+
+	if(empty($posts[0]->ID)){
+		return false;
+	} else {
+		return $posts[0]->ID;
+	}
+}
+
 
 /**
 * Add Settings link in pligins list

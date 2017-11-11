@@ -33,6 +33,11 @@ class WooMS_Product_Import_Walker
     */
     function walker()
     {
+
+      if(empty(get_option('woomss_walker_cron_enabled'))){
+        return;
+      }
+      
       if(get_transient('wooms_end_timestamp')){
         return;
       }
