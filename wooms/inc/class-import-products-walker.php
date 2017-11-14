@@ -24,9 +24,10 @@ class WooMS_Product_Import_Walker
       add_action( 'admin_notices', array($this, 'notice_results') );
 
       //Main Walker
-      add_action( 'wooms_cron_walker', [$this, 'walker']);
+      add_action( 'wooms_cron_walker', [$this, 'walker_cron_starter']);
 
     }
+
 
     /**
     * Walker for data from MoySklad
@@ -34,10 +35,6 @@ class WooMS_Product_Import_Walker
     function walker()
     {
 
-      if(empty(get_option('woomss_walker_cron_enabled'))){
-        return;
-      }
-      
       if(get_transient('wooms_end_timestamp')){
         return;
       }
@@ -138,6 +135,11 @@ class WooMS_Product_Import_Walker
     */
     function cron_init()
     {
+
+      if(empty(get_option('woomss_walker_cron_enabled'))){
+        return;
+      }
+
       if(get_transient('wooms_end_timestamp')){
         return;
       }
@@ -146,6 +148,19 @@ class WooMS_Product_Import_Walker
         wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_walker' );
       }
     }
+
+    /**
+    * Starter walker by cron if option enabled 
+    */
+    function walker_cron_starter(){
+
+      if(empty(get_option('woomss_walker_cron_enabled'))){
+        return;
+      }
+
+      $this->walker();
+    }
+
 
     /**
     * Start manually actions
