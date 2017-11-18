@@ -13,8 +13,9 @@ class woomss_tool_products_import {
 
     function load_data($value, $key, $data){
 
-      if( ! empty($value['archived']))
+      if( ! empty($value['archived'])){
         return;
+      }
 
       if( empty( get_option('wooms_use_uuid') ) ){
         if( empty($value['article'])){

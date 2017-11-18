@@ -9,9 +9,6 @@ class WooMS_Product_Import_Walker
 {
     function __construct()
     {
-      //Cron settings
-      add_action('init', [$this,'cron_init']);
-      add_filter( 'cron_schedules', array($this, 'add_schedule') );
 
       //UI and actions manually
       add_action( 'woomss_tool_actions_btns', [$this, 'ui']);
@@ -24,7 +21,9 @@ class WooMS_Product_Import_Walker
       add_action( 'admin_notices', array($this, 'notice_results') );
 
       //Main Walker
-      add_action( 'wooms_cron_walker', [$this, 'walker_cron_starter']);
+      add_action( 'wooms_cron_walker', array($this, 'walker_cron_starter'));
+      add_action( 'init', array($this, 'cron_init'));
+      add_filter( 'cron_schedules', array($this, 'add_schedule') );
 
     }
 
@@ -34,10 +33,6 @@ class WooMS_Product_Import_Walker
     */
     function walker()
     {
-
-      if(get_transient('wooms_end_timestamp')){
-        return;
-      }
 
       //Stop via key
       if( get_transient('wooms_walker_stop') ){
@@ -84,22 +79,23 @@ class WooMS_Product_Import_Walker
 
           if (empty($data['rows'])) {
             //If no rows, that send 'end' and stop walker
-              delete_transient('wooms_start_timestamp');
-              delete_transient('wooms_offset');
+            delete_transient('wooms_start_timestamp');
+            delete_transient('wooms_offset');
+            delete_transient('wooms_manual_sync');
 
-              if(empty(get_option('woomss_walker_cron_enabled'))){
-                $timer = 0;
-              } else {
-                $timer = 60*60*intval(get_option('woomss_walker_cron_timer', 24));
-              }
-              set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
-              return true;
+            if(empty(get_option('woomss_walker_cron_enabled'))){
+              $timer = 0;
+            } else {
+              $timer = 60*60*intval(get_option('woomss_walker_cron_timer', 24));
+            }
+            set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
+            return true;
           }
 
           $i = 0;
           foreach ($data['rows'] as $key => $value) {
-              do_action('wooms_product_import_row', $value, $key, $data);
-              $i++;
+            do_action('wooms_product_import_row', $value, $key, $data);
+            $i++;
           }
 
           if($count_saved = get_transient('wooms_count_stat')){
@@ -135,30 +131,20 @@ class WooMS_Product_Import_Walker
     */
     function cron_init()
     {
-
-      if(empty(get_option('woomss_walker_cron_enabled'))){
-        return;
-      }
-
-      if(get_transient('wooms_end_timestamp')){
-        return;
-      }
-
       if ( ! wp_next_scheduled( 'wooms_cron_walker' ) ) {
         wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_walker' );
       }
     }
 
     /**
-    * Starter walker by cron if option enabled 
+    * Starter walker by cron if option enabled
     */
     function walker_cron_starter(){
 
-      if(empty(get_option('woomss_walker_cron_enabled'))){
-        return;
+      if( $this->can_cron_start() ){
+        $this->walker();
       }
 
-      $this->walker();
     }
 
 
@@ -171,6 +157,8 @@ class WooMS_Product_Import_Walker
       delete_transient('wooms_error_background');
       delete_transient('wooms_offset');
       delete_transient('wooms_end_timestamp');
+      delete_transient('wooms_walker_stop');
+      set_transient('wooms_manual_sync', 1);
 
       $this->walker();
 
@@ -186,6 +174,7 @@ class WooMS_Product_Import_Walker
       delete_transient('wooms_start_timestamp');
       delete_transient('wooms_offset');
       delete_transient('wooms_end_timestamp');
+      delete_transient('wooms_manual_sync');
       wp_redirect(admin_url('tools.php?page=moysklad'));
     }
 
@@ -219,8 +208,49 @@ class WooMS_Product_Import_Walker
         ?>
       </div>
       <?php
+
     }
 
+    /**
+    * Can cron start? true or false
+    */
+    function can_cron_start(){
+
+      //Если стоит отметка о ручном запуске - крон может стартовать
+      if( ! empty(get_transient('wooms_manual_sync'))){
+        return true;
+      }
+
+      //Если работа по расписанию отключена - не запускаем
+      if( empty(get_option('woomss_walker_cron_enabled')) ){
+        return false;
+      }
+
+
+      if( $end_stamp = get_transient('wooms_end_timestamp') ){
+
+        $interval_hours = get_option('woomss_walker_cron_timer');
+        $interval_hours = (int)$interval_hours;
+
+        if(empty($interval_hours)){
+          return false;
+        }
+
+        $now = new DateTime();
+        $end_stamp = new DateTime($end_stamp);
+        $end_stamp = $now->diff($end_stamp);
+
+        $diff_hours = $end_stamp->format('%h');
+
+        if($diff_hours > $interval_hours) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return true;
+      }
+    }
 
     function notice_walker()
     {
@@ -242,8 +272,8 @@ class WooMS_Product_Import_Walker
         <div id="message" class="updated notice">
           <p><strong>Сейчас выполняется пакетная обработка данных в фоне.</strong></p>
           <p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
-          <p>Количество операций: <?php echo get_transient('wooms_count_stat'); ?></p>
-          <p>Секунд прошло: <?php echo $diff_sec ?>. Следующая серия данных должна отправиться примерно через минуту. Можно обновить страницу для проверки результатов работы.</p>
+          <p>Количество обработанных записей: <?php echo get_transient('wooms_count_stat'); ?></p>
+          <p>Секунд прошло: <?php echo $diff_sec ?>.<br/> Следующая серия данных должна отправиться примерно через минуту. Можно обновить страницу для проверки результатов работы.</p>
         </div>
         <?php
     }
@@ -280,6 +310,7 @@ class WooMS_Product_Import_Walker
       } else {
         printf('<a href="%s" class="button">Остановить импорт продуктов</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('tools.php?page=moysklad')));
       }
+
     }
 }
 
