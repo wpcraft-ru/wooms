@@ -55,8 +55,8 @@ class WooMS_Import_Product_Categories {
       if(isset($term->errors["term_exists"])){
         $term = get_term_by('name', $term_new['name'], 'product_cat');
         $term_id = $term->term_id;
-      } elseif(isset($term['term_id'])){
-        $term_id = $term['term_id'];
+      } elseif(isset($term->term_id)){
+        $term_id = $term->term_id;
       } else {
         return false;
       }
