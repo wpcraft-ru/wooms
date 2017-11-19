@@ -9,7 +9,6 @@ class WooMS_Product_Import_Walker
 {
     function __construct()
     {
-
       //UI and actions manually
       add_action( 'woomss_tool_actions_btns', [$this, 'ui']);
       add_action( 'woomss_tool_actions_wooms_products_start_import', [$this, 'start_manually']);
@@ -24,9 +23,7 @@ class WooMS_Product_Import_Walker
       add_action( 'wooms_cron_walker', array($this, 'walker_cron_starter'));
       add_action( 'init', array($this, 'cron_init'));
       add_filter( 'cron_schedules', array($this, 'add_schedule') );
-
     }
-
 
     /**
     * Walker for data from MoySklad
@@ -303,9 +300,9 @@ class WooMS_Product_Import_Walker
     */
     function ui()
     {
-      echo '<h2>Импорт продуктов</h2>';
+      echo '<h2>Синхронизация продуктов</h2>';
       if(empty(get_transient('wooms_start_timestamp'))) {
-        echo "<p>Нажмите на кнопку ниже, чтобы запустить импорт продуктов вручную</p>";
+        echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
         printf('<a href="%s" class="button">Старт импорта продуктов</a>', add_query_arg('a', 'wooms_products_start_import', admin_url('tools.php?page=moysklad')));
       } else {
         printf('<a href="%s" class="button">Остановить импорт продуктов</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('tools.php?page=moysklad')));
