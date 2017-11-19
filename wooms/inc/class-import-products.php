@@ -102,7 +102,6 @@ class woomss_tool_products_import {
 
         $product = wc_get_product($product_id);
 
-
         //save data of source
         $now = date("Y-m-d H:i:s");
         update_post_meta($product_id, 'wooms_data_of_source', print_r($data_of_source, true));
@@ -137,6 +136,8 @@ class woomss_tool_products_import {
           }
         }
 
+        $product->set_stock_status('instock');
+        
         $product->set_status('publish');
         $product->save();
 
