@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Import Product Categories from MoySklad
  */
@@ -30,6 +29,7 @@ class WooMS_Import_Product_Categories {
     $data = wooms_get_data_by_url($url);
 
     if($term_id = $this->check_term_by_ms_id($data['id'])){
+
       return $term_id;
     } else {
 
@@ -48,15 +48,17 @@ class WooMS_Import_Product_Categories {
         }
       }
 
-
       $term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
 
-
       if(isset($term->errors["term_exists"])){
-        $term = get_term_by('name', $term_new['name'], 'product_cat');
-        $term_id = $term->term_id;
+        $term_id = intval($term->error_data['term_exists']);
+        if(empty($term_id)){
+          return false;
+        }
       } elseif(isset($term->term_id)){
         $term_id = $term->term_id;
+      } elseif(isset($term["term_id"])){
+        $term_id = $term["term_id"];
       } else {
         return false;
       }
