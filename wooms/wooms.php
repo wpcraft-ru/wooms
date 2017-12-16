@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.7.8
+Version: 1.7.9
 */
 
 
@@ -36,6 +36,11 @@ function wooms_get_data_by_url($url = ''){
 		);
 
 	$response = wp_remote_get( $url, $args );
+
+	if ( is_wp_error( $response ) ){
+		set_transient('wooms_error_background', $response->get_error_message());
+		return false;
+	}
 	$body = $response['body'];
 
 	return json_decode( $body, true );
