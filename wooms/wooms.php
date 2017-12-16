@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.7.9
+Version: 1.7.10
 */
 
 
@@ -41,6 +41,12 @@ function wooms_get_data_by_url($url = ''){
 		set_transient('wooms_error_background', $response->get_error_message());
 		return false;
 	}
+
+	if ( ! is_array( $response ) ){
+		set_transient('wooms_error_background', "REST API вернулся без массива");
+		return false;
+	}
+
 	$body = $response['body'];
 
 	return json_decode( $body, true );
