@@ -67,10 +67,10 @@ class WooMS_Settings
   {
 
     add_settings_section(
-    	'woomss_section_login',
-    	'Данные для доступа МойСклад',
-    	null,
-    	'mss-settings'
+      'woomss_section_login',
+      'Данные для доступа МойСклад',
+      null,
+      'mss-settings'
     );
 
     register_setting('mss-settings', 'woomss_login');
@@ -90,9 +90,6 @@ class WooMS_Settings
       $page = 'mss-settings',
       $section = 'woomss_section_login'
     );
-
-
-
   }
 
   function woomss_pass_display(){
@@ -103,15 +100,16 @@ class WooMS_Settings
     printf('<input type="text" name="woomss_login" value="%s"/>',get_option('woomss_login'));
   }
 
-
-
-  function settings_other(){
-
+  /**
+  * Settings - Other
+  */
+  function settings_other()
+  {
       add_settings_section(
-      	'woomss_section_other',
-      	'Прочие настройки',
-      	null,
-      	'mss-settings'
+        'woomss_section_other',
+        'Прочие настройки',
+        null,
+        'mss-settings'
       );
 
       register_setting('mss-settings', 'wooms_use_uuid');
@@ -156,9 +154,15 @@ class WooMS_Settings
 
   function mss_settings_callback(){
     ?>
-
     <form method="POST" action="options.php">
+      <style media="screen" scoped="true">
+        .lead {
+          background-color: blanchedalmond;
+          padding: 10px;
+        }
+      </style>
       <h1>Настройки интеграции МойСклад</h1>
+      <p><strong class="lead">Внимание! Настройки следует сначала выполнять на тестовой копии сайта. Только после тестов, переносить конфигурацию на рабочий сайт с клиентами.</strong></p>
       <?php
         settings_fields( 'mss-settings' );
         do_settings_sections( 'mss-settings' );
@@ -170,7 +174,7 @@ class WooMS_Settings
     <?php
     printf('<p><a href="%s">Управление синхронизацией</a></p>', admin_url('tools.php?page=moysklad'));
     printf('<p><a href="%s" target="_blank">Расширенная версия с дополнительными возможностями</a></p>', "https://wpcraft.ru/product/wooms-extra/");
-    printf('<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru");
+    printf('<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru/contacts/");
   }
 
 }

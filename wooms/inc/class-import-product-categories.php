@@ -9,9 +9,17 @@ class WooMS_Import_Product_Categories {
     * Use hook: do_action('wooms_product_update', $product_id, $value, $data);
     */
     add_action('wooms_product_update', [$this, 'load_data'], 100, 3);
+
+    add_action( 'admin_init', array($this, 'settings_init'), 100 );
   }
 
   function load_data($product_id, $value, $data){
+
+    //Если опция отключена - пропускаем обработку
+    if(empty(get_option('woomss_categories_sync_enabled'))){
+      return;
+    }
+    
     if(empty($value['productFolder']['meta']['href'])){
       return;
     }
@@ -83,5 +91,29 @@ class WooMS_Import_Product_Categories {
     }
   }
 
+  /**
+  * Settings UI
+  */
+  function settings_init(){
+
+    register_setting('mss-settings', 'woomss_categories_sync_enabled');
+    add_settings_field(
+      $id = 'woomss_categories_sync_enabled',
+      $title = 'Включить синхронизацию категорий',
+      $callback = [$this, 'display_option_categories_sync_enabled'],
+      $page = 'mss-settings',
+      $section = 'woomss_section_other'
+    );
+
+  }
+
+  //Display field
+  function display_option_categories_sync_enabled(){
+    $option = 'woomss_categories_sync_enabled';
+    printf('<input type="checkbox" name="%s" value="1" %s />', $option, checked( 1, get_option($option), false ));
+    ?>
+    <small>Если включить опцию, то при обновлении продуктов будут создаваться и связываться категории в соответствии с группами МойСклад.</small>
+    <?php
+  }
 }
 new WooMS_Import_Product_Categories;
