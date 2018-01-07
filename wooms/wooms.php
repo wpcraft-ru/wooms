@@ -7,7 +7,7 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.8.1
+Version: 1.8.2
 */
 
 require_once 'inc/class-import-products-walker.php';

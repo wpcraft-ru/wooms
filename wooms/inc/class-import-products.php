@@ -137,7 +137,8 @@ class woomss_tool_products_import {
         }
 
         $product->set_stock_status('instock');
-        
+        $product->set_manage_stock('no');
+
         $product->set_status('publish');
         $product->save();
 
