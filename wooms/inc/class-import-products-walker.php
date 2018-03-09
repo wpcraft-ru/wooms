@@ -30,12 +30,8 @@ class WooMS_Product_Import_Walker
     */
     function walker()
     {
-
-      //Stop via key
-      if( get_transient('wooms_walker_stop') ){
-        delete_transient('wooms_start_timestamp');
-        delete_transient('wooms_walker_stop');
-        delete_transient('wooms_offset');
+      //Check stop tag and break the walker
+      if($this->check_stop_manual()){
         return;
       }
 
@@ -43,7 +39,8 @@ class WooMS_Product_Import_Walker
 
       if( ! $offset = get_transient('wooms_offset')){
         $offset = 0;
-        set_transient('wooms_offset', $offset, 60*60*24);
+        set_transient('wooms_offset', $offset);
+        update_option('wooms_session_id', date("YmdHis"), 'no'); //set id session sync
         delete_transient('wooms_count_stat');
       }
 
@@ -74,18 +71,9 @@ class WooMS_Product_Import_Walker
               }
           }
 
+          //If no rows, that send 'end' and stop walker
           if (empty($data['rows'])) {
-            //If no rows, that send 'end' and stop walker
-            delete_transient('wooms_start_timestamp');
-            delete_transient('wooms_offset');
-            delete_transient('wooms_manual_sync');
-
-            if(empty(get_option('woomss_walker_cron_enabled'))){
-              $timer = 0;
-            } else {
-              $timer = 60*60*intval(get_option('woomss_walker_cron_timer', 24));
-            }
-            set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
+            $this->walker_finish();
             return true;
           }
 
@@ -107,6 +95,40 @@ class WooMS_Product_Import_Walker
       } catch (Exception $e) {
           delete_transient('wooms_start_timestamp');
           set_transient('wooms_error_background', $e->getMessage());
+      }
+    }
+
+    /**
+     * Finish walker
+     */
+    public function walker_finish()
+    {
+      delete_transient('wooms_start_timestamp');
+      delete_transient('wooms_offset');
+      delete_transient('wooms_manual_sync');
+
+      //Отключаем обработчик или ставим на паузу
+      if(empty(get_option('woomss_walker_cron_enabled'))){
+        $timer = 0;
+      } else {
+        $timer = 60*60*intval(get_option('woomss_walker_cron_timer', 24));
+      }
+      set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
+      return true;
+    }
+
+    /**
+     * Check and stop walker manual
+     */
+    public function check_stop_manual()
+    {
+      if( get_transient('wooms_walker_stop') ){
+        delete_transient('wooms_start_timestamp');
+        delete_transient('wooms_offset');
+        delete_transient('wooms_walker_stop');
+        return true;
+      } else {
+        return false;
       }
     }
 
@@ -199,8 +221,9 @@ class WooMS_Product_Import_Walker
       <div id="message" class="updated notice">
         <p><strong>Успешно завершился импорт продуктов из МойСклад</strong></p>
         <?php
-          printf('<p>Количество обработанных записей в последней итерации: %s</p>', get_transient('wooms_count_stat'));
+          printf('<p>Номер текущей сессии: %s</p>', get_option('wooms_session_id'));
           printf('<p>Время успешного завершения последней загрузки: %s</p>', get_transient('wooms_end_timestamp'));
+          printf('<p>Количество обработанных записей в последней итерации: %s</p>', get_transient('wooms_count_stat'));
           printf('<p>Количество операций: %s</p>', get_transient('wooms_count_stat'));
         ?>
       </div>

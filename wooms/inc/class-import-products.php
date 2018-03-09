@@ -106,6 +106,11 @@ class woomss_tool_products_import {
         $now = date("Y-m-d H:i:s");
         update_post_meta($product_id, 'wooms_data_of_source', print_r($data_of_source, true));
 
+        //Set session id for product
+        if($session_id = get_option('wooms_session_id')){
+          update_post_meta($product_id, 'wooms_session_id', $session_id);
+        }
+
         //the time stamp for database cleanup by cron
         update_post_meta($product_id, 'wooms_updated_timestamp', $now);
 
@@ -127,13 +132,11 @@ class woomss_tool_products_import {
         //Price Retail 'salePrices'
         if(isset($data_of_source['salePrices'][0]['value'])){
           $price_source = floatval($data_of_source['salePrices'][0]['value']/100);
+          $price = apply_filters('wooms_product_price', $price_source, $data_of_source);
 
-          if($price_source != $product->get_price()){
+          $product->set_price( $price );
+          $product->set_regular_price( $price );
 
-            $product->set_price( $price_source );
-            $product->set_regular_price( $price_source );
-
-          }
         }
 
         $product->set_stock_status('instock');
@@ -141,11 +144,6 @@ class woomss_tool_products_import {
 
         $product->set_status('publish');
         $product->save();
-
-        if(get_option('woomss_debug')){
-          unset($data_of_source['description']);
-
-        }
 
     }
 

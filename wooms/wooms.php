@@ -7,15 +7,17 @@ Author: WPCraft
 Author URI: https://wpcraft.ru/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 1.8.2
+Version: 1.9.1
 */
 
+require_once 'inc/class-menu-settings.php';
+require_once 'inc/class-menu-tool.php';
 require_once 'inc/class-import-products-walker.php';
 require_once 'inc/class-import-products.php';
 require_once 'inc/class-import-product-categories.php';
-require_once 'inc/class-menu-settings.php';
-require_once 'inc/class-menu-tool.php';
 require_once 'inc/class-import-product-images.php';
+require_once 'inc/class-import-prices.php';
+require_once 'inc/class-hide-old-products.php';
 
 /**
 * Helper function for get data from moysklad.ru
