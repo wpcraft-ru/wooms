@@ -131,8 +131,10 @@ class woomss_tool_products_import {
 
         //Price Retail 'salePrices'
         if(isset($data_of_source['salePrices'][0]['value'])){
-          $price_source = floatval($data_of_source['salePrices'][0]['value']/100);
+          $price_source = floatval($data_of_source['salePrices'][0]['value']);
           $price = apply_filters('wooms_product_price', $price_source, $data_of_source);
+
+          $price = $price/100;
 
           $product->set_price( $price );
           $product->set_regular_price( $price );

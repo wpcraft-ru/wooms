@@ -14,7 +14,7 @@ class WooMS_Hide_Old_Products
 
   function walker(){
 
-    do_action('logger_u7', ['tt2', 1]);
+    // do_action('logger_u7', ['tt2', 1]);
 
     $session_id = get_option('wooms_session_id');
     if(empty($session_id)){
