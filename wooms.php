@@ -1,14 +1,19 @@
 <?php
-/*
-Plugin Name: WooMS
-Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
-Plugin URI: https://wpcraft.ru/product/wooms/
-Author: WPCraft
-Author URI: https://wpcraft.ru/
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Version: 2.0.2
-*/
+/**
+ * Plugin Name: WooMS
+ * Plugin URI: https://wpcraft.ru/product/wooms/
+ * Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
+ * Author: WPCraft
+ * Author URI: https://wpcraft.ru/
+ * Developer: WPCraft
+ * Developer URI: https://wpcraft.ru/
+ * Version: 2.0.2
+ * WC requires at least: 3.0
+ * WC tested up to: 3.3.3
+ *
+ * License: GPLv2 or later
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 require_once 'inc/class-menu-settings.php';
 require_once 'inc/class-menu-tool.php';
