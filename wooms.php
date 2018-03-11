@@ -56,48 +56,52 @@ function wooms_get_data_by_url($url = ''){
   }
 
 }
+
 /**
  * Helper new function for responses data from moysklad.ru
+ *
+ *
+ * @param string $url
+ * @param array $data
+ * @param string $type
+ *
+ * @return array|bool|mixed|object
  */
 function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
-  if ( empty( $url ) ) {
-    return false;
-  }
-  switch ( $type ) {
-    case 'GET':
-      $data = null;
-      break;
-    case 'POST':
-      $data = json_encode( $data );
-      break;
-    case 'PUT':
-      $data = json_encode( $data );
-      break;
-  }
-  $request = wp_remote_request( $url, array(
-    'method'      => $type,
-    'timeout'     => 45,
-    'redirection' => 5,
-    'headers'     => array(
-      "Content-Type"  => 'application/json',
-      'Authorization' => 'Basic ' .
-                         base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
-    ),
-    'body'        => $data,
-  ) );
-  if ( is_wp_error( $request ) ) {
-    set_transient( 'wooms_error_background', $request->get_error_message() );
-
-    return false;
-  }
-  if ( empty( $request['body'] ) ) {
-    set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
-
-    return false;
-  }
-  $response = json_decode( $request['body'], true );
-
-  return $response;
+	if ( empty( $url ) ) {
+		return false;
+	}
+	if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
+		$type = 'POST';
+	}
+	if ( 'GET' == $type ) {
+		$data = null;
+	} else {
+		$data = json_encode( $data );
+	}
+	$request = wp_remote_request( $url, array(
+		'method'      => $type,
+		'timeout'     => 45,
+		'redirection' => 5,
+		'headers'     => array(
+			"Content-Type"  => 'application/json',
+			'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
+		),
+		'body'        => $data,
+	) );
+	if ( is_wp_error( $request ) ) {
+		set_transient( 'wooms_error_background', $request->get_error_message() );
+		
+		return false;
+	}
+	if ( empty( $request['body'] ) ) {
+		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
+		
+		return false;
+	}
+	$response = json_decode( $request['body'], true );
+	
+	return $response;
 }
 /**
 * Get product id by UUID from metafield
