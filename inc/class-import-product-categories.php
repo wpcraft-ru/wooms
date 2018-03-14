@@ -18,6 +18,12 @@ class WooMS_Import_Product_Categories {
     if(get_option('woomss_categories_sync_enabled')){
       return;
     }
+    if(!empty(get_option('woomss_include_categories_sync'))){
+      return;
+    }
+    if(!empty(get_option('woomss_exclude_categories_sync'))){
+      return;
+    }
     
     if(empty($value['productFolder']['meta']['href'])){
       return;
