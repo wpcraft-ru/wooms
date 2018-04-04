@@ -7,7 +7,7 @@
  * Author URI: https://wpcraft.ru/
  * Developer: WPCraft
  * Developer URI: https://wpcraft.ru/
- * Version: 2.0.3
+ * Version: 2.0.4
  * WC requires at least: 3.0
  * WC tested up to: 3.3.3
  *
@@ -34,6 +34,7 @@ function wooms_get_data_by_url($url = ''){
   }
 
   $args = array(
+	  'timeout'     => 45,
       'headers' => array(
           'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) )
       )
@@ -122,6 +123,38 @@ function wooms_get_product_id_by_uuid($uuid){
     return $posts[0]->ID;
   }
 }
+
+/**
+ * Helper new function for translit slug data from moysklad.ru
+ *
+ * @param null $str
+ *
+ * @return null|string|string[]
+ */
+function wooms_translit($str = null){
+	$tr = array(
+		"А"=>"A","Б"=>"B","В"=>"V","Г"=>"G","Д"=>"D",
+		"Е"=>"E","Ё"=>"Yo","Ж"=>"J","З"=>"Z","И"=>"I",
+		"Й"=>"Y","К"=>"K","Л"=>"L","М"=>"M","Н"=>"N",
+		"О"=>"O","П"=>"P","Р"=>"R","С"=>"S","Т"=>"T",
+		"У"=>"U","Ф"=>"F","Х"=>"H","Ц"=>"C","Ч"=>"Ch",
+		"Ш"=>"Sh","Щ"=>"Sch","Ъ"=>"","Ы"=>"Yi","Ь"=>"",
+		"Э"=>"E","Ю"=>"Yu","Я"=>"Ya","а"=>"a","б"=>"b",
+		"в"=>"v","г"=>"g","д"=>"d","е"=>"e","ё"=>"yo","ж"=>"j",
+		"з"=>"z","и"=>"i","й"=>"y","к"=>"k","л"=>"l",
+		"м"=>"m","н"=>"n","о"=>"o","п"=>"p","р"=>"r",
+		"с"=>"s","т"=>"t","у"=>"u","ф"=>"f","х"=>"h",
+		"ц"=>"c","ч"=>"ch","ш"=>"sh","щ"=>"sch","ъ"=>"y",
+		"ы"=>"y","ь"=>"","э"=>"e","ю"=>"yu","я"=>"ya",
+		" "=> "-", "."=> "", "/"=> "_"
+	);
+	$str = strtr($str,$tr);
+	if (preg_match('/[^A-Za-z0-9_\-]/', $str)) {
+		$str = preg_replace('/[^A-Za-z0-9_\-]/', '', $str);
+	}
+	return $str;
+}
+
 
 /**
 * Add Settings link in pligins list
