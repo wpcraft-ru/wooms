@@ -7,60 +7,101 @@
  * Author URI: https://wpcraft.ru/
  * Developer: WPCraft
  * Developer URI: https://wpcraft.ru/
- * Version: 2.0.4
+ * Text Domain: wooms
+ * Domain Path: /languages
+ * Version: 2.0.5
  * WC requires at least: 3.0
  * WC tested up to: 3.3.3
  *
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+define( 'WOOMS_PLUGIN_NAME', 'WooMS' );
+define( 'WOOMS_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
+define( 'WOOMS_PLUGIN_VER', '2.0.5' );
+add_action( 'admin_init', 'wooms_check_php_and_wp_version' );
+add_action( 'admin_notices', 'wooms_show_notices' );
+function wooms_check_php_and_wp_version() {
+	$php = 5.6;
+	$wp  = 4.7;
+	global $wp_version;
+	if ( version_compare( PHP_VERSION, $php, '<' ) ) {
+		$flag = 'PHP';
+	} elseif ( version_compare( $wp_version, $wp, '<' ) ) {
+		$flag = 'WordPress';
+	}
+	if ( ! empty( $flag ) ) {
+		$version = 'PHP' == $flag ? $php : $wp;
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+		$error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
+		set_transient( 'wooms_activation_error_message', $error_text, 60 );
+	} else {
+		register_activation_hook( __FILE__, 'wooms_activate_plugin' );
+		add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'wooms_plugin_add_settings_link' );
+	}
+}
 
-require_once 'inc/class-menu-settings.php';
-require_once 'inc/class-menu-tool.php';
-require_once 'inc/class-import-products-walker.php';
-require_once 'inc/class-import-products.php';
-require_once 'inc/class-import-product-categories.php';
-require_once 'inc/class-import-product-images.php';
-require_once 'inc/class-import-prices.php';
-require_once 'inc/class-hide-old-products.php';
+function wooms_show_notices() {
+	$message = get_transient( 'wooms_activation_error_message' );
+	if ( ! empty( $message ) ) {
+		echo '<div class="notice notice-error">
+            <p><strong>Плагин WooMS не активирован!</strong> ' . $message . '</p>
+        </div>';
+		delete_transient( 'wooms_activation_error_message' );
+	}
+}
+
+function wooms_activate_plugin() {
+	require_once 'inc/class-menu-settings.php';
+	require_once 'inc/class-menu-tool.php';
+	require_once 'inc/class-import-products-walker.php';
+	require_once 'inc/class-import-products.php';
+	require_once 'inc/class-import-product-categories.php';
+	require_once 'inc/class-import-product-images.php';
+	require_once 'inc/class-import-prices.php';
+	require_once 'inc/class-hide-old-products.php';
+}
 
 /**
-* Helper function for get data from moysklad.ru
-*/
-function wooms_get_data_by_url($url = ''){
-
-  if(empty($url)){
-    return false;
-  }
-
-  $args = array(
-	  'timeout'     => 45,
-      'headers' => array(
-          'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) )
-      )
-    );
-
-  $response = wp_remote_get( $url, $args );
-
-  if ( is_wp_error( $response ) ){
-    set_transient('wooms_error_background', $response->get_error_message());
-    return false;
-  }
-
-  if ( empty($response['body']) ){
-    set_transient('wooms_error_background', "REST API вернулся без требуемых данных");
-    return false;
-  }
-
-  $data = json_decode( $response['body'], true );
-
-  if(empty($data)){
-    set_transient('wooms_error_background', "REST API вернулся без JSON данных");
-    return false;
-  } else {
-    return $data;
-  }
-
+ * Helper function for get data from moysklad.ru
+ */
+function wooms_get_data_by_url( $url = '' ) {
+	
+	if ( empty( $url ) ) {
+		return false;
+	}
+	$args     = array(
+		'timeout' => 45,
+		'headers' => array(
+			'Authorization' => 'Basic ' .
+			                   base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
+		),
+	);
+	$response = wp_remote_get( $url, $args );
+	if ( is_wp_error( $response ) ) {
+		set_transient( 'wooms_error_background', $response->get_error_message() );
+		
+		return false;
+	}
+	if ( empty( $response['body'] ) ) {
+		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
+		
+		return false;
+	}
+	$data = json_decode( $response['body'], true );
+	if ( empty( $data ) ) {
+		set_transient( 'wooms_error_background', "REST API вернулся без JSON данных" );
+		
+		return false;
+	} else {
+		return $data;
+	}
 }
 
 /**
@@ -91,7 +132,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 		'redirection' => 5,
 		'headers'     => array(
 			"Content-Type"  => 'application/json',
-			'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
+			'Authorization' => 'Basic ' .
+			                   base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
 		),
 		'body'        => $data,
 	) );
@@ -109,60 +151,29 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 	
 	return $response;
 }
-/**
-* Get product id by UUID from metafield
-* or false
-*/
-function wooms_get_product_id_by_uuid($uuid){
-
-  $posts = get_posts('post_type=product&meta_key=wooms_id&meta_value='.$uuid);
-
-  if(empty($posts[0]->ID)){
-    return false;
-  } else {
-    return $posts[0]->ID;
-  }
-}
 
 /**
- * Helper new function for translit slug data from moysklad.ru
- *
- * @param null $str
- *
- * @return null|string|string[]
+ * Get product id by UUID from metafield
+ * or false
  */
-function wooms_translit($str = null){
-	$tr = array(
-		"А"=>"A","Б"=>"B","В"=>"V","Г"=>"G","Д"=>"D",
-		"Е"=>"E","Ё"=>"Yo","Ж"=>"J","З"=>"Z","И"=>"I",
-		"Й"=>"Y","К"=>"K","Л"=>"L","М"=>"M","Н"=>"N",
-		"О"=>"O","П"=>"P","Р"=>"R","С"=>"S","Т"=>"T",
-		"У"=>"U","Ф"=>"F","Х"=>"H","Ц"=>"C","Ч"=>"Ch",
-		"Ш"=>"Sh","Щ"=>"Sch","Ъ"=>"","Ы"=>"Yi","Ь"=>"",
-		"Э"=>"E","Ю"=>"Yu","Я"=>"Ya","а"=>"a","б"=>"b",
-		"в"=>"v","г"=>"g","д"=>"d","е"=>"e","ё"=>"yo","ж"=>"j",
-		"з"=>"z","и"=>"i","й"=>"y","к"=>"k","л"=>"l",
-		"м"=>"m","н"=>"n","о"=>"o","п"=>"p","р"=>"r",
-		"с"=>"s","т"=>"t","у"=>"u","ф"=>"f","х"=>"h",
-		"ц"=>"c","ч"=>"ch","ш"=>"sh","щ"=>"sch","ъ"=>"y",
-		"ы"=>"y","ь"=>"","э"=>"e","ю"=>"yu","я"=>"ya",
-		" "=> "-", "."=> "", "/"=> "_"
-	);
-	$str = strtr($str,$tr);
-	if (preg_match('/[^A-Za-z0-9_\-]/', $str)) {
-		$str = preg_replace('/[^A-Za-z0-9_\-]/', '', $str);
+function wooms_get_product_id_by_uuid( $uuid ) {
+	
+	$posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
+	if ( empty( $posts[0]->ID ) ) {
+		return false;
+	} else {
+		return $posts[0]->ID;
 	}
-	return $str;
 }
-
 
 /**
-* Add Settings link in pligins list
-*/
+ * Add Settings link in pligins list
+ */
 function wooms_plugin_add_settings_link( $links ) {
-    $settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
-    array_push( $links, $settings_link );
-    return $links;
+	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
+	array_push( $links, $settings_link );
+	
+	return $links;
 }
 
-add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'wooms_plugin_add_settings_link' );
+
