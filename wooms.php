@@ -19,22 +19,32 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
 define( 'WOOMS_PLUGIN_NAME', 'WooMS' );
 define( 'WOOMS_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
 define( 'WOOMS_PLUGIN_VER', '2.0.5' );
-add_action( 'admin_init', 'wooms_check_php_and_wp_version' );
+
+add_action( 'plugins_loaded', 'wooms_check_php_and_wp_version' );
 add_action( 'admin_notices', 'wooms_show_notices' );
 function wooms_check_php_and_wp_version() {
-	$php = 5.6;
-	$wp  = 4.7;
 	global $wp_version;
-	if ( version_compare( PHP_VERSION, $php, '<' ) ) {
+	$php       = 5.6;
+	$wp        = 4.7;
+	$php_check = version_compare( PHP_VERSION, $php, '<' );
+	$wp_check  = version_compare( $wp_version, $wp, '<' );
+	
+	if ( $php_check ) {
 		$flag = 'PHP';
-	} elseif ( version_compare( $wp_version, $wp, '<' ) ) {
+	} elseif ( $wp_check ) {
 		$flag = 'WordPress';
 	}
-	if ( ! empty( $flag ) ) {
+	
+	if ( $php_check || $wp_check ) {
 		$version = 'PHP' == $flag ? $php : $wp;
+		if ( ! function_exists( 'deactivate_plugins' ) ) {
+			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+		
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
@@ -42,7 +52,7 @@ function wooms_check_php_and_wp_version() {
 		$error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
 	} else {
-		register_activation_hook( __FILE__, 'wooms_activate_plugin' );
+		wooms_activate_plugin();
 		add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'wooms_plugin_add_settings_link' );
 	}
 }
@@ -56,6 +66,7 @@ function wooms_show_notices() {
 		delete_transient( 'wooms_activation_error_message' );
 	}
 }
+
 
 function wooms_activate_plugin() {
 	require_once 'inc/class-menu-settings.php';
@@ -169,6 +180,7 @@ function wooms_get_product_id_by_uuid( $uuid ) {
 /**
  * Add Settings link in pligins list
  */
+
 function wooms_plugin_add_settings_link( $links ) {
 	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
 	array_push( $links, $settings_link );
