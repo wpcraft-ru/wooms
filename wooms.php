@@ -22,7 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'WOOMS_PLUGIN_NAME', 'WooMS' );
 define( 'WOOMS_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
-define( 'WOOMS_PLUGIN_VER', '2.0.5' );
+if ( ! function_exists( 'get_plugin_data' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+}
+$wooms_version = get_file_data( __FILE__, array( 'wooms_ver' => 'Version' ) );
+define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
 
 add_action( 'plugins_loaded', 'wooms_check_php_and_wp_version' );
 add_action( 'admin_notices', 'wooms_show_notices' );
@@ -49,7 +53,22 @@ function wooms_check_php_and_wp_version() {
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
+		
 		$error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
+		set_transient( 'wooms_activation_error_message', $error_text, 60 );
+		
+	} elseif ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+		
+		if ( ! function_exists( 'deactivate_plugins' ) ) {
+			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+		
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+		
+		$error_text = sprintf( 'Для корректной работы требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
 	} else {
 		wooms_activate_plugin();
@@ -66,7 +85,6 @@ function wooms_show_notices() {
 		delete_transient( 'wooms_activation_error_message' );
 	}
 }
-
 
 function wooms_activate_plugin() {
 	require_once 'inc/class-menu-settings.php';
