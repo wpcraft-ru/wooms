@@ -10,8 +10,12 @@
  * Text Domain: wooms
  * Domain Path: /languages
  * Version: 2.0.5
+ *
  * WC requires at least: 3.0
  * WC tested up to: 3.3.3
+ *
+ * PHP requires at least: 5.6
+ * WP requires at least: 4.8
  *
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,13 +24,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-define( 'WOOMS_PLUGIN_NAME', 'WooMS' );
-define( 'WOOMS_PLUGIN_URI', plugin_dir_url( __FILE__ ) );
+
 if ( ! function_exists( 'get_plugin_data' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 }
-$wooms_version = get_file_data( __FILE__, array( 'wooms_ver' => 'Version' ) );
+$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
+
 define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
+
 
 add_action( 'plugins_loaded', 'wooms_check_php_and_wp_version' );
 add_action( 'admin_notices', 'wooms_show_notices' );
@@ -68,7 +73,7 @@ function wooms_check_php_and_wp_version() {
 			unset( $_GET['activate'] );
 		}
 		
-		$error_text = sprintf( 'Для корректной работы требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
+		$error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
 	} else {
 		wooms_activate_plugin();
