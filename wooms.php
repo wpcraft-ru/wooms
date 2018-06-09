@@ -9,7 +9,7 @@
  * Developer URI: https://wpcraft.ru/
  * Text Domain: wooms
  * Domain Path: /languages
- * Version: 2.0.5
+ * Version: 2.0.6
  *
  * WC requires at least: 3.0
  * WC tested up to: 3.3.3
@@ -41,38 +41,38 @@ function wooms_check_php_and_wp_version() {
 	$wp        = 4.7;
 	$php_check = version_compare( PHP_VERSION, $php, '<' );
 	$wp_check  = version_compare( $wp_version, $wp, '<' );
-	
+
 	if ( $php_check ) {
 		$flag = 'PHP';
 	} elseif ( $wp_check ) {
 		$flag = 'WordPress';
 	}
-	
+
 	if ( $php_check || $wp_check ) {
 		$version = 'PHP' == $flag ? $php : $wp;
 		if ( ! function_exists( 'deactivate_plugins' ) ) {
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
-		
+
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
-		
+
 		$error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
-		
+
 	} elseif ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
-		
+
 		if ( ! function_exists( 'deactivate_plugins' ) ) {
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
-		
+
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
-		
+
 		$error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
 	} else {
@@ -106,7 +106,7 @@ function wooms_activate_plugin() {
  * Helper function for get data from moysklad.ru
  */
 function wooms_get_data_by_url( $url = '' ) {
-	
+
 	if ( empty( $url ) ) {
 		return false;
 	}
@@ -120,18 +120,18 @@ function wooms_get_data_by_url( $url = '' ) {
 	$response = wp_remote_get( $url, $args );
 	if ( is_wp_error( $response ) ) {
 		set_transient( 'wooms_error_background', $response->get_error_message() );
-		
+
 		return false;
 	}
 	if ( empty( $response['body'] ) ) {
 		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
-		
+
 		return false;
 	}
 	$data = json_decode( $response['body'], true );
 	if ( empty( $data ) ) {
 		set_transient( 'wooms_error_background', "REST API вернулся без JSON данных" );
-		
+
 		return false;
 	} else {
 		return $data;
@@ -173,16 +173,16 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 	) );
 	if ( is_wp_error( $request ) ) {
 		set_transient( 'wooms_error_background', $request->get_error_message() );
-		
+
 		return false;
 	}
 	if ( empty( $request['body'] ) ) {
 		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
-		
+
 		return false;
 	}
 	$response = json_decode( $request['body'], true );
-	
+
 	return $response;
 }
 
@@ -191,7 +191,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
  * or false
  */
 function wooms_get_product_id_by_uuid( $uuid ) {
-	
+
 	$posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
 	if ( empty( $posts[0]->ID ) ) {
 		return false;
@@ -207,8 +207,6 @@ function wooms_get_product_id_by_uuid( $uuid ) {
 function wooms_plugin_add_settings_link( $links ) {
 	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
 	array_push( $links, $settings_link );
-	
+
 	return $links;
 }
-
-

@@ -100,6 +100,8 @@ class woomss_tool_products_import {
      */
     function update_product($product_id, $data_of_source){
 
+        wp_set_object_terms( $product_id, 'simple', 'product_type', false );
+
         $product = wc_get_product($product_id);
 
         //save data of source
@@ -146,6 +148,8 @@ class woomss_tool_products_import {
 
         $product->set_status('publish');
         $product->save();
+
+
 
     }
 
