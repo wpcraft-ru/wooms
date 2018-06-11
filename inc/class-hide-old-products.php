@@ -31,7 +31,7 @@ class WooMS_Hide_Old_Products
 
     $list = get_posts($args);
 
-    // do_action('logger_u7', ['tt1', $list]);
+    //do_action('logger_u7', ['tt1', $list]);
 
   }
 

@@ -148,9 +148,6 @@ class woomss_tool_products_import {
 
         $product->set_status('publish');
         $product->save();
-
-
-
     }
 
 
