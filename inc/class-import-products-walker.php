@@ -221,7 +221,7 @@ class WooMS_Product_Import_Walker {
 		do_action( 'wooms_notice_walker' );
 		?>
 		<div class="wrap">
-			<div id="message" class="updated notice">
+			<div id="message" class="notice notice-warning is-dismissible">
 				<p><strong>Сейчас выполняется пакетная обработка данных в фоне.</strong></p>
 				<p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
 				<p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
@@ -250,7 +250,7 @@ class WooMS_Product_Import_Walker {
 		do_action( 'wooms_notice_result' );
 		?>
 		<div class="wrap">
-			<div id="message" class="updated notice">
+			<div id="message" class="notice notice-success is-dismissible">
 				<p><strong>Успешно завершился импорт продуктов из МойСклад</strong></p>
 				<?php
 				printf( '<p>Номер текущей сессии: %s</p>', get_option( 'wooms_session_id' ) );
@@ -274,7 +274,7 @@ class WooMS_Product_Import_Walker {
 		}
 		?>
 		<div class="wrap">
-			<div class="error">
+			<div class="notice notice-error is-dismissible">
 				<p><strong>Обработка заверишлась с ошибкой.</strong></p>
 				<p>Данные: <?php echo get_transient( 'wooms_error_background' ) ?></p>
 			</div>
