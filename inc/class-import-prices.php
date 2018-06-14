@@ -72,7 +72,7 @@ class WooMS_Import_Prices
 
   function display_field_wooms_price_id(){
     $id = 'wooms_price_id';
-    printf('<input type="text" name="%s" value="%s" />', $id, get_option($id));
+    printf('<input type="text" name="%s" value="%s" />', $id, sanitize_text_field(get_option($id)));
     echo '<p><small>Укажите наименование цены, если нужно выбрать специальный тип цен. Система будет проверять такой тип цены и если он указан то будет подставлять его вместо базового.</small></p>';
   }
 
