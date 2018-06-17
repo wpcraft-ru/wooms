@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 /**
  * Import products from MoySklad
@@ -12,7 +15,6 @@ class woomss_tool_products_import {
 		//do_action('wooms_product_import_row', $value, $key, $data);
 		add_action( 'wooms_product_import_row', [ $this, 'load_data' ], 10, 3 );
 	}
-	
 	
 	/**
 	 * Load data and set product type simple
@@ -128,12 +130,13 @@ class woomss_tool_products_import {
 		}
 	}
 	
+	
 	/**
 	 * Add product from source data
 	 *
-	 * @param $data_of_source var data of source from MoySklad
+	 * @param $data_source
 	 *
-	 * @return return bool - true or false if updated
+	 * @return bool|int|WP_Error
 	 */
 	public function add_product( $data_source ) {
 		
