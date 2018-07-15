@@ -7,7 +7,7 @@ class WooMS_Import_Prices
   public function __construct()
   {
     add_filter('wooms_product_price', array($this, 'chg_price'), 10, 2);
-    add_action( 'admin_init', array($this, 'settings'), $priority = 100, $accepted_args = 1 );
+    add_action( 'admin_init', array($this, 'settings'), $priority = 200, $accepted_args = 1 );
   }
   /**
    * Update prices for product
