@@ -102,11 +102,14 @@ class WooMS_Product_Import_Walker {
 			update_option( 'wooms_session_id', date( "YmdHis" ), 'no' ); //set id session sync
 			delete_transient( 'wooms_count_stat' );
 		}
-		$args_ms_api = array(
+		
+		$ms_api_args = apply_filters( 'wooms_product_ms_api_arg', array(
 			'offset' => $offset,
 			'limit'  => $count,
-		);
-		$url_api = add_query_arg( $args_ms_api, 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
+		) );
+		$ms_api_url  = apply_filters( 'wooms_product_ms_api_url', 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
+		$url_api     = add_query_arg( $ms_api_args, $ms_api_url );
+		do_action("logger_u7", $url_api);
 		try {
 			
 			delete_transient( 'wooms_end_timestamp' );

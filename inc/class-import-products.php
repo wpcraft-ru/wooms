@@ -25,6 +25,10 @@ class woomss_tool_products_import {
 	 */
 	public function load_data( $value, $key, $data ) {
 		
+		if ('variant' == $value['meta']['type']){
+			return;
+			
+		}
 		if ( ! empty( $value['archived'] ) ) {
 			return;
 		}
@@ -62,9 +66,9 @@ class woomss_tool_products_import {
 	 *
 	 */
 	public function update_product( $product_id, $data_of_source ) {
-		
-		wp_set_object_terms( $product_id, 'simple', 'product_type', false );
-		
+		/*if ( empty( get_option( 'woomss_variations_sync_enabled' ) ) ) {
+			wp_set_object_terms( $product_id, 'simple', 'product_type', false );
+		}*/
 		$product = wc_get_product( $product_id );
 		
 		//save data of source
