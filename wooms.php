@@ -9,7 +9,7 @@
  * Developer URI: https://wpcraft.ru/
  * Text Domain: wooms
  * Domain Path: /languages
- * Version: 2.0.6
+ * Version: 2.0.7
  *
  * WC requires at least: 3.0
  * WC tested up to: 3.3.3
