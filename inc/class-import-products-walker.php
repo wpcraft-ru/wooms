@@ -103,13 +103,13 @@ class WooMS_Product_Import_Walker {
 			delete_transient( 'wooms_count_stat' );
 		}
 		
-		$ms_api_args = apply_filters( 'wooms_product_ms_api_arg', array(
+		$ms_api_args = array(
 			'offset' => $offset,
 			'limit'  => $count,
-		) );
+		);
 		$ms_api_url  = apply_filters( 'wooms_product_ms_api_url', 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
 		$url_api     = add_query_arg( $ms_api_args, $ms_api_url );
-		//do_action("logger_u7", [$ms_api_url,$ms_api_args]);
+		//do_action("logger_u7", $url_api);
 		try {
 			
 			delete_transient( 'wooms_end_timestamp' );
