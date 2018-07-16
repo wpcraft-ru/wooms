@@ -27,7 +27,7 @@ class WooMS_Product_Import_Walker {
 	 */
 	public function add_schedule( $schedules ) {
 		$schedules['wooms_cron_walker_shedule'] = array(
-			'interval' => 60,
+			'interval' => apply_filters('wooms_cron_interval', 60),
 			'display'  => 'WooMS Cron Walker 60 sec',
 		);
 		
@@ -109,7 +109,7 @@ class WooMS_Product_Import_Walker {
 		) );
 		$ms_api_url  = apply_filters( 'wooms_product_ms_api_url', 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
 		$url_api     = add_query_arg( $ms_api_args, $ms_api_url );
-		// do_action("logger_u7", $url_api);
+		//do_action("logger_u7", [$ms_api_url,$ms_api_args]);
 		try {
 			
 			delete_transient( 'wooms_end_timestamp' );
