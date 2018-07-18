@@ -30,7 +30,7 @@ class WooMS_Import_Product_Categories {
 		}
 		
 		$url = $value['productFolder']['meta']['href'];
-		
+
 		if ( $term_id = $this->update_category( $url ) ) {
 			
 			wp_set_object_terms( $product_id, $term_id, $taxonomy = 'product_cat' );
@@ -39,7 +39,7 @@ class WooMS_Import_Product_Categories {
 	}
 	
 	public function update_category( $url ) {
-		$data = wooms_get_data_by_url( $url );
+		$data = wooms_request( $url );
 		
 		if ( $term_id = $this->check_term_by_ms_id( $data['id'] ) ) {
 			
@@ -48,20 +48,22 @@ class WooMS_Import_Product_Categories {
 			
 			$args = array();
 			
-			$term_new = [
+			$term_new = array(
 				'wooms_id' => $data['id'],
 				'name'     => $data['name'],
 				'archived' => $data['archived'],
-			];
-			
-			if ( isset( $data['productFolder']['meta']['href'] ) ) {
-				$url_parent = $data['productFolder']['meta']['href'];
+			);
+
+			if ( isset( $data['productFolder']['meta']['href']  )  ) {
+				$url_parent = $data['productFolder']['meta']['href'] ;
 				if ( $term_id_parent = $this->update_category( $url_parent ) ) {
 					$args['parent'] = intval( $term_id_parent );
 				}
 			}
 			
-			$term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
+			if ( apply_filters( 'wooms_skip_categories', true, $url_parent , $data['pathName']) ) {
+				$term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
+			}
 			
 			if ( isset( $term->errors["term_exists"] ) ) {
 				$term_id = intval( $term->error_data['term_exists'] );
@@ -77,6 +79,8 @@ class WooMS_Import_Product_Categories {
 			}
 			
 			update_term_meta( $term_id, 'wooms_id', $term_new['wooms_id'] );
+			
+			do_action('wooms_update_category', $url_parent, $term_id_parent);
 			
 			return $term_id;
 		}
