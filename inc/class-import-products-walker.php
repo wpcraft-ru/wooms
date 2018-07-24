@@ -129,8 +129,11 @@ class WooMS_Product_Import_Walker {
 			if ( empty( $data['rows'] ) ) {
 				$this->walker_finish();
 				
+				do_action( 'wooms_walker_finish' );
+				
 				return true;
 			}
+			
 			$i = 0;
 			foreach ( $data['rows'] as $key => $value ) {
 				do_action( 'wooms_product_import_row', $value, $key, $data );

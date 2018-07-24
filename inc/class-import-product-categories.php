@@ -28,9 +28,9 @@ class WooMS_Import_Product_Categories {
 		if ( empty( $value['productFolder']['meta']['href'] ) ) {
 			return;
 		}
-		
-		$url = $value['productFolder']['meta']['href'];
 
+		$url = $value['productFolder']['meta']['href'];
+		
 		if ( $term_id = $this->update_category( $url ) ) {
 			
 			wp_set_object_terms( $product_id, $term_id, $taxonomy = 'product_cat' );
@@ -40,8 +40,11 @@ class WooMS_Import_Product_Categories {
 	
 	public function update_category( $url ) {
 		$data = wooms_request( $url );
-		
+		//do_action( 'logger_u7', [ 'tt_term22', $data['name'] ] );
 		if ( $term_id = $this->check_term_by_ms_id( $data['id'] ) ) {
+			if ( $session_id = get_option( 'wooms_session_id' ) ) {
+				update_term_meta($term_id, 'wooms_session_id', $session_id );
+			}
 			
 			return $term_id;
 		} else {
@@ -54,7 +57,7 @@ class WooMS_Import_Product_Categories {
 				'archived' => $data['archived'],
 			);
 
-			if ( isset( $data['productFolder']['meta']['href']  )  ) {
+			if ( isset( $data['productFolder']['meta']['href']  ) ) {
 				$url_parent = $data['productFolder']['meta']['href'] ;
 				if ( $term_id_parent = $this->update_category( $url_parent ) ) {
 					$args['parent'] = intval( $term_id_parent );
@@ -80,8 +83,10 @@ class WooMS_Import_Product_Categories {
 			
 			update_term_meta( $term_id, 'wooms_id', $term_new['wooms_id'] );
 			
-			do_action('wooms_update_category', $url_parent, $term_id_parent);
-			
+			if ( $session_id = get_option( 'wooms_session_id' ) ) {
+				update_term_meta($term_id, 'wooms_session_id', $session_id );
+			}
+
 			return $term_id;
 		}
 		
@@ -92,11 +97,20 @@ class WooMS_Import_Product_Categories {
 	 */
 	public function check_term_by_ms_id( $id ) {
 		
-		$terms = get_terms( 'taxonomy=product_cat&meta_key=wooms_id&meta_value=' . $id );
-		
+		$terms = get_terms( array(
+			'taxonomy'   => array( 'product_cat' ),
+			'meta_query' => array(
+				array(
+					'key'     => 'wooms_id',
+					'value'   => $id,
+				)
+			)
+		) );
+		//do_action( 'logger_u7', [ 'tt_term11', $terms ] );
 		if ( empty( $terms ) ) {
 			return false;
 		} else {
+			
 			return $terms[0]->term_id;
 		}
 	}

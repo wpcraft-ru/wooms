@@ -25,10 +25,6 @@ class woomss_tool_products_import {
 	 */
 	public function load_data( $value, $key, $data ) {
 		
-		if ('variant' == $value['meta']['type']){
-			return;
-			
-		}
 		if ( ! empty( $value['archived'] ) ) {
 			return;
 		}
