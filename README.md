@@ -7,7 +7,7 @@ WooCommerce и МойСклад (интеграция, синхронизаци�
 *   Загрузка категорий
 *   Простые настройки
 
-Исходники https://github.com/uptimizt/wooms
+Исходники https://github.com/yumashev/wooms
 
 Адрес в каталоге WordPress https://wordpress.org/plugins/wooms/
 
