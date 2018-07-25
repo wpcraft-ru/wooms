@@ -9,7 +9,8 @@ class WooMS_Hide_Old_Products
     //Main Walker
     add_action( 'init', array($this, 'cron_init'));
     add_action( 'wooms_cron_clear_old_products_walker', array($this, 'cron_starter'));
-
+	
+	add_action( 'wooms_walker_finish', array( $this, 'remove_parent_category' ));
   }
 	
 	public function get_session() {
@@ -23,7 +24,7 @@ class WooMS_Hide_Old_Products
 	public function get_product_old_session($offset = 0){
 		$args = array(
 			'post_type'    => 'product',
-			'numberposts' => 5,
+			'numberposts' => 10,
 			'fields'       => 'ids',
 			'offset' => $offset,
 			'meta_query' => array(
@@ -41,66 +42,71 @@ class WooMS_Hide_Old_Products
 
 		return get_posts( $args );
 	}
- 
-	public function get_product_new_session($offset){
-		$args = array(
-			'post_type'    => 'product',
-			'numberposts' => 5,
-			'fields'       => 'ids',
-			'offset' => $offset,
-			'meta_query' => array(
-				array(
-					'key'     => 'wooms_session_id',
-					'value'   => $this->get_session(),
-					'compare' => '='
-				),
-				array(
-					'key'     => 'wooms_id',
-					'compare' => 'EXISTS'
-				)
-			)
-		);
-		
-		return get_posts( $args );
-		
-	}
-	function walker() {
-		
+	
+	public function set_hide_old_product() {
 		if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
 			$offset = 0;
 			set_transient( 'wooms_offset_hide_product', $offset );
 		}
-		// do_action('logger_u7', ['tt2', 1]);
 		
-
-		//$products = array_diff($this->get_product_old_session(), $this->get_product_new_session());
-		$products = $this->get_product_old_session($offset);
-		do_action( 'logger_u7', [
-			'tt1',
-			$this->get_session(),
-			$this->get_product_old_session(),
-			$this->get_product_new_session()
-			]  );
-		//do_action( 'logger_u7', [ 'tt2', $this->get_product_new_session() ] );
+		$products = $this->get_product_old_session( $offset );
+		
 		$i = 0;
+		
 		foreach ( $products as $product_id ) {
 			$product = wc_get_product( $product_id );
-			
-			$product->set_catalog_visibility('hidden');
+			//$product->set_catalog_visibility( 'hidden' );
 			$product->set_stock_status( 'outofstock' );
-
-			//do_action( 'logger_u7', [ 'tt3',$product_id, $offset ] );
 			$product->save();
 			$i ++;
+			
 		}
 		set_transient( 'wooms_offset_hide_product', $offset + $i );
-		
-		if (empty($products)){
-			//do_action( 'logger_u7', [ 'tt4',$products, get_transient( 'wooms_offset_hide_product' ) ] );
-			delete_transient( 'wooms_offset_hide_product');
+		if ( empty( $products ) ) {
+			delete_transient( 'wooms_offset_hide_product' );
 		}
+		
 	}
+	
 
+	function walker() {
+		$this->set_hide_old_product();
+		//$this->remove_parent_category();
+	}
+	
+	public function remove_parent_category() {
+		if ( empty( get_option( 'woomss_include_categories_sync' ) ) ) {
+			return;
+		}
+		
+		$term_select = wooms_request( get_option( 'woomss_include_categories_sync' ) );
+		
+		$term = get_terms( array(
+			'taxonomy'     => array( 'product_cat' ),
+			'hide_empty'   => 0,
+			'parent'       => 0,
+			'hierarchical' => false,
+			'meta_query'   => array(
+				array(
+					'key'     => 'wooms_session_id',
+					'value'   => $this->get_session(),
+					'compare' => '!=',
+				),
+				array(
+					'key'   => 'wooms_id',
+					'value' => $term_select['id'],
+				),
+			),
+		) );
+		
+		do_action( 'logger_u7', [ 'tt_term', $term_select, $term ] );
+		
+		$term_remove = wp_delete_term( $term[0]->term_id, 'product_cat', array( 'force_default' => true ) );
+		
+		
+		//do_action( 'logger_u7', [ 'tt_term', $term_remove ] );
+	}
+	
   /**
   * Cron task restart
   */
