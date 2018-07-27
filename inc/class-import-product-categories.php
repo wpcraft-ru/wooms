@@ -19,6 +19,13 @@ class WooMS_Import_Product_Categories {
 		add_action( 'wooms_walker_finish', array( $this, 'update_parent_category' ), 10);
 	}
 	
+	/**
+	 * Receiving data and distributing products by category
+	 *
+	 * @param $product_id
+	 * @param $value
+	 * @param $data
+	 */
 	public function load_data( $product_id, $value, $data ) {
 		//Если опция отключена - пропускаем обработку
 		if ( get_option( 'woomss_categories_sync_enabled' ) ) {
@@ -38,6 +45,13 @@ class WooMS_Import_Product_Categories {
 		
 	}
 	
+	/**
+	 * Create and update categories
+	 *
+	 * @param $url
+	 *
+	 * @return bool|int|mixed
+	 */
 	public function update_category( $url ) {
 		$data = wooms_request( $url );
 		
@@ -63,9 +77,17 @@ class WooMS_Import_Product_Categories {
 				}
 			}
 			
-			if ( apply_filters( 'wooms_skip_categories', true, $url_parent, $data['pathName'] ) ) {
+			$url_parent = isset( $data['productFolder']['meta']['href'] ) ? $data['productFolder']['meta']['href'] : '';
+			$path_name  = isset( $data['pathName'] ) ? $data['pathName'] : null;
+			
+			$was_suspended = wp_suspend_cache_addition();
+			wp_suspend_cache_addition( true );
+			
+			if ( apply_filters( 'wooms_skip_categories', true, $url_parent, $path_name ) ) {
 				$term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
 			}
+			
+			wp_suspend_cache_addition( $was_suspended );
 			
 			if ( isset( $term->errors["term_exists"] ) ) {
 				$term_id = intval( $term->error_data['term_exists'] );
@@ -74,7 +96,7 @@ class WooMS_Import_Product_Categories {
 				}
 			} elseif ( isset( $term->term_id ) ) {
 				$term_id = $term->term_id;
-			} elseif ( isset( $term["term_id"] ) ) {
+			} elseif ( is_array( $term ) && ! empty( $term["term_id"] ) ) {
 				$term_id = $term["term_id"];
 			} else {
 				return false;
@@ -86,13 +108,18 @@ class WooMS_Import_Product_Categories {
 				update_term_meta( $term_id, 'wooms_session_id', $session_id );
 			}
 			
+			do_action( 'wooms_add_category', $term, $url_parent, $path_name );
+			
 			return $term_id;
 		}
 		
 	}
 	
+	/**
+	 * Creating a parent category, if it is not
+	 */
 	public function update_parent_category(){
-
+		
 		$terms_sub = get_terms( array(
 			'taxonomy'     => array( 'product_cat' ),
 			'meta_query'   => array(
@@ -102,8 +129,6 @@ class WooMS_Import_Product_Categories {
 				),
 			),
 		) );
-		//do_action( 'logger_u7', [ 'tt_term2', $terms_sub] );
-		
 
 		if ( false == $terms_sub ) {
 			return;
@@ -117,10 +142,15 @@ class WooMS_Import_Product_Categories {
 			$term_parent_args['wooms_id'] = get_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent', true );
 		}
 		
+		$was_suspended = wp_suspend_cache_addition();
+		wp_suspend_cache_addition( true );
+		
 		$term_add = wp_insert_term( $term_parent_args['name'], $taxonomy = 'product_cat', array(
 			'slug'        => $term_parent_args['slug'],
 			'parent'      => 0
 		) );
+		
+		wp_suspend_cache_addition( $was_suspended );
 		
 		if ( isset( $term_add->errors["term_exists"] ) ) {
 			$term_id = intval( $term_add->error_data['term_exists'] );
@@ -134,7 +164,7 @@ class WooMS_Import_Product_Categories {
 		} else {
 			return;
 		}
-		//do_action( 'logger_u7', [ 'tt_term22', $term_add] );
+
 		update_term_meta( $term_id, 'wooms_id', $term_parent_args['wooms_id']);
 		
 		if ( $session_id = get_option( 'wooms_session_id' ) ) {
@@ -149,8 +179,8 @@ class WooMS_Import_Product_Categories {
 			delete_term_meta( $term_sub->term_id, 'wooms_slug_parent' );
 			delete_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent' );
 		}
-		
-		//do_action( 'logger_u7', [ 'tt_term3', $terms_sub, $term_parent_args ,$term_add, $term_upd] );
+
+		wp_cache_flush();
 	}
 	
 	/**
