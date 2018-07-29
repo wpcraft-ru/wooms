@@ -27,7 +27,7 @@ class WooMS_Product_Import_Walker {
 	 */
 	public function add_schedule( $schedules ) {
 		$schedules['wooms_cron_walker_shedule'] = array(
-			'interval' => 60,
+			'interval' => apply_filters('wooms_cron_interval', 60),
 			'display'  => 'WooMS Cron Walker 60 sec',
 		);
 		
@@ -102,11 +102,14 @@ class WooMS_Product_Import_Walker {
 			update_option( 'wooms_session_id', date( "YmdHis" ), 'no' ); //set id session sync
 			delete_transient( 'wooms_count_stat' );
 		}
-		$args_ms_api = array(
+		
+		$ms_api_args = array(
 			'offset' => $offset,
 			'limit'  => $count,
 		);
-		$url_api = add_query_arg( $args_ms_api, 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
+		$ms_api_url  = apply_filters( 'wooms_product_ms_api_url', 'https://online.moysklad.ru/api/remap/1.1/entity/product/' );
+		$url_api     = add_query_arg( $ms_api_args, $ms_api_url );
+		//do_action("logger_u7", $url_api);
 		try {
 			
 			delete_transient( 'wooms_end_timestamp' );
@@ -126,8 +129,11 @@ class WooMS_Product_Import_Walker {
 			if ( empty( $data['rows'] ) ) {
 				$this->walker_finish();
 				
+				do_action( 'wooms_walker_finish' );
+				
 				return true;
 			}
+			
 			$i = 0;
 			foreach ( $data['rows'] as $key => $value ) {
 				do_action( 'wooms_product_import_row', $value, $key, $data );
