@@ -179,8 +179,9 @@ class WooMS_Import_Product_Categories {
 			delete_term_meta( $term_sub->term_id, 'wooms_slug_parent' );
 			delete_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent' );
 		}
+		
+		wp_update_term_count( $term_id, $taxonomy = 'product_cat' );
 
-		wp_cache_flush();
 	}
 	
 	/**
