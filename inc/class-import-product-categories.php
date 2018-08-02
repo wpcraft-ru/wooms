@@ -15,7 +15,7 @@ class WooMS_Import_Product_Categories {
 		 * Use hook: do_action('wooms_product_update', $product_id, $value, $data);
 		 */
 		add_action( 'wooms_product_update', array( $this, 'load_data' ), 100, 3 );
-		add_action( 'admin_init', array( $this, 'settings_init' ), 101 );
+		add_action( 'admin_init', array( $this, 'settings_init' ), 103 );
 		add_action( 'wooms_walker_finish', array( $this, 'update_parent_category' ), 10);
 	}
 	
