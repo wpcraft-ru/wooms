@@ -95,6 +95,7 @@ class WooMS_Product_Import_Walker {
 		if ( $this->check_stop_manual() ) {
 			return;
 		}
+		
 		$count = apply_filters( 'wooms_iteration_size', 20 );
 		if ( ! $offset = get_transient( 'wooms_offset' ) ) {
 			$offset = 0;
@@ -139,11 +140,13 @@ class WooMS_Product_Import_Walker {
 				do_action( 'wooms_product_import_row', $value, $key, $data );
 				$i ++;
 			}
+			
 			if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
 				set_transient( 'wooms_count_stat', $i + $count_saved );
 			} else {
 				set_transient( 'wooms_count_stat', $i );
 			}
+			
 			set_transient( 'wooms_offset', $offset + $i );
 			
 			return;
@@ -181,6 +184,7 @@ class WooMS_Product_Import_Walker {
 		} else {
 			$timer = 60 * 60 * intval( get_option( 'woomss_walker_cron_timer', 24 ) );
 		}
+		
 		set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
 		
 		return true;
@@ -247,13 +251,17 @@ class WooMS_Product_Import_Walker {
 		if ( $screen->base != 'tools_page_moysklad' ) {
 			return;
 		}
+		
 		if ( empty( get_transient( 'wooms_end_timestamp' ) ) ) {
 			return;
 		}
+		
 		if ( ! empty( get_transient( 'wooms_start_timestamp' ) ) ) {
 			return;
 		}
+		
 		do_action( 'wooms_notice_result' );
+		
 		?>
 		<div class="wrap">
 			<div id="message" class="notice notice-success is-dismissible">
@@ -275,9 +283,11 @@ class WooMS_Product_Import_Walker {
 		if ( $screen->base != 'tools_page_moysklad' ) {
 			return;
 		}
+		
 		if ( empty( get_transient( 'wooms_error_background' ) ) ) {
 			return;
 		}
+		
 		?>
 		<div class="wrap">
 			<div class="notice notice-error is-dismissible">
