@@ -15,7 +15,7 @@ class WooMS_Import_Product_Categories {
 		 * Use hook: do_action('wooms_product_update', $product_id, $value, $data);
 		 */
 		add_action( 'wooms_product_update', array( $this, 'load_data' ), 100, 3 );
-		add_action( 'admin_init', array( $this, 'settings_init' ), 101 );
+		add_action( 'admin_init', array( $this, 'settings_init' ), 103 );
 		add_action( 'wooms_walker_finish', array( $this, 'update_parent_category' ), 10);
 	}
 	
@@ -179,8 +179,9 @@ class WooMS_Import_Product_Categories {
 			delete_term_meta( $term_sub->term_id, 'wooms_slug_parent' );
 			delete_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent' );
 		}
+		
+		wp_update_term_count( $term_id, $taxonomy = 'product_cat' );
 
-		wp_cache_flush();
 	}
 	
 	/**

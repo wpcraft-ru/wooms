@@ -4,12 +4,13 @@
  * Hide old products
  */
 class WooMS_Hide_Old_Products {
+	/**
+	 * WooMS_Hide_Old_Products constructor.
+	 */
 	public function __construct() {
 		//Main Walker
 		add_action( 'init', array( $this, 'cron_init' ) );
 		add_action( 'wooms_cron_clear_old_products_walker', array( $this, 'cron_starter' ) );
-		
-		
 	}
 	
 	/**
@@ -30,12 +31,18 @@ class WooMS_Hide_Old_Products {
 		
 	}
 	
+	/**
+	 * Walker
+	 */
 	public function walker() {
 		
 		$this->set_hide_old_product();
 		
 	}
 	
+	/**
+	 * Adding hiding attributes to products
+	 */
 	public function set_hide_old_product() {
 		if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
 			$offset = 0;
@@ -43,17 +50,20 @@ class WooMS_Hide_Old_Products {
 		}
 		
 		$products = $this->get_product_old_session( $offset );
-		
+
 		$i = 0;
 		
 		foreach ( $products as $product_id ) {
 			$product = wc_get_product( $product_id );
-			//$product->set_catalog_visibility( 'hidden' );
+			if ( $product->get_type() == 'variable' ) {
+			$product->set_manage_stock( 'yes' );
+			}
 			$product->set_stock_status( 'outofstock' );
 			$product->save();
 			$i ++;
 			
 		}
+		
 		set_transient( 'wooms_offset_hide_product', $offset + $i );
 		if ( empty( $products ) ) {
 			delete_transient( 'wooms_offset_hide_product' );
@@ -61,6 +71,13 @@ class WooMS_Hide_Old_Products {
 		
 	}
 	
+	/**
+	 * Obtaining products with specific attributes
+	 *
+	 * @param int $offset
+	 *
+	 * @return array
+	 */
 	public function get_product_old_session( $offset = 0 ) {
 		$args = array(
 			'post_type'   => 'product',
@@ -83,6 +100,11 @@ class WooMS_Hide_Old_Products {
 		return get_posts( $args );
 	}
 	
+	/**
+	 * Method for getting the value of an option
+	 *
+	 * @return bool|mixed
+	 */
 	public function get_session() {
 		$session_id = get_option( 'wooms_session_id' );
 		if ( empty( $session_id ) ) {
