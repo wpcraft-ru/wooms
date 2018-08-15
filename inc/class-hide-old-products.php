@@ -56,7 +56,7 @@ class WooMS_Hide_Old_Products {
 		foreach ( $products as $product_id ) {
 			$product = wc_get_product( $product_id );
 			if ( $product->get_type() == 'variable' ) {
-			$product->set_manage_stock( 'yes' );
+				$product->set_manage_stock( 'yes' );
 			}
 			$product->set_stock_status( 'outofstock' );
 			$product->save();
