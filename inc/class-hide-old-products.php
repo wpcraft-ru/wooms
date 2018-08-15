@@ -55,16 +55,21 @@ class WooMS_Hide_Old_Products {
 		
 		foreach ( $products as $product_id ) {
 			$product = wc_get_product( $product_id );
+			
 			if ( $product->get_type() == 'variable' ) {
-			$product->set_manage_stock( 'yes' );
+				$product->set_manage_stock( 'yes' );
 			}
+			
 			$product->set_stock_status( 'outofstock' );
 			$product->save();
 			$i ++;
 			
 		}
+
+		do_action('wooms_hide_old_product', $products , $offset);
 		
 		set_transient( 'wooms_offset_hide_product', $offset + $i );
+		
 		if ( empty( $products ) ) {
 			delete_transient( 'wooms_offset_hide_product' );
 		}
