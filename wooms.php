@@ -9,20 +9,20 @@
  * Developer URI: https://wpcraft.ru/
  * Text Domain: wooms
  * Domain Path: /languages
- * Version: 2.0.11
- *
  * WC requires at least: 3.0
  * WC tested up to: 3.4.4
- *
  * PHP requires at least: 5.6
  * WP requires at least: 4.8
- *
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * Version: 2.0.12
+ * WooMS XT Latest: 1.7.9
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
+
 
 
 if ( ! function_exists( 'get_plugin_data' ) ) {
@@ -34,7 +34,6 @@ define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
 
 
 add_action( 'plugins_loaded', 'wooms_check_php_and_wp_version' );
-add_action( 'admin_notices', 'wooms_show_notices' );
 function wooms_check_php_and_wp_version() {
 	global $wp_version;
 	$php       = 5.6;
@@ -90,6 +89,53 @@ function wooms_show_notices() {
 		delete_transient( 'wooms_activation_error_message' );
 	}
 }
+add_action( 'admin_notices', 'wooms_show_notices' );
+
+/**
+ * Проверяем актуальность расширенной версии и сообщаем если есть обновления
+ * Проверка происходит на базе данных в комментарии базовой версии
+ */
+function wooms_xt_plugin_update_message( $data, $response ) {
+
+
+	$data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+	$xt_version_remote = $data['xt_version'];
+
+	// $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+	$data = get_plugin_data( plugin_dir_path( __DIR__ ) . "wooms-extra/wooms-extra.php", false, false );
+	$xt_version_local = $data['Version'];
+	// $data = plugin_dir_path( __DIR__ );
+
+	$check = version_compare( $xt_version_local, $xt_version_remote, '>=' );
+
+
+	if($check){
+		return;
+	}
+	$wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
+
+	printf(
+		'<tr class="plugin-update-tr">
+			<td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
+				<div class="update-message">Есть данны о новой версии WooMS XT: %s. Получить новую версию можно в консоли: <a href="https://wpcraft.ru/my" target="_blank">https://wpcraft.ru/my</a></div>
+			</td>
+		</tr>',
+		$wp_list_table->get_column_count(),
+		$xt_version_remote
+	);
+
+	// printf(
+	// 	'<div class="update-message">
+	// 		<p><strong>Версия:</strong> %s</p>
+	// 	</div>',
+	// $xt_version);
+
+	// printf(
+	// 	'<div class="update-message"><p><strong>%s</strong></p></div>',
+	// 	__( 'Version 2.3.4 is a recommended update', 'text-domain' )
+	// );
+}
+add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', 'wooms_xt_plugin_update_message', 10, 2 );
 
 function wooms_activate_plugin() {
 	require_once 'inc/class-menu-settings.php';
