@@ -16,7 +16,7 @@
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Version: 2.0.12
- * WooMS XT Latest: 1.7.9
+ * WooMS XT Latest: 1.8.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
