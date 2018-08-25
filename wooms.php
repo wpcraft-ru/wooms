@@ -9,34 +9,28 @@
  * Developer URI: https://wpcraft.ru/
  * Text Domain: wooms
  * Domain Path: /languages
- * Version: 2.0.11
- *
  * WC requires at least: 3.0
  * WC tested up to: 3.4.4
- *
  * PHP requires at least: 5.6
  * WP requires at least: 4.8
- *
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * Version: 2.0.12
+ * WooMS XT Latest: 1.8.0
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 
-if ( ! function_exists( 'get_plugin_data' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-}
-$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
-
-define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
-
-
-add_action( 'plugins_loaded', 'wooms_check_php_and_wp_version' );
-add_action( 'admin_notices', 'wooms_show_notices' );
 function wooms_check_php_and_wp_version() {
 	global $wp_version;
+
+	$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
+
+	define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
+
 	$php       = 5.6;
 	$wp        = 4.7;
 	$php_check = version_compare( PHP_VERSION, $php, '<' );
@@ -76,11 +70,14 @@ function wooms_check_php_and_wp_version() {
 		$error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
 		set_transient( 'wooms_activation_error_message', $error_text, 60 );
 	} else {
-		wooms_activate_plugin();
 		add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'wooms_plugin_add_settings_link' );
 	}
 }
+add_action( 'admin_init', 'wooms_check_php_and_wp_version' );
 
+/**
+ * Вывод сообщения в консоли
+ */
 function wooms_show_notices() {
 	$message = get_transient( 'wooms_activation_error_message' );
 	if ( ! empty( $message ) ) {
@@ -90,8 +87,50 @@ function wooms_show_notices() {
 		delete_transient( 'wooms_activation_error_message' );
 	}
 }
+add_action( 'admin_notices', 'wooms_show_notices' );
 
-function wooms_activate_plugin() {
+/**
+ * Проверяем актуальность расширенной версии и сообщаем если есть обновления
+ * Проверка происходит на базе данных в комментарии базовой версии
+ */
+function wooms_xt_plugin_update_message( $data, $response ) {
+
+
+	$data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+	$xt_version_remote = $data['xt_version'];
+
+	// $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+	$data = get_plugin_data( plugin_dir_path( __DIR__ ) . "wooms-extra/wooms-extra.php", false, false );
+	$xt_version_local = $data['Version'];
+	// $data = plugin_dir_path( __DIR__ );
+
+	$check = version_compare( $xt_version_local, $xt_version_remote, '>=' );
+
+
+	if($check){
+		return;
+	}
+	$wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
+
+	printf(
+		'<tr class="plugin-update-tr">
+			<td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
+				<div class="update-message">
+					<span>Вышла новая версия плагина WooMS XT: %s. Скачать обновление можно в консоли: <a href="https://wpcraft.ru/my" target="_blank">https://wpcraft.ru/my</a></span>
+				</div>
+			</td>
+		</tr>',
+		$wp_list_table->get_column_count(),
+		$xt_version_remote
+	);
+
+}
+
+add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', 'wooms_xt_plugin_update_message', 10, 2 );
+
+/**
+ * Подключение компонентов
+ */
 	require_once 'inc/class-menu-settings.php';
 	require_once 'inc/class-menu-tool.php';
 	require_once 'inc/class-import-products-walker.php';
@@ -100,7 +139,6 @@ function wooms_activate_plugin() {
 	require_once 'inc/class-import-product-images.php';
 	require_once 'inc/class-import-prices.php';
 	require_once 'inc/class-hide-old-products.php';
-}
 
 /**
  * Helper function for get data from moysklad.ru
