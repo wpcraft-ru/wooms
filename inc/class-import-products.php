@@ -47,7 +47,11 @@ class woomss_tool_products_import {
 			$this->update_product( $product_id, $value );
 		} else {
 			$product_id = $this->add_product( $value );
-			$this->update_product( $product_id, $value );
+			if ( $product_id ) {
+				$this->update_product( $product_id, $value );
+			} else {
+				return;
+			}
 		}
 		
 		do_action( 'wooms_product_update', $product_id, $value, $data );
