@@ -10,13 +10,13 @@
  * Text Domain: wooms
  * Domain Path: /languages
  * WC requires at least: 3.0
- * WC tested up to: 3.4.4
+ * WC tested up to: 3.4.5
  * PHP requires at least: 5.6
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.13
- * WooMS XT Latest: 1.8.2
+ * Version: 2.0.14
+ * WooMS XT Latest: 1.8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -139,6 +139,7 @@ add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', 'wooms_xt_plugin_upd
 	require_once 'inc/class-import-product-images.php';
 	require_once 'inc/class-import-prices.php';
 	require_once 'inc/class-hide-old-products.php';
+	require_once 'inc/class-metaboxes.php';
 
 /**
  * Helper function for get data from moysklad.ru
