@@ -9,20 +9,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WooMS_Metaboxes {
 	
 	/**
-	 * WooMS_Import_Product_Categories constructor.
+	 * WooMS_Metaboxes constructor.
 	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_post_type' ) );
-		add_action( 'product_cat_edit_form_fields', array( $this, 'add_data_category' ) , 30);
+		add_action( 'product_cat_edit_form_fields', array( $this, 'add_data_category' ), 30 );
 		add_action( 'save_post', array( $this, 'save_meta_boxes_order' ), 1, 2 );
 	}
 	
+	/**
+	 * Add metaboxes
+	 */
 	public function add_meta_boxes_post_type() {
 		add_meta_box( 'metabox_order', 'МойСклад', array( $this, 'add_meta_box_data_order' ), 'shop_order', 'side', 'low' );
 		add_meta_box( 'metabox_product', 'МойСклад', array( $this, 'add_meta_box_data_product' ), 'product', 'side', 'low' );
 	}
-
 	
+	/**
+	 * Meta box in order
+	 */
+	public function add_meta_box_data_order() {
+		global $post;
+		$meta_data = get_post_meta( $post->ID, 'wooms_id', true );
+		echo $this->meta_box_data( $meta_data );
+		
+	}
+	
+	/**
+	 *
+	 * Data output in the metabox
+	 *
+	 * @param string $data
+	 * @param string $type
+	 *
+	 * @return string
+	 */
 	public function meta_box_data( $data = '', $type = 'order' ) {
 		$meta_data = '';
 		switch ( $type ) {
@@ -38,38 +59,30 @@ class WooMS_Metaboxes {
 				$meta_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data );
 				$meta_data .= sprintf( '<p><a href="https://online.moysklad.ru/app/#good/edit?id=%s">Посмотреть товар в МойСклад</a></p>', $data );
 				break;
-			case 'category':
-				$meta_data = sprintf( '<div>ID категории в МойСклад: <div><strong>%s</strong></div></div>', $data );
-				$meta_data .= sprintf( '<p><a href="https://online.moysklad.ru/app/#good/edit?id=%s">Посмотреть категории в МойСклад</a></p>', $data );
-				break;
 		}
 		
 		return $meta_data;
 	}
 	
-	function add_meta_box_data_order() {
+	/**
+	 * Meta box in product
+	 */
+	public function add_meta_box_data_product() {
 		global $post;
 		$meta_data = get_post_meta( $post->ID, 'wooms_id', true );
-		echo $this->meta_box_data( $meta_data );
-		
-	}
-	function add_meta_box_data_product() {
-		global $post;
-		$meta_data = get_post_meta( $post->ID, 'wooms_id', true );
-		echo $this->meta_box_data( $meta_data, 'product');
+		echo $this->meta_box_data( $meta_data, 'product' );
 		
 	}
 	
-	function add_meta_box_data_category() {
-		global $post;
-		$meta_data_order = get_term_meta( $post->ID, 'wooms_id', true );
-		echo $this->meta_box_data( $meta_data_order , 'category');
-		
-	}
-
-	function add_data_category( $term ) {
-		$meta_data  = get_term_meta( $term->term_id , 'wooms_id', true );
-		if (!$meta_data){
+	
+	/**
+	 * Meta box in category
+	 *
+	 * @param $term
+	 */
+	public function add_data_category( $term ) {
+		$meta_data = get_term_meta( $term->term_id, 'wooms_id', true );
+		if ( ! $meta_data ) {
 			$meta_data = '';
 		}
 		//echo $this->meta_box_data( $meta_data , 'category');
