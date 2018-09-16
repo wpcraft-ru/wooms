@@ -4,34 +4,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Import Product Categories from MoySklad
+ * Info metaboxes
  */
 class WooMS_Metaboxes {
 	
+	
 	/**
-	 * WooMS_Metaboxes constructor.
+	 * WooMS_Metaboxes init.
 	 */
-	public function __construct() {
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_post_type' ) );
-		add_action( 'product_cat_edit_form_fields', array( $this, 'add_data_category' ), 30 );
-		add_action( 'save_post', array( $this, 'save_meta_boxes_order' ), 1, 2 );
+	public static function init() {
+		add_action( 'plugins_loaded', array( __CLASS__, 'loaded' ) );
+	}
+	
+	/**
+	 *
+	 */
+	public static function loaded() {
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes_post_type' ) );
+		add_action( 'product_cat_edit_form_fields', array( __CLASS__, 'add_data_category' ), 30 );
 	}
 	
 	/**
 	 * Add metaboxes
 	 */
-	public function add_meta_boxes_post_type() {
-		add_meta_box( 'metabox_order', 'МойСклад', array( $this, 'add_meta_box_data_order' ), 'shop_order', 'side', 'low' );
-		add_meta_box( 'metabox_product', 'МойСклад', array( $this, 'add_meta_box_data_product' ), 'product', 'side', 'low' );
+	public static function add_meta_boxes_post_type() {
+		add_meta_box( 'metabox_order', 'МойСклад', array( __CLASS__, 'add_meta_box_data_order' ), 'shop_order', 'side', 'low' );
+		add_meta_box( 'metabox_product', 'МойСклад', array( __CLASS__, 'add_meta_box_data_product' ), 'product', 'side', 'low' );
 	}
 	
 	/**
 	 * Meta box in order
 	 */
-	public function add_meta_box_data_order() {
-		global $post;
+	public static function add_meta_box_data_order() {
+		$post      = get_post();
 		$meta_data = get_post_meta( $post->ID, 'wooms_id', true );
-		echo $this->meta_box_data( $meta_data );
+		echo self::meta_box_data( $meta_data );
 		
 	}
 	
@@ -44,7 +51,7 @@ class WooMS_Metaboxes {
 	 *
 	 * @return string
 	 */
-	public function meta_box_data( $data = '', $type = 'order' ) {
+	public static function meta_box_data( $data = '', $type = 'order' ) {
 		$meta_data = '';
 		switch ( $type ) {
 			case 'order':
@@ -67,10 +74,10 @@ class WooMS_Metaboxes {
 	/**
 	 * Meta box in product
 	 */
-	public function add_meta_box_data_product() {
-		global $post;
+	public static function add_meta_box_data_product() {
+		$post      = get_post();
 		$meta_data = get_post_meta( $post->ID, 'wooms_id', true );
-		echo $this->meta_box_data( $meta_data, 'product' );
+		echo self::meta_box_data( $meta_data, 'product' );
 		
 	}
 	
@@ -80,12 +87,12 @@ class WooMS_Metaboxes {
 	 *
 	 * @param $term
 	 */
-	public function add_data_category( $term ) {
+	public static function add_data_category( $term ) {
 		$meta_data = get_term_meta( $term->term_id, 'wooms_id', true );
 		if ( ! $meta_data ) {
 			$meta_data = '';
 		}
-		//echo $this->meta_box_data( $meta_data , 'category');
+		
 		?>
 		
 		<tr class="form-field term-meta-text-wrap">
@@ -112,4 +119,4 @@ class WooMS_Metaboxes {
 	<?php }
 }
 
-new WooMS_Metaboxes();
+WooMS_Metaboxes::init();
