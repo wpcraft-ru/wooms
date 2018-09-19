@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.14
- * WooMS XT Latest: 1.8.3
+ * Version: 2.0.15
+ * WooMS XT Latest: 1.8.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -139,7 +139,6 @@ add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', 'wooms_xt_plugin_upd
 	require_once 'inc/class-import-product-images.php';
 	require_once 'inc/class-import-prices.php';
 	require_once 'inc/class-hide-old-products.php';
-	require_once 'inc/class-metaboxes.php';
 
 /**
  * Helper function for get data from moysklad.ru
@@ -245,7 +244,8 @@ function wooms_get_product_id_by_uuid( $uuid ) {
 
 function wooms_plugin_add_settings_link( $links ) {
 	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
-	array_push( $links, $settings_link );
-
+	$xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
+	array_unshift($links, $xt_link);
+	array_unshift($links, $settings_link);
 	return $links;
 }

@@ -14,6 +14,7 @@ class woomss_tool_products_import {
 	public function __construct() {
 		//do_action('wooms_product_import_row', $value, $key, $data);
 		add_action( 'wooms_product_import_row', [ $this, 'load_data' ], 10, 3 );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_post_type' ) );
 	}
 	
 	/**
@@ -38,7 +39,7 @@ class woomss_tool_products_import {
 		if ( ! empty( $value['article'] ) ) {
 			$product_id = wc_get_product_id_by_sku( $value['article'] );
 		} else {
-			$product_id = '';
+			$product_id = null;
 		}
 		
 		if ( intval( $product_id ) ) {
@@ -66,7 +67,7 @@ class woomss_tool_products_import {
 	 *
 	 */
 	public function update_product( $product_id, $data_of_source ) {
-
+		
 		wp_set_object_terms( $product_id, 'simple', 'product_type', false );
 		
 		$product = wc_get_product( $product_id );
@@ -106,14 +107,46 @@ class woomss_tool_products_import {
 			
 			$product->set_price( $price );
 			$product->set_regular_price( $price );
+			
+			if ( 0 == $product->get_price()){
+				$product->set_catalog_visibility('hidden' );
+			} else {
+				$product->set_catalog_visibility('visible');
+			}
 		}
 		
 		$product->set_stock_status( 'instock' );
 		$product->set_manage_stock( 'no' );
+
 		
 		$product->set_status( 'publish' );
 		$product->save();
 		
+	}
+	
+	/**
+	 * Add metaboxes
+	 */
+	public function add_meta_boxes_post_type() {
+		add_meta_box( 'metabox_product', 'МойСклад', array( $this, 'add_meta_box_data_product' ), 'product', 'side', 'low' );
+	}
+	
+	/**
+	 * Meta box in product
+	 */
+	public function add_meta_box_data_product() {
+		$post = get_post();
+		
+		$data_id   = get_post_meta( $post->ID, 'wooms_id', true );
+		$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
+		if ( $data_id ) {
+			$box_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
+		}
+		if ( $data_meta ) {
+			$box_data .= sprintf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
+		}
+		
+		echo $box_data;
 	}
 	
 	/**
@@ -165,6 +198,8 @@ class woomss_tool_products_import {
 		}
 		
 		update_post_meta( $post_id, $meta_key = 'wooms_id', $meta_value = $data_source['id'] );
+		
+		update_post_meta( $post_id, 'wooms_meta', $data_source['meta']);
 		
 		if ( isset( $data_source['article'] ) ) {
 			update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );
