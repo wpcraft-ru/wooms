@@ -17,6 +17,7 @@ class WooMS_Import_Product_Categories {
 		add_action( 'wooms_product_update', array( $this, 'load_data' ), 100, 3 );
 		add_action( 'admin_init', array( $this, 'settings_init' ), 103 );
 		add_action( 'wooms_walker_finish', array( $this, 'update_parent_category' ), 10);
+		add_action( 'product_cat_edit_form_fields', array( $this, 'add_data_category' ), 30 );
 	}
 	
 	/**
@@ -183,6 +184,42 @@ class WooMS_Import_Product_Categories {
 		wp_update_term_count( $term_id, $taxonomy = 'product_cat' );
 
 	}
+	
+	/**
+	 * Meta box in category
+	 *
+	 * @param $term
+	 */
+	public function add_data_category( $term ) {
+		$meta_data = get_term_meta( $term->term_id, 'wooms_id', true );
+		if ( ! $meta_data ) {
+			$meta_data = '';
+		}
+		
+		?>
+		
+		<tr class="form-field term-meta-text-wrap">
+			<td colspan="2" style="padding: 0;">
+				<h3 style="margin: 0;">МойСклад</h3>
+			</td>
+		</tr>
+		<tr class="form-field term-meta-text-wrap">
+			<th scope="row">
+				<label for="term-meta-text">ID категории в МойСклад</label>
+			</th>
+			<td>
+				<strong><?php echo $meta_data ?></strong>
+			</td>
+		</tr>
+		<tr class="form-field term-meta-text-wrap">
+			<th scope="row">
+				<label for="term-meta-text">Ссылка на категорию</label>
+			</th>
+			<td>
+				<a href="https://online.moysklad.ru/app/#good/edit?id=<?php echo $meta_data ?>" target="_blank">Посмотреть категории в МойСклад</a>
+			</td>
+		</tr>
+	<?php }
 	
 	/**
 	 * If isset term return term_id, else return false
