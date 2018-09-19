@@ -39,7 +39,7 @@ class woomss_tool_products_import {
 		if ( ! empty( $value['article'] ) ) {
 			$product_id = wc_get_product_id_by_sku( $value['article'] );
 		} else {
-			$product_id = '';
+			$product_id = null;
 		}
 		
 		if ( intval( $product_id ) ) {
@@ -107,40 +107,48 @@ class woomss_tool_products_import {
 			
 			$product->set_price( $price );
 			$product->set_regular_price( $price );
+			
+			if ( 0 == $product->get_price()){
+				$product->set_catalog_visibility('hidden' );
+			} else {
+				$product->set_catalog_visibility('visible');
+			}
 		}
 		
 		$product->set_stock_status( 'instock' );
 		$product->set_manage_stock( 'no' );
+
 		
 		$product->set_status( 'publish' );
 		$product->save();
 		
 	}
+	
 	/**
 	 * Add metaboxes
 	 */
 	public function add_meta_boxes_post_type() {
 		add_meta_box( 'metabox_product', 'МойСклад', array( $this, 'add_meta_box_data_product' ), 'product', 'side', 'low' );
 	}
+	
 	/**
 	 * Meta box in product
 	 */
 	public function add_meta_box_data_product() {
-		$post      = get_post();
+		$post = get_post();
 		
-		$data_id = get_post_meta( $post->ID, 'wooms_id', true );
+		$data_id   = get_post_meta( $post->ID, 'wooms_id', true );
 		$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
 		if ( $data_id ) {
 			$box_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
 		}
-		if ($data_meta){
+		if ( $data_meta ) {
 			$box_data .= sprintf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
 		}
 		
-		
 		echo $box_data;
-		
 	}
+	
 	/**
 	 * Product Check
 	 *
