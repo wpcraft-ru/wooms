@@ -97,7 +97,7 @@ class WooMS_Settings {
 		), $page = 'mss-settings', $section = 'woomss_section_other' );
 		
 		register_setting( 'mss-settings', 'wooms_replace_description' );
-		add_settings_field( $id = 'wooms_replace_description', $title = 'Менять описание на Сайте', $callback = array(
+		add_settings_field( $id = 'wooms_replace_description', $title = 'Замена описание при обновлении', $callback = array(
 			$this,
 			'display_wooms_replace_desc',
 		), $page = 'mss-settings', $section = 'woomss_section_other' );

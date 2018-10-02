@@ -95,7 +95,9 @@ class woomss_tool_products_import {
 		
 		//update description
 		if ( isset( $data_of_source['description'] ) and empty( $product->get_description() ) ) {
-			$product->set_description( $data_of_source['description'] );
+			if ( ! empty( get_option( 'wooms_replace_title' ) ) ) {
+				$product->set_description( $data_of_source['description'] );
+			}
 		}
 		
 		//Price Retail 'salePrices'
