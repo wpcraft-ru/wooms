@@ -19,7 +19,6 @@ class WooMS_Import_Product_Categories {
 		 */
 		add_action( 'wooms_product_update', array( $this, 'load_data' ), 100, 3 );
 		add_action( 'admin_init', array( $this, 'settings_init' ), 103 );
-		//add_action( 'wooms_walker_finish', array( $this, 'update_parent_category' ), 10);
 		add_action( 'product_cat_edit_form_fields', array( $this, 'add_data_category' ), 30 );
 	}
 	
@@ -152,75 +151,6 @@ class WooMS_Import_Product_Categories {
 		} else {
 			return $terms[0]->term_id;
 		}
-	}
-	
-	/**
-	 * Creating a parent category, if it is not
-	 */
-	public function update_parent_category() {
-		
-		$terms_sub = get_terms( array(
-			'taxonomy'   => array( 'product_cat' ),
-			'meta_query' => array(
-				array(
-					'key'     => 'wooms_slug_parent',
-					'compare' => 'EXISTS',
-				),
-			),
-		) );
-		
-		if ( false == $terms_sub ) {
-			return;
-		}
-		
-		$term_parent_args = array();
-		
-		foreach ( $terms_sub as $term_sub ) {
-			$term_parent_args['name']     = get_term_meta( $term_sub->term_id, 'wooms_name_parent', true );
-			$term_parent_args['slug']     = get_term_meta( $term_sub->term_id, 'wooms_slug_parent', true );
-			$term_parent_args['wooms_id'] = get_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent', true );
-		}
-		
-		$was_suspended = wp_suspend_cache_addition();
-		wp_suspend_cache_addition( true );
-		
-		$term_add = wp_insert_term( $term_parent_args['name'], $taxonomy = 'product_cat', array(
-			'slug'   => $term_parent_args['slug'],
-			'parent' => 0,
-		) );
-		
-		wp_suspend_cache_addition( $was_suspended );
-		
-		if ( isset( $term_add->errors["term_exists"] ) ) {
-			$term_id = intval( $term_add->error_data['term_exists'] );
-			if ( empty( $term_id ) ) {
-				return;
-			}
-		} elseif ( isset( $term_add->term_id ) ) {
-			$term_id = $term_add->term_id;
-		} elseif ( isset( $term_add["term_id"] ) ) {
-			$term_id = $term_add["term_id"];
-		} else {
-			return;
-		}
-		
-		update_term_meta( $term_id, 'wooms_id', $term_parent_args['wooms_id'] );
-		
-		if ( $session_id = get_option( 'wooms_session_id' ) ) {
-			update_term_meta( $term_id, 'wooms_session_id', $session_id );
-		}
-		
-		foreach ( $terms_sub as $term_sub ) {
-			$term_upd = wp_update_term( $term_sub->term_id, $taxonomy = 'product_cat', array(
-				'parent' => $term_id,
-			) );
-			delete_term_meta( $term_sub->term_id, 'wooms_name_parent' );
-			delete_term_meta( $term_sub->term_id, 'wooms_slug_parent' );
-			delete_term_meta( $term_sub->term_id, 'wooms_wooms_id_parent' );
-		}
-		
-		wp_update_term_count( $term_id, $taxonomy = 'product_cat' );
-		
 	}
 	
 	/**
