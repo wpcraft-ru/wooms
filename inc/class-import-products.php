@@ -94,17 +94,19 @@ class woomss_tool_products_import {
 		}
 		
 		//update description
-		if ( isset( $data_of_source['description'] ) && ! empty( get_option( 'wooms_replace_description' ) ) ) {
-			$product->set_description( $data_of_source['description'] );
+		if ( apply_filters( 'wooms_added_description', true, $data_of_source['description'] ) ) {
 			
-		} else {
-			
-			if ( empty( $product->get_description() ) ) {
-				
+			if ( isset( $data_of_source['description'] ) && ! empty( get_option( 'wooms_replace_description' ) ) ) {
 				$product->set_description( $data_of_source['description'] );
+				
+			} else {
+				
+				if ( empty( $product->get_description() ) ) {
+					
+					$product->set_description( $data_of_source['description'] );
+				}
 			}
 		}
-		
 		//Price Retail 'salePrices'
 		if ( isset( $data_of_source['salePrices'][0]['value'] ) ) {
 			$price_source = floatval( $data_of_source['salePrices'][0]['value'] );
