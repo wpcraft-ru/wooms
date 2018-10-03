@@ -86,6 +86,8 @@ class woomss_tool_products_import {
 		
 		update_post_meta( $product_id, 'wooms_id', $data_of_source['id'] );
 		
+		update_post_meta( $product_id, 'wooms_updated', $data_of_source['updated']);
+		
 		//update title
 		if ( isset( $data_of_source['name'] ) and $data_of_source['name'] != $product->get_title() ) {
 			if ( ! empty( get_option( 'wooms_replace_title' ) ) ) {
@@ -148,11 +150,15 @@ class woomss_tool_products_import {
 		
 		$data_id   = get_post_meta( $post->ID, 'wooms_id', true );
 		$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
+		$data_updated = get_post_meta( $post->ID, 'wooms_updated', true );
 		if ( $data_id ) {
 			$box_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
 		}
 		if ( $data_meta ) {
 			$box_data .= sprintf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
+		}
+		if ( $data_updated ) {
+			$box_data .= sprintf( '<div>Дата последнего обновления товара в МойСклад: <div><strong>%s</strong></div></div>', $data_updated );
 		}
 		
 		echo $box_data;
@@ -209,6 +215,8 @@ class woomss_tool_products_import {
 		update_post_meta( $post_id, $meta_key = 'wooms_id', $meta_value = $data_source['id'] );
 		
 		update_post_meta( $post_id, 'wooms_meta', $data_source['meta']);
+		
+		update_post_meta( $post_id, 'wooms_updated', $data_source['updated']);
 		
 		if ( isset( $data_source['article'] ) ) {
 			update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );

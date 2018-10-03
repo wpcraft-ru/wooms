@@ -71,7 +71,9 @@ class WooMS_Import_Product_Categories {
 				}
 			}
 			$term = wp_update_term( $term_id, 'product_cat', array( 'parent' => $parent ) );
-
+			
+			update_term_meta( $term_id, 'wooms_updated_category', $data['updated']);
+			
 			if ( is_array( $term ) && ! empty( $term["term_id"] ) ) {
 				return $term["term_id"];
 			} else {
@@ -120,6 +122,8 @@ class WooMS_Import_Product_Categories {
 			
 			update_term_meta( $term_id, 'wooms_id', $term_new['wooms_id'] );
 			
+			update_term_meta( $term_id, 'wooms_updated_category', $data['updated']);
+			
 			if ( $session_id = get_option( 'wooms_session_id' ) ) {
 				update_term_meta( $term_id, 'wooms_session_id', $session_id );
 			}
@@ -161,10 +165,15 @@ class WooMS_Import_Product_Categories {
 	public function add_data_category( $term ) {
 		
 		$meta_data = get_term_meta( $term->term_id, 'wooms_id', true );
+		$meta_data_updated = get_term_meta( $term->term_id, 'wooms_updated_category', true );
 		if ( ! $meta_data ) {
 			$meta_data = '';
 		}
 		
+		if ( ! $meta_data_updated ) {
+			$meta_data_updated = '';
+		}
+
 		?>
 		
 		<tr class="form-field term-meta-text-wrap">
@@ -185,7 +194,15 @@ class WooMS_Import_Product_Categories {
 				<label for="term-meta-text">Ссылка на категорию</label>
 			</th>
 			<td>
-				<a href="https://online.moysklad.ru/app/#good/edit?id=<?php echo $meta_data ?>" target="_blank">Посмотреть категории в МойСклад</a>
+				<a href="https://online.moysklad.ru/app/#good/edit?id=<?php echo $meta_data ?>" target="_blank">Посмотреть категорию в МойСклад</a>
+			</td>
+		</tr>
+		<tr class="form-field term-meta-text-wrap">
+			<th scope="row">
+				<label for="term-meta-text">Дата последнего обновления в МойСклад</label>
+			</th>
+			<td>
+				<strong><?php echo $meta_data_updated; ?></strong>
 			</td>
 		</tr>
 	<?php }
