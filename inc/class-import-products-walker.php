@@ -126,6 +126,8 @@ class WooMS_Product_Import_Walker {
 					throw new Exception( $error_code . ': ' . $data['errors'][0]["error"] );
 				}
 			}
+			
+			do_action( 'wooms_walker_start' );
 			//If no rows, that send 'end' and stop walker
 			if ( empty( $data['rows'] ) ) {
 				$this->walker_finish();
@@ -136,6 +138,7 @@ class WooMS_Product_Import_Walker {
 			}
 			
 			$i = 0;
+			
 			foreach ( $data['rows'] as $key => $value ) {
 				do_action( 'wooms_product_import_row', $value, $key, $data );
 				$i ++;
