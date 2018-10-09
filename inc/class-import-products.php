@@ -147,7 +147,7 @@ class woomss_tool_products_import {
 	 */
 	public function add_meta_box_data_product() {
 		$post = get_post();
-		
+		$box_data = '';
 		$data_id   = get_post_meta( $post->ID, 'wooms_id', true );
 		$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
 		$data_updated = get_post_meta( $post->ID, 'wooms_updated', true );

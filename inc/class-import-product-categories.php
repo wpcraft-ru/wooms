@@ -164,48 +164,46 @@ class WooMS_Import_Product_Categories {
 	 */
 	public function add_data_category( $term ) {
 		
-		$meta_data = get_term_meta( $term->term_id, 'wooms_id', true );
+		$meta_data         = get_term_meta( $term->term_id, 'wooms_id', true );
 		$meta_data_updated = get_term_meta( $term->term_id, 'wooms_updated_category', true );
-		if ( ! $meta_data ) {
-			$meta_data = '';
+		if ( $meta_data ) {
+			?>
+			<tr class="form-field term-meta-text-wrap">
+				<td colspan="2" style="padding: 0;">
+					<h3 style="margin: 0;">МойСклад</h3>
+				</td>
+			</tr>
+			<tr class="form-field term-meta-text-wrap">
+				<th scope="row">
+					<label for="term-meta-text">ID категории в МойСклад</label>
+				</th>
+				<td>
+					<strong><?php echo $meta_data ?></strong>
+				</td>
+			</tr>
+			<tr class="form-field term-meta-text-wrap">
+				<th scope="row">
+					<label for="term-meta-text">Ссылка на категорию</label>
+				</th>
+				<td>
+					<a href="https://online.moysklad.ru/app/#good/edit?id=<?php echo $meta_data ?>" target="_blank">Посмотреть категорию в МойСклад</a>
+				</td>
+			</tr>
+			<?php
+			
+			if ( $meta_data_updated ): ?>
+				<tr class="form-field term-meta-text-wrap">
+					<th scope="row">
+						<label for="term-meta-text">Дата последнего обновления в МойСклад</label>
+					</th>
+					<td>
+						<strong><?php echo $meta_data_updated; ?></strong>
+					</td>
+				</tr>
+			<?php
+			endif;
 		}
-		
-		if ( ! $meta_data_updated ) {
-			$meta_data_updated = '';
-		}
-
-		?>
-		
-		<tr class="form-field term-meta-text-wrap">
-			<td colspan="2" style="padding: 0;">
-				<h3 style="margin: 0;">МойСклад</h3>
-			</td>
-		</tr>
-		<tr class="form-field term-meta-text-wrap">
-			<th scope="row">
-				<label for="term-meta-text">ID категории в МойСклад</label>
-			</th>
-			<td>
-				<strong><?php echo $meta_data ?></strong>
-			</td>
-		</tr>
-		<tr class="form-field term-meta-text-wrap">
-			<th scope="row">
-				<label for="term-meta-text">Ссылка на категорию</label>
-			</th>
-			<td>
-				<a href="https://online.moysklad.ru/app/#good/edit?id=<?php echo $meta_data ?>" target="_blank">Посмотреть категорию в МойСклад</a>
-			</td>
-		</tr>
-		<tr class="form-field term-meta-text-wrap">
-			<th scope="row">
-				<label for="term-meta-text">Дата последнего обновления в МойСклад</label>
-			</th>
-			<td>
-				<strong><?php echo $meta_data_updated; ?></strong>
-			</td>
-		</tr>
-	<?php }
+	}
 	
 	/**
 	 * Settings UI
