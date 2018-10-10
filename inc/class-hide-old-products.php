@@ -86,7 +86,7 @@ class WooMS_Hide_Old_Products {
 	public function get_product_old_session( $offset = 0 ) {
 		$args = array(
 			'post_type'   => 'product',
-			'numberposts' => 10,
+			'numberposts' => 60,
 			'fields'      => 'ids',
 			'offset'      => $offset,
 			'meta_query'  => array(
@@ -100,6 +100,10 @@ class WooMS_Hide_Old_Products {
 					'compare' => 'EXISTS',
 				),
 			),
+			'no_found_rows' => true,
+			'update_post_term_cache' => false,
+			'update_post_meta_cache' => false,
+			'cache_results' => false
 		);
 		
 		return get_posts( $args );
