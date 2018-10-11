@@ -95,11 +95,10 @@ class woomss_tool_products_import {
 			}
 		}
 		
+		$product_description = isset($data_of_source['description']) ? $data_of_source['description'] : '';
 		//update description
-		if ( apply_filters( 'wooms_added_description', true, $data_of_source['description'] ) ) {
-			
-			$product_description = $data_of_source['description'] ? $data_of_source['description'] : '';
-			
+		if ( apply_filters( 'wooms_added_description', true, $product_description) ) {
+
 			if ( $product_description && ! empty( get_option( 'wooms_replace_description' ) ) ) {
 				
 				$product->set_description( $product_description );

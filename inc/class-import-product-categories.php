@@ -64,15 +64,19 @@ class WooMS_Import_Product_Categories {
 			
 			do_action( 'wooms_update_category', $term_id );
 			
+			$arg_upd = array();
+			$url_parent = '';
+			
 			if ( isset( $data['productFolder']['meta']['href'] ) ) {
 				$url_parent = $data['productFolder']['meta']['href'];
 				if ( $term_id_parent = $this->update_category( $url_parent ) ) {
-					$parent = isset( $term_id_parent ) ? intval( $term_id_parent ) : 0;
+					$arg_upd['parent'] = isset( $term_id_parent ) ? intval( $term_id_parent ) : 0;
 				}
 			}
+			
 			if ( apply_filters( 'wooms_skip_update_select_category', true, $url_parent ) ) {
 				
-				$term = wp_update_term( $term_id, 'product_cat', array( 'parent' => $parent ) );
+				$term = wp_update_term( $term_id, 'product_cat', $arg_upd );
 				
 			}
 			wp_update_term_count( $term_id, $taxonomy = 'product_cat' );
