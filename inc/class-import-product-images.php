@@ -14,7 +14,7 @@ class WooMS_Import_Product_Images {
 	 */
 	public function __construct() {
 		
-		add_action( 'admin_init', array( $this, 'settings_init' ), 100 );
+		add_action( 'admin_init', array( $this, 'settings_init' ), 50 );
 		
 		//Use hook do_action('wooms_product_update', $product_id, $value, $data);
 		add_action( 'wooms_product_update', array( $this, 'load_data' ), 10, 3 );
@@ -312,20 +312,34 @@ class WooMS_Import_Product_Images {
 	 * Settings UI
 	 */
 	public function settings_init() {
+		add_settings_section( 'woomss_section_images', 'Изображения', null, 'mss-settings' );
 		
 		register_setting( 'mss-settings', 'woomss_images_sync_enabled' );
 		add_settings_field( $id = 'woomss_images_sync_enabled', $title = 'Включить синхронизацию картинок', $callback = array(
 			$this,
 			'setting_images_sync_enabled',
-		), $page = 'mss-settings', $section = 'woomss_section_other' );
+		), $page = 'mss-settings', $section = 'woomss_section_images' );
+		register_setting( 'mss-settings', 'woomss_images_replace_to_sync' );
+		add_settings_field('woomss_images_replace_to_sync', 'Замена изображении при синхронизации', array(
+			$this,
+			'setting_images_replace_to_sync',
+		), $page = 'mss-settings', $section = 'woomss_section_images' );
 		
 	}
 	
 	//Display field
-	public function setting_images_sync_enabled() {
+	public function setting_images_replace_to_sync() {
 		
+		$option = 'woomss_images_replace_to_sync';
+		$desc = '<small>Если включить опцию, то плагин будет обновлять изображения, если они изменились в МойСклад.</small>';
+		printf( '<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked( 1, get_option( $option ), false ), $desc );
+	}
+	//Display field
+	public function setting_images_sync_enabled() {
+
 		$option = 'woomss_images_sync_enabled';
-		printf( '<input type="checkbox" name="%s" value="1" %s />', $option, checked( 1, get_option( $option ), false ) );
+		$desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
+		printf( '<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked( 1, get_option( $option ), false ), $desc );
 	}
 	
 }
