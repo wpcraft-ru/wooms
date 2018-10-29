@@ -32,6 +32,8 @@ class WooMS_Import_Product_Images {
 	/**
 	 * Method load data
 	 *
+	 * @version 2.1.2 update method
+	 *
 	 * @param $product_id
 	 * @param $value
 	 * @param $data
@@ -50,8 +52,9 @@ class WooMS_Import_Product_Images {
 		}
 		
 		//check current thumbnail. if isset - break, or add url for next downloading
-		if ( $id = get_post_thumbnail_id( $product_id ) ) {
+		if ( $id = get_post_thumbnail_id( $product_id ) && empty( get_option( 'woomss_images_replace_to_sync' ) ) ) {
 			return;
+			
 		} else {
 			update_post_meta( $product_id, 'wooms_url_for_get_thumbnail', $url );
 			update_post_meta( $product_id, 'wooms_image_data', $value['image'] );
@@ -113,6 +116,8 @@ class WooMS_Import_Product_Images {
 	
 	
 	/**
+	 * Download images from meta
+	 *
 	 *
 	 * @return array|bool|void
 	 */
@@ -122,7 +127,21 @@ class WooMS_Import_Product_Images {
 			return;
 		}
 		
-		$list = get_posts( 'post_type=product&meta_key=wooms_url_for_get_thumbnail&meta_compare=EXISTS' );
+		$args = array(
+			'post_type'              => 'product',
+			'meta_query'             => array(
+				array(
+					'key'     => 'wooms_url_for_get_thumbnail',
+					'compare' => 'EXISTS',
+				),
+			),
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+			'update_post_meta_cache' => false,
+			'cache_results'          => false,
+		);
+		
+		$list = get_posts( $args );
 		
 		if ( empty( $list ) ) {
 			return false;
@@ -141,10 +160,8 @@ class WooMS_Import_Product_Images {
 			if ( ! empty( $check_id ) ) {
 				
 				set_post_thumbnail( $value->ID, $check_id );
-				
 				delete_post_meta( $value->ID, 'wooms_url_for_get_thumbnail' );
 				delete_post_meta( $value->ID, 'wooms_image_data' );
-				
 				$result[] = $value->ID;
 			}
 			
@@ -302,9 +319,14 @@ class WooMS_Import_Product_Images {
 		}
 		
 		?>
-		<h2>Загрузка картинок</h2><p>Ручная загрузка картинок по 5 штук за раз.</p>
-		<a href="<?php echo add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'tools.php?page=moysklad' ) ) ?>" class="button">Выполнить</a>
+		<h2>Импорт изображений</h2>
+		<p>Ручное импортирование изображений по 5 штук за раз.</p>
 		<?php
+		if (empty( get_transient( 'wooms_start_timestamp' ) )){
+			printf( '<a href="%s" class="button button-primary">Импорт изображений</a>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'tools.php?page=moysklad' ) ) );
+		} else {
+			printf( '<span href="%s" class="button button-secondary" style="display:inline-block">Импорт изображений</span>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'tools.php?page=moysklad' ) ) );
+		}
 		
 	}
 	
@@ -331,7 +353,7 @@ class WooMS_Import_Product_Images {
 	public function setting_images_replace_to_sync() {
 		
 		$option = 'woomss_images_replace_to_sync';
-		$desc = '<small>Если включить опцию, то плагин будет обновлять изображения, если они изменились в МойСклад.</small>';
+		$desc = '<small>Если включить опцию, то плагин будет обновлять изображения, если они изменились в МойСклад.</small><p><small><strong>Внимание!</strong> Для корректной перезаписи изображений, необходимо провести повторную синхронизацию товаров. Если синхронизация товаров происходит по крону, то дождаться окончания очередной сессии синхронизации товаров</small></p>';
 		printf( '<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked( 1, get_option( $option ), false ), $desc );
 	}
 	//Display field
