@@ -155,12 +155,16 @@ class woomss_tool_products_import {
 		$data_updated = get_post_meta( $post->ID, 'wooms_updated', true );
 		if ( $data_id ) {
 			$box_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
+		} else {
+			$box_data = '<p>Товар еще не синхронизирован с МойСклад.</p> <p>Ссылка на товар отсутствует</p>';
 		}
+		
 		if ( $data_meta ) {
 			$box_data .= sprintf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
 		}
+		
 		if ( $data_updated ) {
-			$box_data .= sprintf( '<div>Дата последнего обновления товара в МойСклад: <div><strong>%s</strong></div></div>', $data_updated );
+			$box_data .= sprintf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
 		}
 		
 		echo $box_data;
