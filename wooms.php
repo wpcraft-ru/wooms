@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 3.0.0
- * WooMS XT Latest: 3.0.0
+ * Version: 3.0.1
+ * WooMS XT Latest: 3.0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -190,6 +190,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 	if ( empty( $url ) ) {
 		return false;
 	}
+
 	if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
 		$type = 'POST';
 	}
@@ -198,7 +199,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 	} else {
 		$data = json_encode( $data );
 	}
-	$request = wp_remote_request( $url, array(
+
+    $args = array(
 		'method'      => $type,
 		'timeout'     => 45,
 		'redirection' => 5,
@@ -208,7 +210,9 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 			                   base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
 		),
 		'body'        => $data,
-	) );
+	);
+
+	$request = wp_remote_request( $url, $args);
 	if ( is_wp_error( $request ) ) {
 		set_transient( 'wooms_error_background', $request->get_error_message() );
 
@@ -241,7 +245,6 @@ function wooms_get_product_id_by_uuid( $uuid ) {
 /**
  * Add Settings link in pligins list
  */
-
 function wooms_plugin_add_settings_link( $links ) {
 	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
 	$xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
