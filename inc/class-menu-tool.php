@@ -13,13 +13,14 @@ class woomss_tool {
     $this->url = $_SERVER['REQUEST_URI'];
 
     add_action('admin_menu', function(){
-        add_management_page(
-            $page_title = 'МойСклад',
-            $menu_title = 'МойСклад',
-            $capability = 'manage_options',
-            $menu_slug = 'moysklad',
-            $function = array($this, 'ui_management_page_callback')
-        );
+	    add_submenu_page(
+		    'mss-settings',
+		    $page_title = 'Управление',
+		    $menu_title = 'Управление',
+		    $capability = 'manage_options',
+		    $menu_slug = 'moysklad',
+		    $function = array($this, 'ui_management_page_callback')
+	    );
     });
 
 

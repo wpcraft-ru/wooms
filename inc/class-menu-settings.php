@@ -9,10 +9,6 @@ class WooMS_Settings {
 		
 		add_action( 'admin_menu', function () {
 			
-			/*add_options_page( $page_title = 'МойСклад', $menu_title = "МойСклад", $capability = 'manage_options', $menu_slug = 'mss-settings', $function = array(
-				$this,
-				'mss_settings_callback',
-			) );*/
 			add_menu_page(
 				$page_title = 'МойСклад',
 				$menu_title = 'МойСклад',
