@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 3.3
- * WooMS XT Latest: 3.3
+ * Version: 3.4
+ * WooMS XT Latest: 3.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
