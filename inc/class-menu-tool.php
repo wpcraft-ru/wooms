@@ -12,16 +12,22 @@ class woomss_tool {
 
     $this->url = $_SERVER['REQUEST_URI'];
 
-    add_action('admin_menu', function(){
-	    add_submenu_page(
-		    'mss-settings',
-		    $page_title = 'Управление',
-		    $menu_title = 'Управление',
-		    $capability = 'manage_options',
-		    $menu_slug = 'moysklad',
-		    $function = array($this, 'ui_management_page_callback')
-	    );
-    });
+	  add_action(
+		  'admin_menu',
+		  function () {
+
+			  add_menu_page(
+				  $page_title = 'МойСклад',
+				  $menu_title = 'МойСклад',
+				  $capability = 'manage_woocommerce',
+				  $menu_slug = 'moysklad',
+				  $function = array( $this, 'ui_management_page_callback' ),
+				  $icon = 'dashicons-forms',
+				  '57.5'
+			  );
+		  },
+		  20
+	  );
 
 
   }
