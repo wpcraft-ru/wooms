@@ -8,7 +8,7 @@ class woomss_tool {
 
   public $url;
 
-  function __construct(){
+  public function __construct(){
 
     $this->url = $_SERVER['REQUEST_URI'];
 
