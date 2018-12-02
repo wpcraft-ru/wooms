@@ -246,7 +246,7 @@ function wooms_get_product_id_by_uuid( $uuid ) {
  * Add Settings link in pligins list
  */
 function wooms_plugin_add_settings_link( $links ) {
-	$settings_link = '<a href="options-general.php?page=mss-settings">Настройки</a>';
+	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
 	$xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
 	array_unshift($links, $xt_link);
 	array_unshift($links, $settings_link);

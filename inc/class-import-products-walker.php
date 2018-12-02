@@ -120,7 +120,7 @@ class WooMS_Product_Import_Walker {
 			if ( isset( $data['errors'] ) ) {
 				$error_code = $data['errors'][0]["code"];
 				if ( $error_code == 1056 ) {
-					$msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'options-general.php?page=mss-settings' ) );
+					$msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'admin.php?page=mss-settings' ) );
 					throw new Exception( $msg );
 				} else {
 					throw new Exception( $error_code . ': ' . $data['errors'][0]["error"] );
@@ -204,7 +204,7 @@ class WooMS_Product_Import_Walker {
 		delete_transient( 'wooms_walker_stop' );
 		set_transient( 'wooms_manual_sync', 1 );
 		$this->walker();
-		wp_redirect( admin_url( 'tools.php?page=moysklad' ) );
+		wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
 	}
 	
 	/**
@@ -216,18 +216,21 @@ class WooMS_Product_Import_Walker {
 		delete_transient( 'wooms_offset' );
 		delete_transient( 'wooms_end_timestamp' );
 		delete_transient( 'wooms_manual_sync' );
-		wp_redirect( admin_url( 'tools.php?page=moysklad' ) );
+		wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
 	}
 	
 	public function notice_walker() {
 		do_action( 'wooms_before_notice_walker' );
 		$screen = get_current_screen();
-		if ( $screen->base != 'tools_page_moysklad' ) {
+
+		if ( $screen->base != 'mojsklad_page_moysklad' ) {
 			return;
 		}
+
 		if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
 			return;
 		}
+
 		$time_string = get_transient( 'wooms_start_timestamp' );
 		$diff_sec    = time() - $time_string;
 		$time_string = date( 'Y-m-d H:i:s', $time_string );
@@ -251,7 +254,8 @@ class WooMS_Product_Import_Walker {
 	public function notice_results() {
 		do_action( 'wooms_before_notice_result' );
 		$screen = get_current_screen();
-		if ( $screen->base != 'tools_page_moysklad' ) {
+
+		if ( $screen->base != 'mojsklad_page_moysklad' ) {
 			return;
 		}
 		
@@ -283,7 +287,7 @@ class WooMS_Product_Import_Walker {
 	public function notice_errors() {
 		do_action( 'wooms_before_notice_errors' );
 		$screen = get_current_screen();
-		if ( $screen->base != 'tools_page_moysklad' ) {
+		if ( $screen->base != 'mojsklad_page_moysklad' ) {
 			return;
 		}
 		
@@ -308,9 +312,9 @@ class WooMS_Product_Import_Walker {
 		echo '<h2>Синхронизация продуктов</h2>';
 		if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
 			echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
-			printf( '<a href="%s" class="button button-primary">Старт импорта продуктов</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'tools.php?page=moysklad' ) ) );
+			printf( '<a href="%s" class="button button-primary">Старт импорта продуктов</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
 		} else {
-			printf( '<a href="%s" class="button button-secondary">Остановить импорт продуктов</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'tools.php?page=moysklad' ) ) );
+			printf( '<a href="%s" class="button button-secondary">Остановить импорт продуктов</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
 		}
 	}
 }

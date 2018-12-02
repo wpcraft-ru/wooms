@@ -32,7 +32,7 @@ class woomss_tool {
     <h1>Управление МойСклад</h1>
 
     <p>
-      <a href="<?php echo admin_url('options-general.php?page=mss-settings') ?>">Настройки</a>
+      <a href="<?php echo admin_url('admin.php?page=mss-settings') ?>">Настройки</a>
       <span> | </span>
       <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
     </p>
