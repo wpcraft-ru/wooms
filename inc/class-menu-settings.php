@@ -12,15 +12,24 @@ class WooMS_Settings {
 			'admin_menu',
 			function () {
 
-				add_menu_page(
-					$page_title = 'МойСклад',
-					$menu_title = 'МойСклад',
-					$capability = 'manage_woocommerce',
-					$menu_slug = 'mss-settings',
-					$function = array( $this, 'mss_settings_callback' ),
-					$icon = 'dashicons-forms'
+				add_submenu_page(
+					'moysklad',
+					'Управление',
+					'Управление',
+					'manage_woocommerce',
+					'moysklad'
 				);
-			}
+				add_submenu_page(
+					'moysklad',
+					'Настройки',
+					'Настройки',
+					'manage_woocommerce',
+					'mss-settings',
+					array( $this, 'mss_settings_callback' )
+				);
+
+			},
+			30
 		);
 
 		add_action( 'admin_init', array( $this, 'settings_general' ), $priority = 10, $accepted_args = 1 );

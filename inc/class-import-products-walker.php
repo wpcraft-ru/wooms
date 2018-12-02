@@ -223,7 +223,7 @@ class WooMS_Product_Import_Walker {
 		do_action( 'wooms_before_notice_walker' );
 		$screen = get_current_screen();
 
-		if ( $screen->base != 'mojsklad_page_moysklad' ) {
+		if ( $screen->base != 'toplevel_page_moysklad' ) {
 			return;
 		}
 
@@ -255,7 +255,7 @@ class WooMS_Product_Import_Walker {
 		do_action( 'wooms_before_notice_result' );
 		$screen = get_current_screen();
 
-		if ( $screen->base != 'mojsklad_page_moysklad' ) {
+		if ( $screen->base != 'toplevel_page_moysklad' ) {
 			return;
 		}
 		
@@ -287,7 +287,7 @@ class WooMS_Product_Import_Walker {
 	public function notice_errors() {
 		do_action( 'wooms_before_notice_errors' );
 		$screen = get_current_screen();
-		if ( $screen->base != 'mojsklad_page_moysklad' ) {
+		if ( $screen->base != 'toplevel_page_moysklad' ) {
 			return;
 		}
 		
