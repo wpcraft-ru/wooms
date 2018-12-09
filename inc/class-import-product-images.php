@@ -319,13 +319,13 @@ class WooMS_Import_Product_Images {
 		}
 		
 		?>
-		<h2>Импорт изображений</h2>
+		<h2>Изображения</h2>
 		<p>Ручное импортирование изображений по 5 штук за раз.</p>
 		<?php
 		if (empty( get_transient( 'wooms_start_timestamp' ) )){
-			printf( '<a href="%s" class="button button-primary">Импорт изображений</a>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
+			printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
 		} else {
-			printf( '<span href="%s" class="button button-secondary" style="display:inline-block">Импорт изображений</span>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
+			printf( '<span href="%s" class="button button-secondary" style="display:inline-block">Выполнть</span>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
 		}
 		
 	}

@@ -309,12 +309,12 @@ class WooMS_Product_Import_Walker {
 	 * User interface for manually actions
 	 */
 	public function ui() {
-		echo '<h2>Синхронизация продуктов</h2>';
+		echo '<h2>Товары</h2>';
 		if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
 			echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
-			printf( '<a href="%s" class="button button-primary">Старт импорта продуктов</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
+			printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
 		} else {
-			printf( '<a href="%s" class="button button-secondary">Остановить импорт продуктов</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
+			printf( '<a href="%s" class="button button-secondary">Остановить</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
 		}
 	}
 }
