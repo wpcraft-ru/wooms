@@ -23,6 +23,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+/**
+ * Add hook for activate plugin
+ * @var [type]
+ */
+register_activation_hook( __FILE__, function(){
+  do_action('wooms_activate');
+} );
 
 function wooms_check_php_and_wp_version() {
 	global $wp_version;
@@ -131,14 +138,15 @@ add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', 'wooms_xt_plugin_upd
 /**
  * Подключение компонентов
  */
-	require_once 'inc/class-menu-settings.php';
-	require_once 'inc/class-menu-tool.php';
-	require_once 'inc/class-import-products-walker.php';
-	require_once 'inc/class-import-products.php';
-	require_once 'inc/class-import-product-categories.php';
-	require_once 'inc/class-import-product-images.php';
-	require_once 'inc/class-import-prices.php';
-	require_once 'inc/class-hide-old-products.php';
+require_once 'inc/class-logger.php';
+require_once 'inc/class-menu-settings.php';
+require_once 'inc/class-menu-tool.php';
+require_once 'inc/class-products-walker.php';
+require_once 'inc/class-import-product-categories.php';
+require_once 'inc/class-import-product-images.php';
+require_once 'inc/class-import-prices.php';
+require_once 'inc/class-hide-old-products.php';
+
 
 /**
  * Helper function for get data from moysklad.ru
@@ -148,13 +156,15 @@ function wooms_get_data_by_url( $url = '' ) {
 	if ( empty( $url ) ) {
 		return false;
 	}
-	$args     = array(
+
+  $base64_string = base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) );
+	$args = array(
 		'timeout' => 45,
 		'headers' => array(
-			'Authorization' => 'Basic ' .
-			                   base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
+			'Authorization' => 'Basic ' . $base64_string,
 		),
 	);
+
 	$response = wp_remote_get( $url, $args );
 	if ( is_wp_error( $response ) ) {
 		set_transient( 'wooms_error_background', $response->get_error_message() );
