@@ -470,8 +470,10 @@ class Walker {
 		set_transient( 'wooms_walker_stop', 1, 60 * 60 );
 		delete_transient( 'wooms_start_timestamp' );
 		delete_transient( 'wooms_offset' );
-		delete_transient( 'wooms_end_timestamp' );
+		// delete_transient( 'wooms_end_timestamp' );
 		delete_transient( 'wooms_manual_sync' );
+
+    self::walker_finish();
 		wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
 	}
 
@@ -480,9 +482,17 @@ class Walker {
    */
   public static function display_state(){
     $state = '<strong>Выполняется пакетная обработка данных в фоне очередями раз в минуту.</strong>';
-    $time_string = get_transient( 'wooms_start_timestamp' );
-		$diff_sec    = time() - $time_string;
-		$time_string = date( 'Y-m-d H:i:s', $time_string );
+    $start_timestamp = get_transient( 'wooms_start_timestamp' );
+
+
+		$end_timestamp = get_transient('wooms_end_timestamp');
+
+    $diff_sec = false;
+    if( ! empty($start_timestamp) ){
+      $diff_sec    = time() - $start_timestamp;
+      $time_string = date( 'Y-m-d H:i:s', $start_timestamp );
+
+    }
 
     $errors = get_transient( 'wooms_error_background' );
     if(empty($errors)){
@@ -494,9 +504,9 @@ class Walker {
       $session = 'отсутствует';
     }
 
-    $timestamp_end_last_session = get_transient( 'wooms_end_timestamp' );
-    if(empty($timestamp_end_last_session)){
-      $timestamp_end_last_session = 'отметка времени будет проставлена после завершения текущей сессии синхронизации';
+    $end_timestamp = get_transient( 'wooms_end_timestamp' );
+    if(empty($end_timestamp)){
+      $end_timestamp = 'отметка времени будет проставлена после завершения текущей сессии синхронизации';
     } else {
       $state = 'Синхронизация завершена успешно и находится в ожидании старта';
     }
@@ -506,45 +516,18 @@ class Walker {
       <div id="message" class="notice notice-warning">
         <p>Статус: <?= $state ?></p>
         <p>Сессия (номер/дата): <?= $session ?></p>
-        <p>Последняя успешная синхронихация (отметка времени): <?= $timestamp_end_last_session ?></p>
+        <p>Последняя успешная синхронихация (отметка времени): <?= $end_timestamp ?></p>
         <p>Ошибки: <?= $errors ?></p>
-        <p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
         <p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
-        <p>Секунд прошло: <?= $diff_sec ?>.<br/> Следующая серия данных должна отправиться примерно через
+        <?php if( ! empty($time_string) ): ?>
+          <p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
+          <p>Секунд прошло: <?= $diff_sec ?>.<br/> Следующая серия данных должна отправиться примерно через
           минуту. Можно обновить страницу для проверки результатов работы.</p>
+        <?php endif; ?>
       </div>
     </div>
     <?php
   }
-
-	public static function notice_walker() {
-		do_action( 'wooms_before_notice_walker' );
-		$screen = get_current_screen();
-
-		if ( $screen->base != 'toplevel_page_moysklad' ) {
-			return;
-		}
-
-		if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
-			return;
-		}
-
-		$time_string = get_transient( 'wooms_start_timestamp' );
-		$diff_sec    = time() - $time_string;
-		$time_string = date( 'Y-m-d H:i:s', $time_string );
-		do_action( 'wooms_notice_walker' );
-		?>
-		<div class="wrap">
-			<div id="message" class="notice notice-warning">
-				<p><strong>Выполняется пакетная обработка данных в фоне очередями раз в минуту.</strong></p>
-				<p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
-				<p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
-				<p>Секунд прошло: <?php echo $diff_sec ?>.<br/> Следующая серия данных должна отправиться примерно через
-					минуту. Можно обновить страницу для проверки результатов работы.</p>
-			</div>
-		</div>
-		<?php
-	}
 
 	/**
 	 * User interface for manually actions
