@@ -1,16 +1,22 @@
 <?php
 
+namespace WooMS;
 /**
  *  Tool for MoySklad
  */
+class Tools {
 
-class woomss_tool {
+  /**
+   * URL action
+   */
+  public static $url;
 
-  public $url;
+  /**
+   * The Init
+   */
+  public static function init(){
 
-  public function __construct(){
-
-    $this->url = $_SERVER['REQUEST_URI'];
+    self::$url = $_SERVER['REQUEST_URI'];
 
 	  add_action(
 		  'admin_menu',
@@ -21,7 +27,7 @@ class woomss_tool {
 				  $menu_title = 'МойСклад',
 				  $capability = 'manage_woocommerce',
 				  $menu_slug = 'moysklad',
-				  $function = array( $this, 'ui_management_page_callback' ),
+				  $function = array( __CLASS__, 'display_ui' ),
 				  $icon = 'dashicons-forms',
 				  '57.5'
 			  );
@@ -32,9 +38,11 @@ class woomss_tool {
 
   }
 
-  function ui_management_page_callback(){
-
-    ?>
+  /**
+   * Display UI
+   */
+  public static function display_ui()
+  { ?>
     <h1>Управление МойСклад</h1>
 
     <p>
@@ -50,7 +58,7 @@ class woomss_tool {
 
     } else {
 
-      printf('<a href="%s">Вернуться...</a>', remove_query_arg( 'a', $this->url));
+      printf('<a href="%s">Вернуться...</a>', remove_query_arg( 'a', self::$url));
       do_action('woomss_tool_actions');
       do_action('woomss_tool_actions_' . $_GET['a']);
 
@@ -60,4 +68,5 @@ class woomss_tool {
 
 
 }
-new woomss_tool;
+
+Tools::init();

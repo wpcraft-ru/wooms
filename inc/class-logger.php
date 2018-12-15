@@ -4,18 +4,22 @@ namespace WooMS;
 
 /**
  * Logger for WooMS
+ *
+ * Example: do_action('wooms_logger', $type = '123', $title = '123', $desc = '123');
  */
 class Logger {
 
+  /**
+   * Table name
+   */
   public static $table_name = 'wooms_logger';
+  
   /**
    * The init
    */
   public static function init(){
     add_action('admin_init', array(__CLASS__, 'init_settings_page'));
-
     add_action('wooms_activate', array(__CLASS__, 'add_db_table'));
-
     add_action('wooms_logger', array(__CLASS__, 'add_log'), 10, 3);
   }
 
@@ -88,12 +92,9 @@ class Logger {
       $option_name, checked( 1, get_option( $option_name ), false )
     );
     ?>
-    <p>При включении, ключевые изменения данных будут записываться в специальную таблицу</p>
+    <p>При включении, ошибки и ключевые изменения данных будут записываться в специальную таблицу</p>
     <?php
   }
-
-
-
 }
 
 Logger::init();
