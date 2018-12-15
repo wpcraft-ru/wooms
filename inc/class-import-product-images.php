@@ -17,12 +17,9 @@ class Images {
 	public static function init() {
 
     /**
-     * XXX 5 Заменить хук на новый
+     * Обновление данных о продукте
      */
-    //Use hook do_action('wooms_product_update', $product_id, $value, $data);
-		// add_action( 'wooms_product_update', array( $this, 'load_data' ), 10, 3 );
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 10, 3);
-
 
 		add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
 

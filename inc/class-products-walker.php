@@ -21,6 +21,7 @@ class Walker {
 
     //Product data
     add_action( 'wooms_product_import_row', array( __CLASS__, 'load_product' ), 10, 3 );
+    add_action( 'wooms_product_save', array( __CLASS__, 'update_product' ), 10, 3 );
 
 		//UI and actions manually
 		add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'display_wrapper' ) );
@@ -55,31 +56,44 @@ class Walker {
       return;
     }
 
+    //попытка получить id по артикулу
     if ( ! empty( $value['article'] ) ) {
       $product_id = wc_get_product_id_by_sku( $value['article'] );
     } else {
       $product_id = null;
     }
 
-    if ( intval( $product_id ) ) {
-      self::update_product( $product_id, $value );
-    } elseif ( $product_id = self::get_product_id_by_uuid( $value['id'] ) ) {
-      self::update_product( $product_id, $value );
-    } else {
-      $product_id = self::add_product( $value );
-      if ( $product_id ) {
-        self::update_product( $product_id, $value );
-      } else {
-        return;
-      }
+    //попытка получить id по uuid
+    if ( empty(intval( $product_id )) ) {
+      $product_id = self::get_product_id_by_uuid( $value['id']);
     }
+
+    //создаем продукт, если не нашли
+    if ( empty(intval( $product_id )) ) {
+      $product_id = self::add_product( $value );
+    }
+
+    if ( empty(intval( $product_id )) ) {
+      do_action('wooms_logger',
+        'error_get_product_id',
+        'Ошибка определения и добавления ИД продукта',
+        sprintf('Данные из МойСклад: %s', PHP_EOL . print_r($value, true))
+      );
+      return;
+    }
+
+
+    $product = wc_get_product($product_id);
+
+    // self::update_product( $product, $value, $product_id );
+
+    // self::update_product( $product_id, $value );
 
     /**
      * От этого хука надо будет отказаться в пользу wooms_product_save
      */
     do_action( 'wooms_product_update', $product_id, $value, $data );
 
-    $product = wc_get_product($product_id);
 
     /**
      * Хук позволяет работать с методами WC_Product
@@ -99,27 +113,24 @@ class Walker {
    * @param $data_of_source var data of source from MoySklad
    *
    */
-  public static function update_product( $product_id, $data_of_source )
+  public static function update_product( $product, $data_of_source, $data )
   {
+    $product_id = $product->get_id();
     wp_set_object_terms( $product_id, 'simple', 'product_type', false );
 
-    $product = wc_get_product( $product_id );
-
     //save data of source
-    $now = date( "Y-m-d H:i:s" );
-    update_post_meta( $product_id, 'wooms_data_of_source', print_r( $data_of_source, true ) );
+    $product->update_meta_data( 'wooms_data_of_source', print_r( $data_of_source, true ) );
 
     //Set session id for product
     if ( $session_id = get_option( 'wooms_session_id' ) ) {
-      update_post_meta( $product_id, 'wooms_session_id', $session_id );
+      $product->update_meta_data( 'wooms_session_id', $session_id );
     }
 
-    //the time stamp for database cleanup by cron
-    update_post_meta( $product_id, 'wooms_updated_timestamp', $now );
+    $product->update_meta_data( 'wooms_updated_timestamp', date( "Y-m-d H:i:s" ) );
 
-    update_post_meta( $product_id, 'wooms_id', $data_of_source['id'] );
+    $product->update_meta_data( 'wooms_id', $data_of_source['id'] );
 
-    update_post_meta( $product_id, 'wooms_updated', $data_of_source['updated']);
+    $product->update_meta_data( 'wooms_updated', $data_of_source['updated'] );
 
     //update title
     if ( isset( $data_of_source['name'] ) and $data_of_source['name'] != $product->get_title() ) {
@@ -144,6 +155,7 @@ class Walker {
         }
       }
     }
+
     //Price Retail 'salePrices'
     if ( isset( $data_of_source['salePrices'][0]['value'] ) ) {
       $price_source = floatval( $data_of_source['salePrices'][0]['value'] );
@@ -164,9 +176,9 @@ class Walker {
     $product->set_stock_status( 'instock' );
     $product->set_manage_stock( 'no' );
 
-
     $product->set_status( 'publish' );
-    $product->save();
+
+    return $product;
 
   }
 
@@ -228,41 +240,36 @@ class Walker {
    *
    * @param $data_source
    *
-   * @return bool|int|WP_Error
    */
   public static function add_product( $data_source ) {
-
-    // $product = new WC_Product_Simple();
-    $post_data = array(
-      'post_type'   => 'product',
-      'post_title'  => wp_filter_post_kses( $data_source['name'] ),
-      'post_status' => 'draft',
-    );
 
     if ( ! apply_filters( 'wooms_add_product', true, $data_source ) ) {
       return false;
     }
 
-    // Вставляем запись в базу данных
-    $post_id = wp_insert_post( $post_data );
+    $product = new \WC_Product_Simple();
 
-    // $product = wc_get_product($post_id);
+    $product->set_name(wp_filter_post_kses( $data_source['name'] ));
 
-    if ( empty( $post_id ) ) {
+    $product_id = $product->save();
+
+    if ( empty( $product_id ) ) {
       return false;
     }
 
-    update_post_meta( $post_id, $meta_key = 'wooms_id', $meta_value = $data_source['id'] );
+    $product->update_meta_data( 'wooms_id', $data_source['id'] );
 
-    update_post_meta( $post_id, 'wooms_meta', $data_source['meta']);
+    $product->update_meta_data( 'wooms_meta', $data_source['meta'] );
 
-    update_post_meta( $post_id, 'wooms_updated', $data_source['updated']);
+    $product->update_meta_data( 'wooms_updated', $data_source['updated'] );
 
     if ( isset( $data_source['article'] ) ) {
-      update_post_meta( $post_id, $meta_key = '_sku', $meta_value = $data_source['article'] );
+      $product->set_sku( $data_source['article'] );
     }
 
-    return $post_id;
+    $product_id = $product->save();
+
+    return $product_id;
   }
 
 	/**
