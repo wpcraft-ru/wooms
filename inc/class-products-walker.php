@@ -25,7 +25,7 @@ class Walker {
 
     //Product data
     add_action( 'wooms_product_import_row', array( __CLASS__, 'load_product' ), 10, 3 );
-    add_action( 'wooms_product_save', array( __CLASS__, 'update_product' ), 10, 3 );
+    add_filter( 'wooms_product_save', array( __CLASS__, 'update_product' ), 10, 3 );
 
 		//UI and actions manually
 		add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'display_wrapper' ) );
