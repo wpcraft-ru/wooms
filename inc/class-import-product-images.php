@@ -19,7 +19,7 @@ class Images {
     /**
      * Обновление данных о продукте
      */
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 10, 3);
+    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 35, 3);
 
 		add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
 
@@ -62,37 +62,6 @@ class Images {
     return $product;
   }
 
-	/**
-	 * Method load data
-	 *
-	 * @version 2.1.2 update method
-	 *
-	 * @param $product_id
-	 * @param $value
-	 * @param $data
-	 */
-	public static function load_data( $product_id, $value, $data ) {
-
-		if ( empty( get_option( 'woomss_images_sync_enabled' ) ) ) {
-			return;
-		}
-
-		//Check image
-		if ( empty( $value['image']['meta']['href'] ) ) {
-			return;
-		} else {
-			$url = $value['image']['meta']['href'];
-		}
-
-		//check current thumbnail. if isset - break, or add url for next downloading
-		if ( $id = get_post_thumbnail_id( $product_id ) && empty( get_option( 'woomss_images_replace_to_sync' ) ) ) {
-			return;
-
-		} else {
-			update_post_meta( $product_id, 'wooms_url_for_get_thumbnail', $url );
-			update_post_meta( $product_id, 'wooms_image_data', $value['image'] );
-		}
-	}
 
 	/**
 	 * Setup cron
@@ -147,10 +116,10 @@ class Images {
 		}
 	}
 
-
 	/**
 	 * Download images from meta
 	 *
+	 * @TODO - переписать на методы CRUD WooCommerce
 	 *
 	 * @return array|bool|void
 	 */
@@ -370,11 +339,7 @@ class Images {
 		<h2>Изображения</h2>
 		<p>Ручная загрузка изображений по 5 штук за раз.</p>
 		<?php
-		if (empty( get_transient( 'wooms_start_timestamp' ) )){
-			printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
-		} else {
-			printf( '<span href="%s" class="button button-secondary" style="display:inline-block">Выполнть</span>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
-		}
+    printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_images_manual_start', admin_url( 'admin.php?page=moysklad' ) ) );
 
 	}
 
