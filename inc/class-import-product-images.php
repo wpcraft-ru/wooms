@@ -276,9 +276,24 @@ class Images {
 		// If error storing permanently, unlink.
 		if ( is_wp_error( $file_data ) ) {
 			@unlink( $tmpfname );
-
+      do_action('wooms_logger',
+        'error_get_tmpfname_image_download',
+        'Загрузка картинки - не удалось получить файл',
+        sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
+      );
 			return false;
 		}
+
+    if(empty($file_data['url'])){
+      do_action('wooms_logger',
+        'error_get_url_image_download',
+        'Загрузка картинки - не удалось получить URL',
+        sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
+      );
+      @unlink( $tmpfname );
+
+      return false;
+    }
 
 		$url     = $file_data['url'];
 		$type    = $file_data['type'];

@@ -2,6 +2,10 @@
 
 namespace WooMS\Products;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
  * Product Import Walker
  * do_action('wooms_product_import_row', $value, $key, $data);
@@ -82,18 +86,14 @@ class Walker {
       return;
     }
 
-
     $product = wc_get_product($product_id);
-
-    // self::update_product( $product, $value, $product_id );
-
-    // self::update_product( $product_id, $value );
 
     /**
      * От этого хука надо будет отказаться в пользу wooms_product_save
+     *
+     * @TODO После тестов - удалить
      */
-    do_action( 'wooms_product_update', $product_id, $value, $data );
-
+    // do_action( 'wooms_product_update', $product_id, $value, $data );
 
     /**
      * Хук позволяет работать с методами WC_Product
@@ -102,21 +102,21 @@ class Walker {
      */
     $product = apply_filters('wooms_product_save', $product, $value, $data);
     $product_id = $product->save();
-    do_action('wooms_logger', 'product_save', $product_id, 'main walker');
+    do_action('wooms_logger',
+      'product_save',
+      sprintf('Продукт %s сохранен', $product_id),
+      sprintf('Данные %s', PHP_EOL . print_r($product, true))
+    );
 
   }
 
   /**
    * Update product from source data
-   *
-   * @param $product_id var id product
-   * @param $data_of_source var data of source from MoySklad
-   *
    */
   public static function update_product( $product, $data_of_source, $data )
   {
     $product_id = $product->get_id();
-    wp_set_object_terms( $product_id, 'simple', 'product_type', false );
+    $product = new \WC_Product_Simple($product);
 
     //save data of source
     $product->update_meta_data( 'wooms_data_of_source', print_r( $data_of_source, true ) );
@@ -217,11 +217,7 @@ class Walker {
   }
 
   /**
-   * Product Check
-   *
-   * @param $uuid
-   *
-   * @return bool
+   * get_product_id_by_uuid
    */
   public static function get_product_id_by_uuid( $uuid ) {
 
@@ -233,7 +229,6 @@ class Walker {
       return $posts[0]->ID;
     }
   }
-
 
   /**
    * Add product from source data
@@ -350,9 +345,9 @@ class Walker {
 		$count = apply_filters( 'wooms_iteration_size', 20 );
 		if ( ! $offset = get_transient( 'wooms_offset' ) ) {
 			$offset = 0;
+      self::walker_started();
 			set_transient( 'wooms_offset', $offset );
-			update_option( 'wooms_session_id', date( "YmdHis" ), 'no' ); //set id session sync
-			delete_transient( 'wooms_count_stat' );
+
 		}
 
 		$ms_api_args = array(
@@ -377,8 +372,6 @@ class Walker {
         print_r($data, true)
       );
 
-      // do_action( 'cl', array( 'tag2', $data ) );
-
 			//Check for errors and send message to UI
 			if ( isset( $data['errors'] ) ) {
 				$error_code = $data['errors'][0]["code"];
@@ -390,19 +383,28 @@ class Walker {
 				}
 			}
 
-			do_action( 'wooms_walker_start' );
+
 			//If no rows, that send 'end' and stop walker
 			if ( empty( $data['rows'] ) ) {
 				self::walker_finish();
 
-				do_action( 'wooms_walker_finish' );
-
 				return true;
 			}
 
-			$i = 0;
+      do_action( 'wooms_walker_start_iteration', $data );
 
+      /**
+       * @TODO: deprecated. remove after tests
+       */
+      do_action( 'wooms_walker_start' );
+
+			$i = 0;
 			foreach ( $data['rows'] as $key => $value ) {
+
+        if( apply_filters('wooms_skip_product_import', false, $value) ){
+          continue;
+        }
+
 				do_action( 'wooms_product_import_row', $value, $key, $data );
 				$i ++;
 			}
@@ -422,6 +424,44 @@ class Walker {
 		}
 	}
 
+  /**
+   * walker_started
+   */
+  public static function walker_started() {
+    update_option( 'wooms_session_id', date( "YmdHis" ), 'no' ); //set id session sync
+    delete_transient( 'wooms_count_stat' );
+    delete_transient( 'wooms_error_background' );
+
+    do_action('wooms_main_walker_started');
+
+  }
+
+	/**
+	 * Finish walker
+	 */
+	public static function walker_finish() {
+		delete_transient( 'wooms_start_timestamp' );
+		delete_transient( 'wooms_offset' );
+		delete_transient( 'wooms_manual_sync' );
+
+
+
+		//Отключаем обработчик или ставим на паузу
+		if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
+			$timer = 0;
+		} else {
+			$timer = 60 * 60 * intval( get_option( 'woomss_walker_cron_timer', 24 ) );
+		}
+
+		set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
+
+    do_action( 'wooms_walker_finish' );
+
+    do_action( 'wooms_main_walker_finish' );
+
+		return true;
+	}
+
 	/**
 	 * Check and stop walker manual
 	 */
@@ -435,25 +475,6 @@ class Walker {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Finish walker
-	 */
-	public static function walker_finish() {
-		delete_transient( 'wooms_start_timestamp' );
-		delete_transient( 'wooms_offset' );
-		delete_transient( 'wooms_manual_sync' );
-		//Отключаем обработчик или ставим на паузу
-		if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
-			$timer = 0;
-		} else {
-			$timer = 60 * 60 * intval( get_option( 'woomss_walker_cron_timer', 24 ) );
-		}
-
-		set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
-
-		return true;
 	}
 
 	/**
@@ -526,6 +547,7 @@ class Walker {
         <p>Последняя успешная синхронихация (отметка времени): <?= $end_timestamp ?></p>
         <p>Ошибки: <?= $errors ?></p>
         <p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
+        <?php do_action('wooms_products_state_before'); ?>
         <?php if( ! empty($time_string) ): ?>
           <p>Отметка времени о последней итерации: <?php echo $time_string ?></p>
           <p>Секунд прошло: <?= $diff_sec ?>.<br/> Следующая серия данных должна отправиться примерно через
@@ -540,7 +562,7 @@ class Walker {
 	 * User interface for manually actions
 	 */
 	public static function display_wrapper() {
-		echo '<h2>Товары</h2>';
+		echo '<h2>Продукты (Товары)</h2>';
 
     do_action('wooms_products_display_state');
 

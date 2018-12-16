@@ -2,6 +2,10 @@
 
 namespace WooMS\Products;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
  * Hide old products
  */
@@ -13,7 +17,10 @@ class Hide_Old_Products {
 	public static function init() {
 		//Main Walker
 		add_action( 'init', array( __CLASS__, 'cron_init' ) );
-		add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'cron_starter' ) );
+		add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
+
+    add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
+    add_action('wooms_main_walker_finish', array(__CLASS__, 'finis_main_walker'));
 	}
 
 	/**
@@ -28,20 +35,39 @@ class Hide_Old_Products {
 	/**
 	 * Starter walker by cron if option enabled
 	 */
-	public static function cron_starter() {
+	public static function walker_starter() {
 
-		self::walker();
-
-	}
-
-	/**
-	 * Walker
-	 */
-	public static function walker() {
-
-		self::set_hide_old_product();
+    //Если работает синк товаров, то блокируем работу
+    if( ! empty('wooms_start_timestamp')){
+      return;
+    }
+    
+    self::set_hide_old_product();
 
 	}
+
+  /**
+   * Убираем паузу для сокрытия продуктов
+   */
+  public static function finis_main_walker(){
+
+    delete_transient('wooms_products_old_hide_pause', 1, HOUR_IN_SECONDS);
+
+  }
+
+  /**
+   * display_state
+   */
+  public static function display_state(){
+
+    if( $timestamp = get_transient('wooms_products_old_hide_pause')){
+      $msg = sprintf('<p>Скрытие устаревших продуктов: успешно завершено в последний раз %s</p>', $timestamp);
+    } else {
+      $msg = sprintf('<p>Скрытие устаревших продуктов: %s</p>', '<strong>выполняется</strong>');
+    }
+
+    echo $msg;
+  }
 
 	/**
 	 * Adding hiding attributes to products
@@ -52,8 +78,15 @@ class Hide_Old_Products {
 			set_transient( 'wooms_offset_hide_product', $offset );
 		}
 
+    if(get_transient('wooms_products_old_hide_pause')){
+      return;
+    }
+
 		$products = self::get_product_old_session( $offset );
+
     if( empty($products) ){
+      delete_transient( 'wooms_offset_hide_product' );
+      set_transient('wooms_products_old_hide_pause', date( "Y-m-d H:i:s" ), HOUR_IN_SECONDS);
       return;
     }
 
@@ -68,6 +101,13 @@ class Hide_Old_Products {
 
 			$product->set_stock_status( 'outofstock' );
 			$product->save();
+
+      do_action('wooms_logger',
+        'stock_product_save',
+        sprintf('Нет в наличии - статус выбран для продукта %s', $product_id),
+        sprintf('Данные %s', PHP_EOL . print_r($product, true))
+      );
+
 			$i ++;
 
 		}
@@ -79,7 +119,6 @@ class Hide_Old_Products {
 		if ( empty( $products ) ) {
 			delete_transient( 'wooms_offset_hide_product' );
 		}
-
 	}
 
 	/**
@@ -98,7 +137,7 @@ class Hide_Old_Products {
 
 		$args = array(
 			'post_type'   => 'product',
-			'numberposts' => 60,
+			'numberposts' => 50,
 			'fields'      => 'ids',
 			'offset'      => $offset,
 			'meta_query'  => array(

@@ -16,13 +16,6 @@ class Categories {
 	 */
 	public static function init() {
 
-
-    /**
-     * Загрузка данных о категории для продукта
-     *
-     * Use hook apply_filters('wooms_product_save', $product, $value, $data);
-     *
-     */
     add_filter('wooms_product_save', array(__CLASS__, 'load_category_for_product'), 10, 3);
 
     /**
@@ -31,17 +24,18 @@ class Categories {
 		add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
 		add_action( 'product_cat_edit_form_fields', array( __CLASS__, 'display_data_category' ), 30 );
 
-		if ( empty( get_option( 'woomss_include_categories_sync' ) ) ) {
-			return;
+		if ( ! empty( get_option( 'woomss_include_categories_sync' ) ) ) {
+
+  		add_filter( 'wooms_url_get_products', array( __CLASS__, 'add_filter_by_folder' ), 10 );
+  		add_filter( 'wooms_url_get_variants', array( __CLASS__, 'add_filter_by_folder' ), 10 );
+
+  		add_action( 'wooms_main_walker_started', array( __CLASS__, 'delete_parent_category' ) );
+
+      // add_shortcode('test', array(__CLASS__, 'delete_parent_category'));
+
+  		add_action( 'wooms_update_category', array( __CLASS__, 'update_meta_session_term' ) );
+
 		}
-
-		// add_filter( 'wooms_variant_ms_api_url', array( __CLASS__, 'change_ms_api_url_variant' ), 10 );
-		add_filter( 'wooms_url_get_products', array( __CLASS__, 'add_filter_by_folder' ), 10 );
-		add_filter( 'wooms_url_get_variants', array( __CLASS__, 'add_filter_by_folder' ), 10 );
-
-		add_action( 'wooms_walker_finish', array( __CLASS__, 'update_category_v2' ) );
-
-		add_action( 'wooms_update_category', array( __CLASS__, 'update_meta_session_term' ) );
 
 	}
 
@@ -101,8 +95,6 @@ class Categories {
 	 */
 	public static function update_category( $url ) {
 
-		$data = wooms_request( $url );
-
     /**
      * Если указана группа для синхронизации,
      * и совпадает с запрошенной, то вернуть false, чтобы прекратить рекурсию создания родителей
@@ -110,6 +102,8 @@ class Categories {
     if($url == get_option('woomss_include_categories_sync')){
       return false;
     }
+
+		$data = wooms_request( $url );
 
 		if ( $term_id = self::check_term_by_ms_uuid( $data['id'] ) ) {
 
@@ -246,31 +240,25 @@ class Categories {
 		return get_option( 'woomss_include_categories_sync' );
 	}
 
-	/**
-	 * Replace the link for import from the selected category for variation products
-	 *
-	 * XXX на замену под вариативные
-	 *
-	 * @param $url
-	 *
-	 * @return string|void
-	 */
-	public static function change_ms_api_url_variant( $url ) {
+  /**
+   * get_select_category_sync_id description
+   */
+	public static function get_uuid_selected_category_sync() {
+    $uuid = '';
+    if( $url = get_option( 'woomss_include_categories_sync' )){
+      $uuid = str_replace(
+        'https://online.moysklad.ru/api/remap/1.1/entity/productfolder/',
+        '',
+        $url
+      );
+    }
 
-		if ( empty( self::select_category() ) ) {
-			return;
-		}
-
-		$arg = array(
-			'scope'  => 'variant',
-			'filter' => 'productFolder=' . self::select_category(),
-		);
-
-		$url = add_query_arg( $arg, 'https://online.moysklad.ru/api/remap/1.1/entity/assortment' );
-
-		return $url;
+    if(empty($uuid)){
+      return false;
+    } else {
+      return $uuid;
+    }
 	}
-
 
 	/**
 	 * Skipping the update category by sync time
@@ -303,12 +291,9 @@ class Categories {
 
 	/**
 	 * Delete the parent category
-	 *
-	 * @since 1.8.6
-	 * @version 1.8.8
-	 * @return bool|void
+	 * if select specific category for sync
 	 */
-	public static function update_category_v2() {
+	public static function delete_parent_category() {
 
 		if ( empty( self::select_category() ) ) {
 			return;
@@ -319,69 +304,57 @@ class Categories {
 			return;
 		}
 
-		$term_select = wooms_request( self::select_category() );
+		// $term_select = wooms_request( self::select_category() );
+    $uuid = self::get_uuid_selected_category_sync();
+    if(empty($uuid)){
+      return;
+    }
 
 		$arg = array(
 			'taxonomy'     => array( 'product_cat' ),
-			'hierarchical' => false,
+      'hide_empty' => false,
+      'fields' => 'ids',
+      'number' => 1,
 			'meta_query'   => array(
 				array(
 					'key'   => 'wooms_id',
-					'value' => $term_select['id'],
+					'value' => $uuid,
 				),
 			),
 		);
 
-		if ( ! isset( $term_select['productFolder']['meta']['href'] ) ) {
-			$arg_parent = array(
-				'hide_empty' => 0,
-				'parent'     => 0,
-			);
-			$arg        = array_merge( $arg, $arg_parent );
-		}
+		$term_ids = get_terms( $arg );
 
-		$term = get_terms( $arg );
+    if(empty($term_ids)){
+      return;
+    }
 
-		if ( false != $term ) {
+    if(empty($term_ids[0])){
+      return;
+    }
+    $term_id = $term_ids[0];
 
-			if ( 0 == $term[0]->parent ) {
-				$term_children = get_terms( array(
-					'taxonomy' => array( 'product_cat' ),
-					'parent'   => $term[0]->term_id,
-					'fields'   => 'ids',
-				) );
-			} else {
-				$term_children = get_term_children( $term[0]->term_id, 'product_cat' );
+    $term_childrens = get_term_children( $term_id, 'product_cat' );
+    $term_childrens = get_terms( array(
+      'taxonomy' => 'product_cat',
+      'number' => 100,
+      'fields' => 'ids',
+      'hide_empty' => false,
+      'parent' => $term_id )
+    );
+
+    if ( $term_childrens and is_array( $term_childrens ) ) {
+			foreach ( $term_childrens as $child_term_id ) {
+
+				wp_update_term( $child_term_id, 'product_cat', array( 'parent' => 0 ) );
 			}
 
-			if ( 0 == $term[0]->parent && ! empty( $term_children ) ) {
+      wp_update_term_count( $term_id, 'product_cat' );
 
-				self::update_term_children( $term_children, array( 'parent' => 0 ) );
-				wp_update_term_count( $term[0]->term_id, 'product_cat' );
+		} else {
+      return;
+    }
 
-			}
-
-			if ( 0 != $term[0]->parent && ! empty( $term_children ) ) {
-
-				self::update_term_children( $term_children, array( 'parent' => 0 ) );
-				self::update_term_children( $term[0]->parent, array( 'count' => 0 ) );
-				wp_update_term_count( $term[0]->parent, 'product_cat' );
-				self::delete_relationship( $term[0] );
-
-			}
-
-			if ( 0 != $term[0]->parent && empty( $term_children ) ) {
-
-				apply_filters( 'wooms_skip_update_select_category', array( __CLASS__, 'skip_update_category' ) );
-				self::delete_relationship( $term[0] );
-
-			}
-			if ( 0 == $term[0]->parent && empty( $term_children ) ) {
-
-				self::delete_relationship( $term[0] );
-
-			}
-		}
 	}
 
 	/**
@@ -481,7 +454,7 @@ class Categories {
 		</p>
 		<ul style="margin-left: 18px;">
 			<li>
-				<small>&mdash;&nbsp;включена опция <a href="admin.php?page=wc-settings" target="_blank">управления запасами</a></small>
+				<small>&mdash;&nbsp;включена опция <a href="<?= admin_url('admin.php?page=wc-settings&tab=products&section=inventory') ?>" target="_blank">управления запасами</a></small>
 			</li>
 			<li>
 				<small>&mdash;&nbsp;стоит опция сокрытия отсутствующих товаров</small>
@@ -519,7 +492,7 @@ class Categories {
 
 		if ( ! $data = get_transient( 'wooms_settings_categories' ) ) {
 			$data = wooms_request( $url_api );
-			set_transient( 'wooms_settings_categories', $data, 60 * 60 * 12 );
+			set_transient( 'wooms_settings_categories', $data, 60 );
 		}
 
 		if ( empty( $data['rows'] ) ) {
