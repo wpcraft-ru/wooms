@@ -433,7 +433,6 @@ class Walker {
     delete_transient( 'wooms_error_background' );
 
     do_action('wooms_main_walker_started');
-
   }
 
 	/**
@@ -443,8 +442,6 @@ class Walker {
 		delete_transient( 'wooms_start_timestamp' );
 		delete_transient( 'wooms_offset' );
 		delete_transient( 'wooms_manual_sync' );
-
-
 
 		//Отключаем обработчик или ставим на паузу
 		if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
