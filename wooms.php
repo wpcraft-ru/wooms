@@ -15,12 +15,12 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 3.5
- * WooMS XT Latest: 3.5
+ * Version: 3.6
+ * WooMS XT Latest: 3.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+  exit; // Exit if accessed directly
 }
 
 /**
@@ -82,11 +82,11 @@ class WooMS_Core {
    * Add Settings link in pligins list
    */
   public static function plugin_add_settings_link( $links ) {
-  	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
-  	$xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
-  	array_unshift($links, $xt_link);
-  	array_unshift($links, $settings_link);
-  	return $links;
+    $settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
+    $xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
+    array_unshift($links, $xt_link);
+    array_unshift($links, $settings_link);
+    return $links;
   }
 
 
@@ -97,33 +97,33 @@ class WooMS_Core {
   public static function xt_plugin_update_message( $data, $response ) {
 
 
-  	$data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
-  	$xt_version_remote = $data['xt_version'];
+    $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+    $xt_version_remote = $data['xt_version'];
 
-  	// $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
-  	$data = get_plugin_data( plugin_dir_path( __DIR__ ) . "wooms-extra/wooms-extra.php", false, false );
-  	$xt_version_local = $data['Version'];
-  	// $data = plugin_dir_path( __DIR__ );
+    // $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
+    $data = get_plugin_data( plugin_dir_path( __DIR__ ) . "wooms-extra/wooms-extra.php", false, false );
+    $xt_version_local = $data['Version'];
+    // $data = plugin_dir_path( __DIR__ );
 
-  	$check = version_compare( $xt_version_local, $xt_version_remote, '>=' );
+    $check = version_compare( $xt_version_local, $xt_version_remote, '>=' );
 
 
-  	if($check){
-  		return;
-  	}
-  	$wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
+    if($check){
+      return;
+    }
+    $wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
 
-  	printf(
-  		'<tr class="plugin-update-tr">
-  			<td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
-  				<div class="update-message">
-  					<span>Вышла новая версия плагина WooMS XT: %s. Скачать обновление можно в консоли: <a href="https://wpcraft.ru/my" target="_blank">https://wpcraft.ru/my</a></span>
-  				</div>
-  			</td>
-  		</tr>',
-  		$wp_list_table->get_column_count(),
-  		$xt_version_remote
-  	);
+    printf(
+      '<tr class="plugin-update-tr">
+        <td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
+          <div class="update-message">
+            <span>Вышла новая версия плагина WooMS XT: %s. Скачать обновление можно в консоли: <a href="https://wpcraft.ru/my" target="_blank">https://wpcraft.ru/my</a></span>
+          </div>
+        </td>
+      </tr>',
+      $wp_list_table->get_column_count(),
+      $xt_version_remote
+    );
 
   }
 
@@ -146,9 +146,9 @@ class WooMS_Core {
 
       $check = version_compare( $xt_version_local, '3.5', '>=' );
 
-    	if($check){
-    		return;
-    	}
+      if($check){
+        return;
+      }
       ?>
       <div class="notice notice-error">
         <p>
@@ -164,64 +164,64 @@ class WooMS_Core {
     //@TODO - переписать эту часть чтобы без транзита работала
     self::$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
 
-  	$message = get_transient( 'wooms_activation_error_message' );
-  	if ( ! empty( $message ) ) {
-  		echo '<div class="notice notice-error">
+    $message = get_transient( 'wooms_activation_error_message' );
+    if ( ! empty( $message ) ) {
+      echo '<div class="notice notice-error">
               <p><strong>Плагин WooMS не активирован!</strong> ' . $message . '</p>
           </div>';
-  		delete_transient( 'wooms_activation_error_message' );
-  	}
+      delete_transient( 'wooms_activation_error_message' );
+    }
   }
 
   /**
    * check_php_and_wp_version
    */
   public static function check_php_and_wp_version() {
-  	global $wp_version;
+    global $wp_version;
 
-  	$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
+    $wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
 
-  	define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
+    define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
 
-  	$php       = 5.6;
-  	$wp        = 4.7;
-  	$php_check = version_compare( PHP_VERSION, $php, '<' );
-  	$wp_check  = version_compare( $wp_version, $wp, '<' );
+    $php       = 5.6;
+    $wp        = 4.7;
+    $php_check = version_compare( PHP_VERSION, $php, '<' );
+    $wp_check  = version_compare( $wp_version, $wp, '<' );
 
-  	if ( $php_check ) {
-  		$flag = 'PHP';
-  	} elseif ( $wp_check ) {
-  		$flag = 'WordPress';
-  	}
+    if ( $php_check ) {
+      $flag = 'PHP';
+    } elseif ( $wp_check ) {
+      $flag = 'WordPress';
+    }
 
-  	if ( $php_check || $wp_check ) {
-  		$version = 'PHP' == $flag ? $php : $wp;
-  		if ( ! function_exists( 'deactivate_plugins' ) ) {
-  			require_once ABSPATH . '/wp-admin/includes/plugin.php';
-  		}
+    if ( $php_check || $wp_check ) {
+      $version = 'PHP' == $flag ? $php : $wp;
+      if ( ! function_exists( 'deactivate_plugins' ) ) {
+        require_once ABSPATH . '/wp-admin/includes/plugin.php';
+      }
 
-  		deactivate_plugins( plugin_basename( __FILE__ ) );
-  		if ( isset( $_GET['activate'] ) ) {
-  			unset( $_GET['activate'] );
-  		}
+      deactivate_plugins( plugin_basename( __FILE__ ) );
+      if ( isset( $_GET['activate'] ) ) {
+        unset( $_GET['activate'] );
+      }
 
-  		$error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
-  		set_transient( 'wooms_activation_error_message', $error_text, 60 );
+      $error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
+      set_transient( 'wooms_activation_error_message', $error_text, 60 );
 
-  	} elseif ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+    } elseif ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 
-  		if ( ! function_exists( 'deactivate_plugins' ) ) {
-  			require_once ABSPATH . '/wp-admin/includes/plugin.php';
-  		}
+      if ( ! function_exists( 'deactivate_plugins' ) ) {
+        require_once ABSPATH . '/wp-admin/includes/plugin.php';
+      }
 
-  		deactivate_plugins( plugin_basename( __FILE__ ) );
-  		if ( isset( $_GET['activate'] ) ) {
-  			unset( $_GET['activate'] );
-  		}
+      deactivate_plugins( plugin_basename( __FILE__ ) );
+      if ( isset( $_GET['activate'] ) ) {
+        unset( $_GET['activate'] );
+      }
 
-  		$error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
-  		set_transient( 'wooms_activation_error_message', $error_text, 60 );
-  	}
+      $error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
+      set_transient( 'wooms_activation_error_message', $error_text, 60 );
+    }
   }
 }
 
@@ -237,37 +237,37 @@ WooMS_Core::init();
  */
 function wooms_get_data_by_url( $url = '' ) {
 
-	if ( empty( $url ) ) {
-		return false;
-	}
+  if ( empty( $url ) ) {
+    return false;
+  }
 
   $base64_string = base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) );
-	$args = array(
-		'timeout' => 45,
-		'headers' => array(
-			'Authorization' => 'Basic ' . $base64_string,
-		),
-	);
+  $args = array(
+    'timeout' => 45,
+    'headers' => array(
+      'Authorization' => 'Basic ' . $base64_string,
+    ),
+  );
 
-	$response = wp_remote_get( $url, $args );
-	if ( is_wp_error( $response ) ) {
-		set_transient( 'wooms_error_background', $response->get_error_message() );
+  $response = wp_remote_get( $url, $args );
+  if ( is_wp_error( $response ) ) {
+    set_transient( 'wooms_error_background', $response->get_error_message() );
 
-		return false;
-	}
-	if ( empty( $response['body'] ) ) {
-		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
+    return false;
+  }
+  if ( empty( $response['body'] ) ) {
+    set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
 
-		return false;
-	}
-	$data = json_decode( $response['body'], true );
-	if ( empty( $data ) ) {
-		set_transient( 'wooms_error_background', "REST API вернулся без JSON данных" );
+    return false;
+  }
+  $data = json_decode( $response['body'], true );
+  if ( empty( $data ) ) {
+    set_transient( 'wooms_error_background', "REST API вернулся без JSON данных" );
 
-		return false;
-	} else {
-		return $data;
-	}
+    return false;
+  } else {
+    return $data;
+  }
 }
 
 /**
@@ -280,34 +280,34 @@ function wooms_get_data_by_url( $url = '' ) {
  * @return array|bool|mixed|object
  */
 function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
-	if ( empty( $url ) ) {
-		return false;
-	}
+  if ( empty( $url ) ) {
+    return false;
+  }
 
-	if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
-		$type = 'POST';
-	}
-	if ( 'GET' == $type ) {
-		$data = null;
-	} else {
-		$data = json_encode( $data );
-	}
+  if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
+    $type = 'POST';
+  }
+  if ( 'GET' == $type ) {
+    $data = null;
+  } else {
+    $data = json_encode( $data );
+  }
 
     $args = array(
-		'method'      => $type,
-		'timeout'     => 45,
-		'redirection' => 5,
-		'headers'     => array(
-			"Content-Type"  => 'application/json',
-			'Authorization' => 'Basic ' .
-			                   base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
-		),
-		'body'        => $data,
-	);
+    'method'      => $type,
+    'timeout'     => 45,
+    'redirection' => 5,
+    'headers'     => array(
+      "Content-Type"  => 'application/json',
+      'Authorization' => 'Basic ' .
+                         base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
+    ),
+    'body'        => $data,
+  );
 
-	$request = wp_remote_request( $url, $args);
-	if ( is_wp_error( $request ) ) {
-		set_transient( 'wooms_error_background', $request->get_error_message() );
+  $request = wp_remote_request( $url, $args);
+  if ( is_wp_error( $request ) ) {
+    set_transient( 'wooms_error_background', $request->get_error_message() );
     do_action(
       'wooms_logger',
       $type = 'error_request_api',
@@ -315,10 +315,10 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
       $desc = $request->get_error_message()
     );
 
-		return false;
-	}
-	if ( empty( $request['body'] ) ) {
-		set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
+    return false;
+  }
+  if ( empty( $request['body'] ) ) {
+    set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
     do_action(
       'wooms_logger',
       $type = 'error_request_api',
@@ -326,11 +326,11 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
       $desc = ''
     );
 
-		return false;
-	}
-	$response = json_decode( $request['body'], true );
+    return false;
+  }
+  $response = json_decode( $request['body'], true );
 
-	return $response;
+  return $response;
 }
 
 /**
@@ -339,10 +339,10 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
  */
 function wooms_get_product_id_by_uuid( $uuid ) {
 
-	$posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
-	if ( empty( $posts[0]->ID ) ) {
-		return false;
-	} else {
-		return $posts[0]->ID;
-	}
+  $posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
+  if ( empty( $posts[0]->ID ) ) {
+    return false;
+  } else {
+    return $posts[0]->ID;
+  }
 }

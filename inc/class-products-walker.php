@@ -3,7 +3,7 @@
 namespace WooMS\Products;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+  exit; // Exit if accessed directly
 }
 
 /**
@@ -15,7 +15,7 @@ class Walker {
   /**
    * The Init
    */
-	public static function init()
+  public static function init()
   {
 
     //Main Walker
@@ -27,18 +27,18 @@ class Walker {
     add_action( 'wooms_product_import_row', array( __CLASS__, 'load_product' ), 10, 3 );
     add_filter( 'wooms_product_save', array( __CLASS__, 'update_product' ), 10, 3 );
 
-		//UI and actions manually
-		add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'display_wrapper' ) );
-		add_action( 'woomss_tool_actions_wooms_products_start_import', array( __CLASS__, 'start_manually' ) );
-		add_action( 'woomss_tool_actions_wooms_products_stop_import', array( __CLASS__, 'stop_manually' ) );
+    //UI and actions manually
+    add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'display_wrapper' ) );
+    add_action( 'woomss_tool_actions_wooms_products_start_import', array( __CLASS__, 'start_manually' ) );
+    add_action( 'woomss_tool_actions_wooms_products_stop_import', array( __CLASS__, 'stop_manually' ) );
 
-		//Notices
-		add_action( 'wooms_products_display_state', array( __CLASS__, 'display_state' ) );
+    //Notices
+    add_action( 'wooms_products_display_state', array( __CLASS__, 'display_state' ) );
 
     //Other
     add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes_post_type' ) );
 
-	}
+  }
 
   /**
    * Load data and set product type simple
@@ -178,6 +178,11 @@ class Walker {
 
     $product->set_status( 'publish' );
 
+    if(11732 == $product_id){
+      do_action( 'logger_u7', array( '$product - update', $product ) );
+      
+    }
+
     return $product;
 
   }
@@ -267,129 +272,129 @@ class Walker {
     return $product_id;
   }
 
-	/**
-	 * Cron shedule setup for 1 minute interval
-	 */
-	public static function add_schedule( $schedules ) {
-		$schedules['wooms_cron_walker_shedule'] = array(
-			'interval' => apply_filters('wooms_cron_interval', 60),
-			'display'  => 'WooMS Cron Walker 60 sec',
-		);
+  /**
+   * Cron shedule setup for 1 minute interval
+   */
+  public static function add_schedule( $schedules ) {
+    $schedules['wooms_cron_walker_shedule'] = array(
+      'interval' => apply_filters('wooms_cron_interval', 60),
+      'display'  => 'WooMS Cron Walker 60 sec',
+    );
 
-		return $schedules;
-	}
+    return $schedules;
+  }
 
-	/**
-	 * Cron task restart
-	 */
-	public static function cron_init() {
-		if ( ! wp_next_scheduled( 'wooms_cron_walker' ) ) {
-			wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_walker' );
-		}
-	}
+  /**
+   * Cron task restart
+   */
+  public static function cron_init() {
+    if ( ! wp_next_scheduled( 'wooms_cron_walker' ) ) {
+      wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_walker' );
+    }
+  }
 
-	/**
-	 * Starter walker by cron if option enabled
-	 */
-	public static function walker_cron_starter() {
+  /**
+   * Starter walker by cron if option enabled
+   */
+  public static function walker_cron_starter() {
 
-		if ( self::can_cron_start() ) {
-			self::walker();
-		}
-	}
+    if ( self::can_cron_start() ) {
+      self::walker();
+    }
+  }
 
-	/**
-	 * Can cron start? true or false
-	 */
-	public static function can_cron_start() {
+  /**
+   * Can cron start? true or false
+   */
+  public static function can_cron_start() {
 
-		//Если стоит отметка о ручном запуске - крон может стартовать
-		if ( ! empty( get_transient( 'wooms_manual_sync' ) ) ) {
-			return true;
-		}
+    //Если стоит отметка о ручном запуске - крон может стартовать
+    if ( ! empty( get_transient( 'wooms_manual_sync' ) ) ) {
+      return true;
+    }
 
-		//Если работа по расписанию отключена - не запускаем
-		if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
-			return false;
-		}
-		if ( $end_stamp = get_transient( 'wooms_end_timestamp' ) ) {
+    //Если работа по расписанию отключена - не запускаем
+    if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
+      return false;
+    }
+    if ( $end_stamp = get_transient( 'wooms_end_timestamp' ) ) {
 
-			$interval_hours = get_option( 'woomss_walker_cron_timer' );
-			$interval_hours = (int) $interval_hours;
-			if ( empty( $interval_hours ) ) {
-				return false;
-			}
-			$now       = new \DateTime();
-			$end_stamp = new \DateTime( $end_stamp );
-			$end_stamp = $now->diff( $end_stamp );
-			$diff_hours = $end_stamp->format( '%h' );
-			if ( $diff_hours > $interval_hours ) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
+      $interval_hours = get_option( 'woomss_walker_cron_timer' );
+      $interval_hours = (int) $interval_hours;
+      if ( empty( $interval_hours ) ) {
+        return false;
+      }
+      $now       = new \DateTime();
+      $end_stamp = new \DateTime( $end_stamp );
+      $end_stamp = $now->diff( $end_stamp );
+      $diff_hours = $end_stamp->format( '%h' );
+      if ( $diff_hours > $interval_hours ) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
 
-	/**
-	 * Walker for data from MoySklad
-	 */
-	public static function walker() {
-		//Check stop tag and break the walker
-		if ( self::check_stop_manual() ) {
-			return;
-		}
+  /**
+   * Walker for data from MoySklad
+   */
+  public static function walker() {
+    //Check stop tag and break the walker
+    if ( self::check_stop_manual() ) {
+      return;
+    }
 
-		$count = apply_filters( 'wooms_iteration_size', 20 );
-		if ( ! $offset = get_transient( 'wooms_offset' ) ) {
-			$offset = 0;
+    $count = apply_filters( 'wooms_iteration_size', 20 );
+    if ( ! $offset = get_transient( 'wooms_offset' ) ) {
+      $offset = 0;
       self::walker_started();
-			set_transient( 'wooms_offset', $offset );
+      set_transient( 'wooms_offset', $offset );
 
-		}
+    }
 
-		$ms_api_args = array(
-			'offset' => $offset,
-			'limit'  => $count,
+    $ms_api_args = array(
+      'offset' => $offset,
+      'limit'  => $count,
       'scope'  => 'product',
-		);
+    );
 
     $url = add_query_arg( $ms_api_args, 'https://online.moysklad.ru/api/remap/1.1/entity/assortment' );
 
     $url_api = apply_filters('wooms_url_get_products', $url);
 
 
-		try {
+    try {
 
-			delete_transient( 'wooms_end_timestamp' );
-			set_transient( 'wooms_start_timestamp', time() );
-			$data = wooms_request( $url_api );
+      delete_transient( 'wooms_end_timestamp' );
+      set_transient( 'wooms_start_timestamp', time() );
+      $data = wooms_request( $url_api );
       do_action('wooms_logger',
         'walker_request_url',
         sprintf('Отправлен запрос %s', $url_api),
         print_r($data, true)
       );
 
-			//Check for errors and send message to UI
-			if ( isset( $data['errors'] ) ) {
-				$error_code = $data['errors'][0]["code"];
-				if ( $error_code == 1056 ) {
-					$msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'admin.php?page=mss-settings' ) );
-					throw new Exception( $msg );
-				} else {
-					throw new Exception( $error_code . ': ' . $data['errors'][0]["error"] );
-				}
-			}
+      //Check for errors and send message to UI
+      if ( isset( $data['errors'] ) ) {
+        $error_code = $data['errors'][0]["code"];
+        if ( $error_code == 1056 ) {
+          $msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'admin.php?page=mss-settings' ) );
+          throw new Exception( $msg );
+        } else {
+          throw new Exception( $error_code . ': ' . $data['errors'][0]["error"] );
+        }
+      }
 
 
-			//If no rows, that send 'end' and stop walker
-			if ( empty( $data['rows'] ) ) {
-				self::walker_finish();
+      //If no rows, that send 'end' and stop walker
+      if ( empty( $data['rows'] ) ) {
+        self::walker_finish();
 
-				return true;
-			}
+        return true;
+      }
 
       do_action( 'wooms_walker_start_iteration', $data );
 
@@ -398,31 +403,31 @@ class Walker {
        */
       do_action( 'wooms_walker_start' );
 
-			$i = 0;
-			foreach ( $data['rows'] as $key => $value ) {
+      $i = 0;
+      foreach ( $data['rows'] as $key => $value ) {
 
         if( apply_filters('wooms_skip_product_import', false, $value) ){
           continue;
         }
 
-				do_action( 'wooms_product_import_row', $value, $key, $data );
-				$i ++;
-			}
+        do_action( 'wooms_product_import_row', $value, $key, $data );
+        $i ++;
+      }
 
-			if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
-				set_transient( 'wooms_count_stat', $i + $count_saved );
-			} else {
-				set_transient( 'wooms_count_stat', $i );
-			}
+      if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
+        set_transient( 'wooms_count_stat', $i + $count_saved );
+      } else {
+        set_transient( 'wooms_count_stat', $i );
+      }
 
-			set_transient( 'wooms_offset', $offset + $i );
+      set_transient( 'wooms_offset', $offset + $i );
 
-			return;
-		} catch ( Exception $e ) {
-			delete_transient( 'wooms_start_timestamp' );
-			set_transient( 'wooms_error_background', $e->getMessage() );
-		}
-	}
+      return;
+    } catch ( Exception $e ) {
+      delete_transient( 'wooms_start_timestamp' );
+      set_transient( 'wooms_error_background', $e->getMessage() );
+    }
+  }
 
   /**
    * walker_started
@@ -435,72 +440,72 @@ class Walker {
     do_action('wooms_main_walker_started');
   }
 
-	/**
-	 * Finish walker
-	 */
-	public static function walker_finish() {
-		delete_transient( 'wooms_start_timestamp' );
-		delete_transient( 'wooms_offset' );
-		delete_transient( 'wooms_manual_sync' );
+  /**
+   * Finish walker
+   */
+  public static function walker_finish() {
+    delete_transient( 'wooms_start_timestamp' );
+    delete_transient( 'wooms_offset' );
+    delete_transient( 'wooms_manual_sync' );
 
-		//Отключаем обработчик или ставим на паузу
-		if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
-			$timer = 0;
-		} else {
-			$timer = 60 * 60 * intval( get_option( 'woomss_walker_cron_timer', 24 ) );
-		}
+    //Отключаем обработчик или ставим на паузу
+    if ( empty( get_option( 'woomss_walker_cron_enabled' ) ) ) {
+      $timer = 0;
+    } else {
+      $timer = 60 * 60 * intval( get_option( 'woomss_walker_cron_timer', 24 ) );
+    }
 
-		set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
+    set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
 
     do_action( 'wooms_walker_finish' );
 
     do_action( 'wooms_main_walker_finish' );
 
-		return true;
-	}
+    return true;
+  }
 
-	/**
-	 * Check and stop walker manual
-	 */
-	public static function check_stop_manual() {
-		if ( get_transient( 'wooms_walker_stop' ) ) {
-			delete_transient( 'wooms_start_timestamp' );
-			delete_transient( 'wooms_offset' );
-			delete_transient( 'wooms_walker_stop' );
+  /**
+   * Check and stop walker manual
+   */
+  public static function check_stop_manual() {
+    if ( get_transient( 'wooms_walker_stop' ) ) {
+      delete_transient( 'wooms_start_timestamp' );
+      delete_transient( 'wooms_offset' );
+      delete_transient( 'wooms_walker_stop' );
 
-			return true;
-		}
+      return true;
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	/**
-	 * Start manually actions
-	 */
-	public static function start_manually() {
-		delete_transient( 'wooms_start_timestamp' );
-		delete_transient( 'wooms_error_background' );
-		delete_transient( 'wooms_offset' );
-		delete_transient( 'wooms_end_timestamp' );
-		delete_transient( 'wooms_walker_stop' );
-		set_transient( 'wooms_manual_sync', 1 );
-		self::walker();
-		wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
-	}
+  /**
+   * Start manually actions
+   */
+  public static function start_manually() {
+    delete_transient( 'wooms_start_timestamp' );
+    delete_transient( 'wooms_error_background' );
+    delete_transient( 'wooms_offset' );
+    delete_transient( 'wooms_end_timestamp' );
+    delete_transient( 'wooms_walker_stop' );
+    set_transient( 'wooms_manual_sync', 1 );
+    self::walker();
+    wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
+  }
 
-	/**
-	 * Stop manually actions
-	 */
-	public static function stop_manually() {
-		set_transient( 'wooms_walker_stop', 1, 60 * 60 );
-		delete_transient( 'wooms_start_timestamp' );
-		delete_transient( 'wooms_offset' );
-		// delete_transient( 'wooms_end_timestamp' );
-		delete_transient( 'wooms_manual_sync' );
+  /**
+   * Stop manually actions
+   */
+  public static function stop_manually() {
+    set_transient( 'wooms_walker_stop', 1, 60 * 60 );
+    delete_transient( 'wooms_start_timestamp' );
+    delete_transient( 'wooms_offset' );
+    // delete_transient( 'wooms_end_timestamp' );
+    delete_transient( 'wooms_manual_sync' );
 
     self::walker_finish();
-		wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
-	}
+    wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
+  }
 
   /**
    * Description
@@ -510,7 +515,7 @@ class Walker {
     $start_timestamp = get_transient( 'wooms_start_timestamp' );
 
 
-		$end_timestamp = get_transient('wooms_end_timestamp');
+    $end_timestamp = get_transient('wooms_end_timestamp');
 
     $diff_sec = false;
     if( ! empty($start_timestamp) ){
@@ -555,21 +560,21 @@ class Walker {
     <?php
   }
 
-	/**
-	 * User interface for manually actions
-	 */
-	public static function display_wrapper() {
-		echo '<h2>Продукты (Товары)</h2>';
+  /**
+   * User interface for manually actions
+   */
+  public static function display_wrapper() {
+    echo '<h2>Продукты (Товары)</h2>';
 
     do_action('wooms_products_display_state');
 
-		if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
-			echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
-			printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
-		} else {
-			printf( '<a href="%s" class="button button-secondary">Остановить</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
-		}
-	}
+    if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
+      echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
+      printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
+    } else {
+      printf( '<a href="%s" class="button button-secondary">Остановить</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
+    }
+  }
 }
 
 Walker::init();
