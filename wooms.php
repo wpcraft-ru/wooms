@@ -19,9 +19,8 @@
  * WooMS XT Latest: 3.6
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-  exit; // Exit if accessed directly
-}
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Core
