@@ -13,7 +13,7 @@ class Logger {
    * Table name
    */
   public static $table_name = 'wooms_logger';
-  
+
   /**
    * The init
    */
@@ -57,7 +57,11 @@ class Logger {
 
     global $wpdb;
 
+    //check if table exists
     $table_name = $wpdb->base_prefix . self::$table_name;
+    if($table_name != $wpdb->get_var("SHOW TABLES LIKE '$table_name'")){
+      return;
+    }
 
     $wpdb->insert("{$table_name}", array(
         'type' => $type,
