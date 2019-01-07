@@ -38,6 +38,12 @@ class Walker {
     //Other
     add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes_post_type' ) );
 
+    /**
+     * Удаляем крон задание при деактивации
+     */
+    add_action( 'wooms_deactivate', function(){
+        wp_unschedule_event( wp_next_scheduled( 'wooms_cron_walker' ), 'wooms_cron_walker' );
+    });
   }
 
   /**

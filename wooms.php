@@ -56,15 +56,18 @@ class WooMS_Core {
       require_once 'inc/class-import-product-images.php';
       require_once 'inc/class-import-prices.php';
       require_once 'inc/class-hide-old-products.php';
+
+      add_action( 'admin_notices', array(__CLASS__, 'show_notices_35') );
+
+      add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', array(__CLASS__, 'xt_plugin_update_message'), 10, 2 );
+
+      add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), array(__CLASS__, 'plugin_add_settings_link') );
+
+
     });
 
-    add_action( 'admin_init', array(__CLASS__, 'check_php_and_wp_version') );
+    // add_action( 'admin_init', array(__CLASS__, 'check_php_and_wp_version') );
 
-    add_action( 'admin_notices', array(__CLASS__, 'show_notices_35') );
-
-    add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', array(__CLASS__, 'xt_plugin_update_message'), 10, 2 );
-
-    add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), array(__CLASS__, 'plugin_add_settings_link') );
 
     /**
      * Add hook for activate plugin
@@ -72,6 +75,10 @@ class WooMS_Core {
      */
     register_activation_hook( __FILE__, function(){
       do_action('wooms_activate');
+    });
+
+    register_deactivation_hook( __FILE__, function(){
+      do_action('wooms_deactivate');
     });
   }
 
