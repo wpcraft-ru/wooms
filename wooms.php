@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 3.8
- * WooMS XT Latest: 3.8
+ * Version: 3.9
+ * WooMS XT Latest: 3.9
  */
 
 // Exit if accessed directly
@@ -42,13 +42,31 @@ class WooMS_Core {
    */
   public static function init(){
 
+    /**
+     * Этот класс должен работать до хука plugins_loaded
+     * Птм что иначе хук wooms_activate не срабатывает
+     */
+    require_once 'inc/class-logger.php';
+
+    /**
+     * Add hook for activate plugin
+     */
+    register_activation_hook( __FILE__, function(){
+      do_action('wooms_activate');
+
+    });
+
+    register_deactivation_hook( __FILE__, function(){
+      do_action('wooms_deactivate');
+    });
+
+
 
     add_action('plugins_loaded', function(){
 
       /**
        * Подключение компонентов
        */
-      require_once 'inc/class-logger.php';
       require_once 'inc/class-menu-settings.php';
       require_once 'inc/class-menu-tool.php';
       require_once 'inc/class-products-walker.php';
@@ -69,17 +87,6 @@ class WooMS_Core {
     // add_action( 'admin_init', array(__CLASS__, 'check_php_and_wp_version') );
 
 
-    /**
-     * Add hook for activate plugin
-     * @var [type]
-     */
-    register_activation_hook( __FILE__, function(){
-      do_action('wooms_activate');
-    });
-
-    register_deactivation_hook( __FILE__, function(){
-      do_action('wooms_deactivate');
-    });
   }
 
 
