@@ -195,7 +195,7 @@ class Images {
             $headers[] = "{$name}: $value";
         }
 
-        $ch = curl_init();
+        $ch = \curl_init();
         curl_setopt( $ch, CURLOPT_URL, $url_api );
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
         curl_setopt( $ch, CURLOPT_BINARYTRANSFER, true );
