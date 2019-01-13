@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 3.9
- * WooMS XT Latest: 3.9
+ * Version: 4.0
+ * WooMS XT Latest: 4.0
  */
 
 // Exit if accessed directly
@@ -60,8 +60,6 @@ class WooMS_Core {
       do_action('wooms_deactivate');
     });
 
-
-
     add_action('plugins_loaded', function(){
 
       /**
@@ -76,20 +74,15 @@ class WooMS_Core {
       require_once 'inc/class-hide-old-products.php';
 
       add_action( 'admin_notices', array(__CLASS__, 'show_notices_35') );
+      add_action( 'admin_notices', array(__CLASS__, 'show_error_notice') );
 
       add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', array(__CLASS__, 'xt_plugin_update_message'), 10, 2 );
 
       add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), array(__CLASS__, 'plugin_add_settings_link') );
 
-
     });
 
-    // add_action( 'admin_init', array(__CLASS__, 'check_php_and_wp_version') );
-
-
   }
-
-
 
   /**
    * Add Settings link in pligins list
@@ -101,7 +94,6 @@ class WooMS_Core {
     array_unshift($links, $settings_link);
     return $links;
   }
-
 
   /**
    * Проверяем актуальность расширенной версии и сообщаем если есть обновления
@@ -119,7 +111,6 @@ class WooMS_Core {
     // $data = plugin_dir_path( __DIR__ );
 
     $check = version_compare( $xt_version_local, $xt_version_remote, '>=' );
-
 
     if($check){
       return;
@@ -140,7 +131,37 @@ class WooMS_Core {
 
   }
 
+  /**
+   * Ошибки - проверка и уведомленич
+   */
+  public static function show_error_notice() {
+    global $wp_version;
 
+    $wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
+
+    $message = '';
+
+    $php       = 5.6;
+    $wp        = 4.7;
+    $php_check = version_compare( PHP_VERSION, $php, '<' );
+    $wp_check  = version_compare( $wp_version, $wp, '<' );
+
+    if ( $php_check ) {
+      $message .= sprintf('<p>Для работы плагина WooMS требуется более свежая версия php минимум - %s</p>', $php);
+    }
+
+    if ( $wp_check ) {
+      $message .= sprintf('<p>Для работы плагина WooMS требуется более свежая версия WordPress минимум - %s</p>', $wp);
+    }
+
+    $message = apply_filters('wooms_error_message', $message);
+
+    if ( empty($message) ) {
+      return;
+    }
+
+    printf('<div class="notice notice-error">%s</div>', $message);
+  }
 
   /**
    * Вывод сообщения в консоли
@@ -155,7 +176,6 @@ class WooMS_Core {
 
       $xt_version_local = $data['Version'];
       // $data = plugin_dir_path( __DIR__ );
-
 
       $check = version_compare( $xt_version_local, '3.5', '>=' );
 
@@ -174,68 +194,8 @@ class WooMS_Core {
 
     return;
 
-    //@TODO - переписать эту часть чтобы без транзита работала
-    self::$wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
-
-    $message = get_transient( 'wooms_activation_error_message' );
-    if ( ! empty( $message ) ) {
-      echo '<div class="notice notice-error">
-              <p><strong>Плагин WooMS не активирован!</strong> ' . $message . '</p>
-          </div>';
-      delete_transient( 'wooms_activation_error_message' );
-    }
   }
 
-  /**
-   * check_php_and_wp_version
-   */
-  public static function check_php_and_wp_version() {
-    global $wp_version;
-
-    $wooms_version = get_file_data( __FILE__, array('wooms_ver' => 'Version') );
-
-    define( 'WOOMS_PLUGIN_VER', $wooms_version['wooms_ver'] );
-
-    $php       = 5.6;
-    $wp        = 4.7;
-    $php_check = version_compare( PHP_VERSION, $php, '<' );
-    $wp_check  = version_compare( $wp_version, $wp, '<' );
-
-    if ( $php_check ) {
-      $flag = 'PHP';
-    } elseif ( $wp_check ) {
-      $flag = 'WordPress';
-    }
-
-    if ( $php_check || $wp_check ) {
-      $version = 'PHP' == $flag ? $php : $wp;
-      if ( ! function_exists( 'deactivate_plugins' ) ) {
-        require_once ABSPATH . '/wp-admin/includes/plugin.php';
-      }
-
-      deactivate_plugins( plugin_basename( __FILE__ ) );
-      if ( isset( $_GET['activate'] ) ) {
-        unset( $_GET['activate'] );
-      }
-
-      $error_text = sprintf( 'Для корректной работы плагин требует версию <strong>%s %s</strong> или выше.', $flag, $version );
-      set_transient( 'wooms_activation_error_message', $error_text, 60 );
-
-    } elseif ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
-
-      if ( ! function_exists( 'deactivate_plugins' ) ) {
-        require_once ABSPATH . '/wp-admin/includes/plugin.php';
-      }
-
-      deactivate_plugins( plugin_basename( __FILE__ ) );
-      if ( isset( $_GET['activate'] ) ) {
-        unset( $_GET['activate'] );
-      }
-
-      $error_text = sprintf( 'Для работы плагина WooMS требуется плагин <strong><a href="//wordpress.org/plugins/woocommerce/" target="_blank">%s %s</a></strong> или выше.', 'WooCommerce', '3.0' );
-      set_transient( 'wooms_activation_error_message', $error_text, 60 );
-    }
-  }
 }
 
 WooMS_Core::init();
