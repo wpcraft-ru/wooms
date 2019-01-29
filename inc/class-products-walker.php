@@ -427,7 +427,6 @@ class Walker {
       return;
     } catch ( \Exception $e ) {
       delete_transient( 'wooms_start_timestamp' );
-      delete_transient( 'wooms_offset' );
       set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
 
       set_transient( 'wooms_error_background', $e->getMessage() );
