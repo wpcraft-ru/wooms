@@ -384,9 +384,9 @@ class Walker {
         $error_code = $data['errors'][0]["code"];
         if ( $error_code == 1056 ) {
           $msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'admin.php?page=mss-settings' ) );
-          throw new Exception( $msg );
+          throw new \Exception( $msg );
         } else {
-          throw new Exception( $error_code . ': ' . $data['errors'][0]["error"] );
+          throw new \Exception( $error_code . ': ' . $data['errors'][0]["error"] );
         }
       }
 
@@ -548,7 +548,7 @@ class Walker {
       <div id="message" class="notice notice-warning">
         <p>Статус: <?= $state ?></p>
         <p>Сессия (номер/дата): <?= $session ?></p>
-        <p>Последняя успешная синхронихация (отметка времени): <?= $end_timestamp ?></p>
+        <p>Последняя успешная синхронизация (отметка времени): <?= $end_timestamp ?></p>
         <p>Ошибки: <?= $errors ?></p>
         <p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
         <?php do_action('wooms_products_state_before'); ?>
