@@ -425,8 +425,11 @@ class Walker {
       set_transient( 'wooms_offset', $offset + $i );
 
       return;
-    } catch ( Exception $e ) {
+    } catch ( \Exception $e ) {
       delete_transient( 'wooms_start_timestamp' );
+      delete_transient( 'wooms_offset' );
+      set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
+
       set_transient( 'wooms_error_background', $e->getMessage() );
     }
   }
@@ -529,7 +532,9 @@ class Walker {
     $errors = get_transient( 'wooms_error_background' );
     if(empty($errors)){
       $errors = 'не обнаружено';
-    }
+  } else {
+      $errors = sprintf('<strong>%s</strong>', $errors);
+  }
 
     $session = get_option( 'wooms_session_id' );
     if(empty($session)){
@@ -540,7 +545,7 @@ class Walker {
     if(empty($end_timestamp)){
       $end_timestamp = 'отметка времени будет проставлена после завершения текущей сессии синхронизации';
     } else {
-      $state = 'Синхронизация завершена успешно и находится в ожидании старта';
+      $state = 'Синхронизация завершена и находится в ожидании старта';
     }
 
     ?>
