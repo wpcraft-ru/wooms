@@ -173,13 +173,9 @@ class Walker {
       $product->set_price( $price );
       $product->set_regular_price( $price );
 
-      if ( 0 == $product->get_price()){
-        $product->set_catalog_visibility('hidden' );
-      } else {
-        $product->set_catalog_visibility('visible');
-      }
     }
 
+    $product->set_catalog_visibility('visible');
     $product->set_stock_status( 'instock' );
     $product->set_manage_stock( 'no' );
 
