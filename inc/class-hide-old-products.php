@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Hide old products
  */
-class Hide_Old_Products {
+class Hiding {
 
   /**
    * The init
@@ -178,4 +178,4 @@ class Hide_Old_Products {
   }
 }
 
-Hide_Old_Products::init();
+Hiding::init();
