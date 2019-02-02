@@ -3,7 +3,7 @@
 namespace WooMS\Products;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+  exit; // Exit if accessed directly
 }
 
 /**
@@ -11,40 +11,41 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Hide_Old_Products {
 
-	/**
-	 * The init
-	 */
-	public static function init() {
-		//Main Walker
-		add_action( 'init', array( __CLASS__, 'cron_init' ) );
-		add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
+  /**
+   * The init
+   */
+  public static function init() {
+    //Main Walker
+    add_action( 'init', array( __CLASS__, 'cron_init' ) );
+    add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
 
     add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
     add_action('wooms_main_walker_finish', array(__CLASS__, 'finis_main_walker'));
-	}
 
-	/**
-	 * Cron task restart
-	 */
-	public static function cron_init() {
-		if ( ! wp_next_scheduled( 'wooms_cron_clear_old_products_walker' ) ) {
-			wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_clear_old_products_walker' );
-		}
-	}
+  }
 
-	/**
-	 * Starter walker by cron if option enabled
-	 */
-	public static function walker_starter() {
+  /**
+   * Cron task restart
+   */
+  public static function cron_init() {
+    if ( ! wp_next_scheduled( 'wooms_cron_clear_old_products_walker' ) ) {
+      wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_clear_old_products_walker' );
+    }
+  }
+
+  /**
+   * Starter walker by cron if option enabled
+   */
+  public static function walker_starter() {
 
     //Если работает синк товаров, то блокируем работу
     if( ! empty('wooms_start_timestamp')){
       return;
     }
-    
+
     self::set_hide_old_product();
 
-	}
+  }
 
   /**
    * Убираем паузу для сокрытия продуктов
@@ -69,20 +70,20 @@ class Hide_Old_Products {
     echo $msg;
   }
 
-	/**
-	 * Adding hiding attributes to products
-	 */
-	public static function set_hide_old_product() {
-		if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
-			$offset = 0;
-			set_transient( 'wooms_offset_hide_product', $offset );
-		}
+  /**
+   * Adding hiding attributes to products
+   */
+  public static function set_hide_old_product() {
+    if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
+      $offset = 0;
+      set_transient( 'wooms_offset_hide_product', $offset );
+    }
 
     if(get_transient('wooms_products_old_hide_pause')){
       return;
     }
 
-		$products = self::get_product_old_session( $offset );
+    $products = self::get_product_old_session( $offset );
 
     if( empty($products) ){
       delete_transient( 'wooms_offset_hide_product' );
@@ -90,17 +91,19 @@ class Hide_Old_Products {
       return;
     }
 
-		$i = 0;
+    $i = 0;
 
-		foreach ( $products as $product_id ) {
-			$product = wc_get_product( $product_id );
+    foreach ( $products as $product_id ) {
+      $product = wc_get_product( $product_id );
 
-			if ( $product->get_type() == 'variable' ) {
-				$product->set_manage_stock( 'yes' );
-			}
+      if ( $product->get_type() == 'variable' ) {
+        $product->set_manage_stock( 'yes' );
+      }
 
-			$product->set_stock_status( 'outofstock' );
-			$product->save();
+      // $product->set_status( 'draft' );
+      $product->set_catalog_visibility( 'hidden' );
+      // $product->set_stock_status( 'outofstock' );
+      $product->save();
 
       do_action('wooms_logger',
         'stock_product_save',
@@ -108,71 +111,71 @@ class Hide_Old_Products {
         sprintf('Данные %s', PHP_EOL . print_r($product, true))
       );
 
-			$i ++;
+      $i ++;
 
-		}
+    }
 
-		do_action('wooms_hide_old_product', $products , $offset);
+    do_action('wooms_hide_old_product', $products , $offset);
 
-		set_transient( 'wooms_offset_hide_product', $offset + $i );
+    set_transient( 'wooms_offset_hide_product', $offset + $i );
 
-		if ( empty( $products ) ) {
-			delete_transient( 'wooms_offset_hide_product' );
-		}
-	}
+    if ( empty( $products ) ) {
+      delete_transient( 'wooms_offset_hide_product' );
+    }
+  }
 
-	/**
-	 * Obtaining products with specific attributes
-	 *
-	 * @param int $offset
-	 *
-	 * @return array
-	 */
-	public static function get_product_old_session( $offset = 0 ) {
+  /**
+   * Obtaining products with specific attributes
+   *
+   * @param int $offset
+   *
+   * @return array
+   */
+  public static function get_product_old_session( $offset = 0 ) {
 
     $session = self::get_session();
     if(empty($session)){
       return false;
     }
 
-		$args = array(
-			'post_type'   => 'product',
-			'numberposts' => 50,
-			'fields'      => 'ids',
-			'offset'      => $offset,
-			'meta_query'  => array(
-				array(
-					'key'     => 'wooms_session_id',
-					'value'   => $session,
-					'compare' => '!=',
-				),
-				array(
-					'key'     => 'wooms_id',
-					'compare' => 'EXISTS',
-				),
-			),
-			'no_found_rows' => true,
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
-			'cache_results' => false
-		);
+    $args = array(
+      'post_type'   => 'product',
+      'numberposts' => 50,
+      'fields'      => 'ids',
+      'offset'      => $offset,
+      'meta_query'  => array(
+        array(
+          'key'     => 'wooms_session_id',
+          'value'   => $session,
+          'compare' => '!=',
+        ),
+        array(
+          'key'     => 'wooms_id',
+          'compare' => 'EXISTS',
+        ),
+      ),
+      'no_found_rows' => true,
+      'update_post_term_cache' => false,
+      'update_post_meta_cache' => false,
+      'cache_results' => false
+    );
 
-		return get_posts( $args );
-	}
+    return get_posts( $args );
+  }
 
-	/**
-	 * Method for getting the value of an option
-	 *
-	 * @return bool|mixed
-	 */
-	public static function get_session() {
-		$session_id = get_option( 'wooms_session_id' );
-		if ( empty( $session_id ) ) {
-			return false;
-		}
+  /**
+   * Method for getting the value of an option
+   *
+   * @return bool|mixed
+   */
+  public static function get_session() {
+    $session_id = get_option( 'wooms_session_id' );
+    if ( empty( $session_id ) ) {
+      return false;
+    }
 
-		return $session_id;
-	}
+    return $session_id;
+  }
 }
 
 Hide_Old_Products::init();
