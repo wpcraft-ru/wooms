@@ -95,13 +95,6 @@ class Walker {
     $product = wc_get_product($product_id);
 
     /**
-     * От этого хука надо будет отказаться в пользу wooms_product_save
-     *
-     * @TODO После тестов - удалить
-     */
-    // do_action( 'wooms_product_update', $product_id, $value, $data );
-
-    /**
      * Хук позволяет работать с методами WC_Product
      * Сохраняет в БД все изменения за 1 раз
      * Снижает нагрузку на БД
@@ -363,12 +356,12 @@ class Walker {
 
     $url_api = apply_filters('wooms_url_get_products', $url);
 
-
     try {
 
       delete_transient( 'wooms_end_timestamp' );
       set_transient( 'wooms_start_timestamp', time() );
       $data = wooms_request( $url_api );
+
       do_action('wooms_logger',
         'walker_request_url',
         sprintf('Отправлен запрос %s', $url_api),
@@ -385,7 +378,6 @@ class Walker {
           throw new \Exception( $error_code . ': ' . $data['errors'][0]["error"] );
         }
       }
-
 
       //If no rows, that send 'end' and stop walker
       if ( empty( $data['rows'] ) ) {
@@ -409,7 +401,7 @@ class Walker {
         }
 
         do_action( 'wooms_product_import_row', $value, $key, $data );
-        $i ++;
+        $i++;
       }
 
       if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
