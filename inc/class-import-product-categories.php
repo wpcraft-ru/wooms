@@ -218,7 +218,7 @@ class Categories {
    */
   public static function add_filter_by_folder( $url ) {
     if ( empty( self::select_category() ) ) {
-      return;
+      return $url;
     }
 
     $arg = array(
