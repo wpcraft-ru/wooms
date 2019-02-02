@@ -35,7 +35,7 @@ class Logger {
     $sql = "CREATE TABLE `{$table_name}` (
       id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
       type varchar(255) NOT NULL,
-      title varchar(255),
+      title text,
       description longtext,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
       PRIMARY KEY (id)
