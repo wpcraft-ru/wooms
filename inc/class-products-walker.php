@@ -453,8 +453,10 @@ class Walker {
 
     do_action( 'wooms_main_walker_finish' );
 
+    do_action('wooms_recount_terms');
     return true;
   }
+
 
   /**
    * Check and stop walker manual

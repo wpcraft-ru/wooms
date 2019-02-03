@@ -35,9 +35,33 @@ class Categories {
 
       add_action( 'wooms_update_category', array( __CLASS__, 'update_meta_session_term' ) );
 
+      add_action('wooms_recount_terms', array( __CLASS__, 'recount_terms' ));
+
     }
 
   }
+
+  /**
+   * recount_terms
+   */
+  public static function recount_terms(){
+    $product_cats = get_terms(
+      'product_cat', array(
+        'hide_empty' => false,
+        'fields'     => 'id=>parent',
+      )
+    );
+    _wc_term_recount( $product_cats, get_taxonomy( 'product_cat' ), true, false );
+
+    $product_tags = get_terms(
+      'product_tag', array(
+        'hide_empty' => false,
+        'fields'     => 'id=>parent',
+      )
+    );
+    _wc_term_recount( $product_tags, get_taxonomy( 'product_tag' ), true, false );
+  }
+
 
   /**
    * Загрузка данных категории для продукта

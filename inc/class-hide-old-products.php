@@ -64,11 +64,8 @@ class Hiding {
     if( $timestamp = get_transient('wooms_products_old_hide_pause')){
       $msg = sprintf('<p>Скрытие устаревших продуктов: успешно завершено в последний раз %s</p>', $timestamp);
     } else {
-      $msg = sprintf('<p>Скрытие устаревших продуктов: %s</p>', '<strong>выполняется</strong>');
+      $msg = sprintf('<p>Скрытие устаревших продуктов: <strong>%s</strong></p>', 'выполняется');
     }
-
-    // $r = get_transient('wooms_start_timestamp');
-    // var_dump($r);
 
     echo $msg;
   }
@@ -91,6 +88,8 @@ class Hiding {
     if( empty($products) ){
       delete_transient( 'wooms_offset_hide_product' );
       set_transient('wooms_products_old_hide_pause', date( "Y-m-d H:i:s" ), HOUR_IN_SECONDS);
+
+      do_action('wooms_recount_terms');
       return;
     }
 
@@ -122,9 +121,6 @@ class Hiding {
 
     set_transient( 'wooms_offset_hide_product', $offset + $i );
 
-    if ( empty( $products ) ) {
-      delete_transient( 'wooms_offset_hide_product' );
-    }
   }
 
   /**
