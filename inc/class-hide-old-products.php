@@ -39,7 +39,7 @@ class Hiding {
   public static function walker_starter() {
 
     //Если работает синк товаров, то блокируем работу
-    if( ! empty('wooms_start_timestamp')){
+    if( ! empty(get_option('wooms_start_timestamp'))){
       return;
     }
 
@@ -66,6 +66,9 @@ class Hiding {
     } else {
       $msg = sprintf('<p>Скрытие устаревших продуктов: %s</p>', '<strong>выполняется</strong>');
     }
+
+    // $r = get_transient('wooms_start_timestamp');
+    // var_dump($r);
 
     echo $msg;
   }
@@ -106,12 +109,12 @@ class Hiding {
       $product->save();
 
       do_action('wooms_logger',
-        'stock_product_save',
-        sprintf('Нет в наличии - статус выбран для продукта %s', $product_id),
+        'products_hiding',
+        sprintf('Скрытие продукта: %s', $product_id),
         sprintf('Данные %s', PHP_EOL . print_r($product, true))
       );
 
-      $i ++;
+      $i++;
 
     }
 
