@@ -22,7 +22,43 @@ class Hiding {
     add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
     add_action('wooms_main_walker_finish', array(__CLASS__, 'finis_main_walker'));
 
+    add_action( 'admin_init', array( __CLASS__, 'settings_init' ) );
+
+    add_shortcode('test', function(){
+
+        self::walker_starter();
+        echo 2;
+    });
+
   }
+
+  /**
+   * settings_init
+   */
+  public static function settings_init(){
+    register_setting( 'mss-settings', 'wooms_product_hiding_disable' );
+    add_settings_field(
+      $id = 'wooms_product_hiding_disable',
+      $title = 'Отключить скрытие продуктов',
+      $callback = array(__CLASS__, 'display_field_wooms_product_hiding_disable' ),
+      $page = 'mss-settings',
+      $section = 'woomss_section_other'
+    );
+  }
+
+  /**
+   * display_field_wooms_product_hiding_disable
+   */
+  public static function display_field_wooms_product_hiding_disable(){
+    $option = 'wooms_product_hiding_disable';
+    printf( '<input type="checkbox" name="%s" value="1" %s />', $option, checked( 1, get_option( $option ), false ) );
+    printf(
+      '<p><small>%s</small></p>',
+      'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.'
+    );
+
+  }
+
 
   /**
    * Cron task restart
@@ -38,8 +74,16 @@ class Hiding {
    */
   public static function walker_starter() {
 
+    if(get_transient('wooms_product_hiding_disable')){
+      return;
+    }
+
     //Если работает синк товаров, то блокируем работу
     if( ! empty(get_option('wooms_start_timestamp'))){
+      return;
+    }
+
+    if(get_transient('wooms_products_old_hide_pause')){
       return;
     }
 
@@ -77,10 +121,6 @@ class Hiding {
     if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
       $offset = 0;
       set_transient( 'wooms_offset_hide_product', $offset );
-    }
-
-    if(get_transient('wooms_products_old_hide_pause')){
-      return;
     }
 
     $products = self::get_product_old_session( $offset );
