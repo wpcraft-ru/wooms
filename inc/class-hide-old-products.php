@@ -24,12 +24,6 @@ class Hiding {
 
     add_action( 'admin_init', array( __CLASS__, 'settings_init' ) );
 
-    add_shortcode('test', function(){
-
-        self::walker_starter();
-        echo 2;
-    });
-
   }
 
   /**
