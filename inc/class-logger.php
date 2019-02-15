@@ -21,7 +21,175 @@ class Logger {
     add_action('admin_init', array(__CLASS__, 'init_settings_page'));
     add_action('wooms_activate', array(__CLASS__, 'add_db_table'));
     add_action('wooms_logger', array(__CLASS__, 'add_log'), 10, 3);
+
+    add_action( 'admin_menu', function (){
+
+      if(get_option('wooms_logger_enable')){
+        add_submenu_page(
+           'moysklad',
+           'Лог',
+           'Лог',
+           'manage_woocommerce',
+           'wooms-log',
+           array( __CLASS__, 'display_log' )
+        );
+      }
+
+    }, 200);
   }
+
+  /**
+   * display_log
+   */
+  public static function display_log(){
+
+    if(empty($_GET['id'])): ?>
+    <div class="wooms-logger-wrapper">
+
+      <h1>Лог синхронизации</h1>
+      <?= self::display_ui(); ?>
+      <table class="wp-list-table widefat fixed striped posts">
+        <thead>
+          <tr>
+            <th scope="col" id="id" class="manage-column" width="33">
+              <span class="wc-image tips">id</span>
+            </th>
+            <th scope="col" id="type" class="manage-column" width="190">
+              <span>type</span>
+            </th>
+            <th scope="col" id="description" class="manage-column">
+              <span>data</span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody id="the-list">
+          <?php self::display_rows_log() ?>
+
+        </tbody>
+      </table>
+    </div>
+    <?php
+    else: ?>
+      <h1>Данные по записи лога</h1>
+      <div class="">
+        <?= sprintf('<a href="%s" class="button button-primary">назад</a>', admin_url('admin.php?page=wooms-log')) ?>
+        <hr>
+      </div>
+      <?php self::display_the_row_log(); ?>
+
+    <?php
+    endif;
+  }
+
+  /**
+   * display_ui
+   */
+  public static function display_ui(){
+    $offset = empty($_GET['offset']) ? 0 : (int)$_GET['offset'];
+    $page = empty($_GET['page']) ? '' : $_GET['page'];
+    $search = empty($_GET['wooms-search']) ? '' : $_GET['wooms-search'];
+    ?>
+    <div class="log-display-ui">
+      <form class="" action="" method="get">
+        <div class="form-field">
+          <label for="offset">Отступ: </label></br>
+          <input id="offset" type="number" name="offset" value="<?= $offset ?>">
+        </div>
+        <div class="form-field">
+          <label for="wooms-search">Поиск: </label></br>
+          <input id="wooms-search" type="text" name="wooms-search" value="<?= $search ?>">
+        </div>
+        <br>
+
+        <div class="form-field">
+          <input type="submit" class="button button-primary"  name="" value="Отбор">
+        </div>
+        <input type="hidden" name="page" value="<?= $page ?>">
+      </form>
+      <br>
+      <br>
+
+    </div>
+    <?php
+  }
+
+  /**
+   * display_the_row_log
+   */
+  public static function display_the_row_log(){
+    global $wpdb;
+    if(empty((int)$_GET['id'])){
+      return;
+    }
+
+    $id = (int)$_GET['id'];
+
+    $log = $wpdb->get_row(
+      "
+      SELECT * FROM {$wpdb->prefix}wooms_logger as log
+      WHERE log.id = {$id}
+      ",
+      ARRAY_A
+    );
+
+    printf('<p>%s</p>', $log['id']);
+    printf('<p>%s</p>', $log['type']);
+    printf('<p>%s</p>', $log['title']);
+    printf('<p><pre>%s</pre></p>', $log['description']);
+  }
+
+  /**
+   * display_row_log
+   */
+  public static function display_rows_log(){
+    global $wpdb;
+
+    $offset = 0;
+    if( ! empty($_GET['offset'])){
+      $offset = (int)$_GET['offset'];
+    }
+
+    $table_name = "{$wpdb->prefix}wooms_logger";
+
+    $sql = "SELECT * FROM $table_name as log";
+
+    if( ! empty($_GET['wooms-search'])){
+      $search = esc_sql( $_GET['wooms-search'] );
+      $sql .= " WHERE log.description LIKE '%$search%'";
+    }
+
+    $sql .= " ORDER BY log.id DESC LIMIT 10 OFFSET $offset";
+
+    $log = $wpdb->get_results( $sql, ARRAY_A );
+
+    if( ! is_array($log) ){
+      echo '<p>Нет данных</p>';
+      return;
+    }
+
+    foreach ($log as $row): ?>
+        <tr id="log-<?= $row['id'] ?>" class="">
+          <td class="wooms-log-id" data-colname="id">
+              <span><?= $row['id'] ?></span>
+          </td>
+          <td class="" data-colname="type">
+            <span><?= $row["type"] ?></span>
+          </td>
+          <td class="" data-colname="data">
+            <p><?= $row["title"] ?></p>
+            <p>
+              <?php
+                $url = sprintf('<a href="%s">...</a>', admin_url('admin.php?page=wooms-log&id=' . $row['id']));
+                echo wp_trim_words( $row["description"], 30, $url );
+              ?>
+            </p>
+          </td>
+        </tr>
+
+    <?php  endforeach;
+  }
+
 
   /**
    * add_db_table
