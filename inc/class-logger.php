@@ -19,23 +19,18 @@ class Logger {
    */
   public static function init(){
     add_action('admin_init', array(__CLASS__, 'init_settings_page'));
-    add_action('wooms_activate', array(__CLASS__, 'add_db_table'));
+    // add_action('wooms_activate', array(__CLASS__, 'add_db_table'));
     add_action('wooms_logger', array(__CLASS__, 'add_log'), 10, 3);
 
-    add_action( 'admin_menu', function (){
-
+    add_action('admin_menu', function(){
       if(get_option('wooms_logger_enable')){
-        add_submenu_page(
-           'moysklad',
-           'Лог',
-           'Лог',
-           'manage_woocommerce',
-           'wooms-log',
-           array( __CLASS__, 'display_log' )
-        );
+        global $submenu;
+        // global $menu;
+        $permalink = admin_url( 'admin.php?page=wc-status&tab=logs' );
+        $submenu['moysklad'][] = array( 'Журнал', 'manage_options', $permalink );
       }
+    }, 111);
 
-    }, 200);
   }
 
   /**
@@ -223,20 +218,30 @@ class Logger {
       return;
     }
 
-    global $wpdb;
+    $data = array(
+      'type' => $type,
+      'title' => $title,
+      'description' => $description,
+    );
 
-    //check if table exists
-    $table_name = $wpdb->base_prefix . self::$table_name;
-    if($table_name != $wpdb->get_var("SHOW TABLES LIKE '$table_name'")){
-      return;
-    }
-
-    $wpdb->insert("{$table_name}", array(
-        'type' => $type,
-        'title' => $title,
-        'description' => $description,
-        'created_at' => gmdate('Y-m-d H:i:s'),
-    ));
+    $logger = wc_get_logger();
+    $context = array( 'source' => 'wooms' );
+    $logger->info( wc_print_r( $data, true ), $context );
+    //
+    // global $wpdb;
+    //
+    // //check if table exists
+    // $table_name = $wpdb->base_prefix . self::$table_name;
+    // if($table_name != $wpdb->get_var("SHOW TABLES LIKE '$table_name'")){
+    //   return;
+    // }
+    //
+    // $wpdb->insert("{$table_name}", array(
+    //     'type' => $type,
+    //     'title' => $title,
+    //     'description' => $description,
+    //     'created_at' => gmdate('Y-m-d H:i:s'),
+    // ));
   }
 
 
@@ -264,7 +269,7 @@ class Logger {
       $option_name, checked( 1, get_option( $option_name ), false )
     );
     ?>
-    <p>При включении, ошибки и ключевые изменения данных будут записываться в специальную таблицу</p>
+    <p>При включении, ошибки и ключевые изменения данных будут записываться в <a href="<?= admin_url( 'admin.php?page=wc-status&tab=logs' ) ?>">журнал WooCommerce</a></p>
     <?php
   }
 }

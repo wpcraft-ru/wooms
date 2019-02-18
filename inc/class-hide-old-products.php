@@ -122,7 +122,6 @@ class Hiding {
     if( empty($products) ){
       delete_transient( 'wooms_offset_hide_product' );
       set_transient('wooms_products_old_hide_pause', date( "Y-m-d H:i:s" ), HOUR_IN_SECONDS);
-
       do_action('wooms_recount_terms');
       return;
     }
