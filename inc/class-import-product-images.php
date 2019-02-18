@@ -186,6 +186,10 @@ class Images {
             return $check_id;
         }
 
+        if( ! function_exists('wp_read_image_metadata')){
+          require_once ABSPATH . '/wp-admin/includes/image.php';
+        }
+
         $header_array = [
             'Authorization' => 'Basic ' . base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
         ];
@@ -264,16 +268,16 @@ class Images {
             return false;
         }
 
-    if(empty($file_data['url'])){
-      do_action('wooms_logger',
-        'error_get_url_image_download',
-        'Загрузка картинки - не удалось получить URL',
-        sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
-      );
-      @unlink( $tmpfname );
+        if(empty($file_data['url'])){
+          do_action('wooms_logger',
+            'error_get_url_image_download',
+            'Загрузка картинки - не удалось получить URL',
+            sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
+          );
+          @unlink( $tmpfname );
 
-      return false;
-    }
+          return false;
+        }
 
         $url     = $file_data['url'];
         $type    = $file_data['type'];

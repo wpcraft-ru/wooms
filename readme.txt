@@ -75,6 +75,9 @@ PHP 5.6
 
 == Changelog ==
 
+= 4.8 =
+* исправлена ошибка: CRITICAL Uncaught Error: Call to undefined function wp_read_image_metadata()
+
 = 4.7 =
 * журнал данных переписали на типовой WooCommerce
 * XT: исправлена ошибка синхронизации цены распродажи у вариаций
