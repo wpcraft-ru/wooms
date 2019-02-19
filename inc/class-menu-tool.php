@@ -18,22 +18,24 @@ class Tools {
 
     self::$url = $_SERVER['REQUEST_URI'];
 
-	  add_action(
-		  'admin_menu',
-		  function () {
+    add_action(
+      'admin_menu',
+      function () {
 
-			  add_menu_page(
-				  $page_title = 'МойСклад',
-				  $menu_title = 'МойСклад',
-				  $capability = 'manage_woocommerce',
-				  $menu_slug = 'moysklad',
-				  $function = array( __CLASS__, 'display_ui' ),
-				  $icon = 'dashicons-forms',
-				  '57.5'
-			  );
-		  },
-		  20
-	  );
+        if(current_user_can('manage_options')){
+          add_menu_page(
+            $page_title = 'МойСклад',
+            $menu_title = 'МойСклад',
+            $capability = 'manage_options',
+            $menu_slug = 'moysklad',
+            $function = array( __CLASS__, 'display_ui' ),
+            $icon = 'dashicons-forms',
+            '57.5'
+          );
+        }
+
+      }
+    );
 
 
   }
