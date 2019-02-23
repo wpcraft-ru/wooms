@@ -476,18 +476,23 @@ class Categories {
   public static function setting_request_category() {
 
     $offset      = 0;
-    $limit       = 200;
+    $limit       = 100;
     $ms_api_args = apply_filters( 'wooms_product_ms_api_arg_category', array(
       'offset' => $offset,
       'limit'  => $limit,
     ) );
-    $url         = apply_filters( 'wooms_product_ms_api_url_category', 'https://online.moysklad.ru/api/remap/1.1/entity/productfolder' );
-    $url_api     = add_query_arg( $ms_api_args, $url );
+    $url     = 'https://online.moysklad.ru/api/remap/1.1/entity/productfolder';
+    $url     = add_query_arg( $ms_api_args, $url );
 
-    if ( ! $data = get_transient( 'wooms_settings_categories' ) ) {
-      $data = wooms_request( $url_api );
-      set_transient( 'wooms_settings_categories', $data, 60 );
+    if( $path_filter = get_option('wooms_filter_for_select_group') ){
+      $url     = add_query_arg( 'filter=pathName', $path_filter, $url );
+    } else {
+      $url     = add_query_arg( 'filter=pathName', '=', $url );
     }
+
+    $url     = apply_filters( 'wooms_product_ms_api_url_category', $url );
+
+    $data = wooms_request( $url );
 
     if ( empty( $data['rows'] ) ) {
       return false;
@@ -512,9 +517,6 @@ class Categories {
       ),
     ) );
 
-    // if($id == '782608d7-fdb9-11e7-7a69-93a70012c996'){
-    // }
-
     if ( is_wp_error($terms) or empty($terms) ){
       return false;
     } else {
@@ -525,7 +527,6 @@ class Categories {
           return false;
         }
       }
-      // return $terms[0]->term_id;
     }
   }
 
@@ -609,11 +610,6 @@ class Categories {
       $section = 'wooms_product_cat'
     );
 
-    //
-    // if ( get_option( 'woomss_categories_sync_enabled' ) ) {
-    //   return;
-    // }
-
     register_setting( 'mss-settings', 'woomss_include_categories_sync' );
     add_settings_field(
       'woomss_include_categories_sync',
@@ -623,8 +619,32 @@ class Categories {
       'wooms_product_cat'
     );
 
+    register_setting( 'mss-settings', 'wooms_filter_for_select_group' );
+    add_settings_field(
+      $id = 'wooms_filter_for_select_group',
+      $title = 'Название группы для фильтрации дочерних групп',
+      $callback = array(__CLASS__, 'display_wooms_filter_for_select_group'),
+      $page = 'mss-settings',
+      $section = 'wooms_product_cat'
+    );
+
   }
 
+  /**
+   * Display field
+   */
+  public static function display_wooms_filter_for_select_group() {
+
+    $option = 'wooms_filter_for_select_group';
+    printf( '<input type="text" name="%s" value="%s" />', $option, get_option( $option ) );
+    ?>
+    <p><small>Напишите тут название группы, если нужно отфильтровать поле ниже.</small></p>
+    <p><small>Пример 1: если нужная группа "Телефоны" находится внутри группы "Электроника", то тут нужно написать: <strong>Электроника</strong></small></p>
+    <p><small>Пример 2: если нужная группа "Аксессуары" находится внутри групп "Компьютеры/Ноутбуки", то тут нужно написать: <strong>Компьютеры/Ноутбуки</strong></small></p>
+    <p><small>После этого в нижнем поле отобразится список подгрупп с учетом данного фильтра.</small></p>
+    <?php
+
+  }
   /**
    * Display field
    */
