@@ -15,6 +15,7 @@ final class Logger {
   public static function init(){
     add_action('admin_init', array(__CLASS__, 'init_settings_page'));
     add_action('wooms_logger', array(__CLASS__, 'add_log'), 10, 3);
+    add_action('wooms_logger_error', array(__CLASS__, 'add_log_error'), 10, 3);
 
     add_action('admin_menu', function(){
       if(get_option('wooms_logger_enable')){
@@ -23,6 +24,36 @@ final class Logger {
         $submenu['moysklad'][] = array( 'Журнал', 'manage_options', $permalink );
       }
     }, 111);
+
+  }
+
+  /**
+   * add_log_error
+   */
+  public static function add_log_error($type = '', $title = '', $description = ''){
+    if( ! get_option('wooms_logger_enable') ){
+      return;
+    }
+
+
+    $data = '';
+
+    $data .= $title;
+
+    $description = wp_trim_words( $description, $num_words = 300, $more = null );
+    if( ! empty($description) ){
+      $data .= ': ' . wc_print_r( $description, true );
+    }
+
+    $source = 'wooms';
+    if( ! empty($type) ){
+      $type = str_replace('\\', '-', $type);
+      $source .= '-' . $type;
+    }
+
+    $logger = wc_get_logger();
+    $context = array( 'source' => $source );
+    $logger->error( $data, $context );
 
   }
 
@@ -46,6 +77,7 @@ final class Logger {
 
     $source = 'wooms';
     if( ! empty($type) ){
+      $type = str_replace('\\', '-', $type);
       $source .= '-' . $type;
     }
 

@@ -86,24 +86,11 @@ class Categories {
       $result = $product->set_category_ids(array($term_id));
 
       if(is_wp_error($result)){
-        do_action('wooms_logger',
-          'error_set_product_cat',
-          $result->get_error_code(),
-          $result->get_error_message()
-        );
+        do_action('wooms_logger_error', __CLASS__, $result->get_error_code(), $result->get_error_message() );
       } elseif($result === false) {
-        do_action('wooms_logger',
-          'error_set_product_cat',
-          'Не удалось выбрать термин',
-          $term_id
-        );
+        do_action('wooms_logger_error', __CLASS__, 'Не удалось выбрать термин', $term_id );
       } else {
-        do_action(
-          'wooms_logger',
-          'set_product_cat',
-          sprintf('Выбран термин %s, для продукта %s', $term_id, $product_id),
-          sprintf('Данные результата: %s', PHP_EOL . $url)
-        );
+        do_action( 'wooms_logger', __CLASS__, sprintf('Выбран термин %s, для продукта %s (url: %s)', $term_id, $product_id, $url) );
       }
     }
 
@@ -192,15 +179,10 @@ class Categories {
             $msg = $term->get_error_message();
             $msg .= PHP_EOL . print_r($args, true);
           }
-          do_action('wooms_logger',
-            'error_add_product_cat',
-            $term->get_error_code(),
-            $msg
-          );
+          do_action('wooms_logger_error', __CLASS__, $term->get_error_code(), $msg );
         } else {
-          do_action(
-            'wooms_logger',
-            'add_product_cat',
+          do_action( 'wooms_logger',
+            __CLASS__,
             sprintf('Добавлен термин %s', $term_new['name']),
             sprintf('Результат обработки %s', PHP_EOL . print_r($term, true))
           );

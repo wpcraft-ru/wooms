@@ -84,7 +84,9 @@ class Walker {
     }
 
     if ( empty(intval( $product_id )) ) {
-      do_action('wooms_logger', 'error-walker-base', 'Ошибка определения и добавления ИД продукта', $value );
+      do_action('wooms_logger_error', __CLASS__,
+        'Ошибка определения и добавления ИД продукта', $value
+      );
       return;
     }
 
@@ -98,7 +100,9 @@ class Walker {
     $product = apply_filters('wooms_product_save', $product, $value, $data);
     $product_id = $product->save();
 
-    do_action('wooms_logger', 'walker-base', sprintf('Продукт %s сохранен', $product_id));
+    do_action('wooms_logger', __CLASS__,
+      sprintf('Продукт: %s (%s) сохранен', $product->get_title(), $product_id)
+    );
 
   }
 
@@ -355,7 +359,7 @@ class Walker {
       set_transient( 'wooms_start_timestamp', time() );
       $data = wooms_request( $url_api );
 
-      do_action('wooms_logger', 'walker-base', sprintf('Отправлен запрос %s', $url_api) );
+      do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url_api) );
 
       //Check for errors and send message to UI
       if ( isset( $data['errors'] ) ) {
@@ -406,7 +410,7 @@ class Walker {
       delete_transient( 'wooms_start_timestamp' );
       set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
 
-      set_transient( 'wooms_error_background', $e->getMessage() );
+      do_action('wooms_logger_error', __CLASS__, 'Главный обработчик завершился с ошибкой' . $e->getMessage() );
     }
   }
 
@@ -420,7 +424,7 @@ class Walker {
     delete_transient( 'wooms_error_background' );
     do_action('wooms_main_walker_started');
 
-    do_action('wooms_logger', 'walker-base', 'Старт основного волкера: ' . $timestamp );
+    do_action('wooms_logger', __CLASS__, 'Старт основного волкера: ' . $timestamp );
 
   }
 
