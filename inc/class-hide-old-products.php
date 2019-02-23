@@ -53,7 +53,6 @@ class Hiding {
 
   }
 
-
   /**
    * Cron task restart
    */
@@ -81,7 +80,7 @@ class Hiding {
       return;
     }
 
-    self::set_hide_old_product();
+    self::set_hidden_old_product();
 
   }
 
@@ -111,7 +110,7 @@ class Hiding {
   /**
    * Adding hiding attributes to products
    */
-  public static function set_hide_old_product() {
+  public static function set_hidden_old_product() {
     if ( ! $offset = get_transient( 'wooms_offset_hide_product' ) ) {
       $offset = 0;
       set_transient( 'wooms_offset_hide_product', $offset );
@@ -141,9 +140,8 @@ class Hiding {
       $product->save();
 
       do_action('wooms_logger',
-        'products_hiding',
-        sprintf('Скрытие продукта: %s', $product_id),
-        sprintf('Данные %s', PHP_EOL . print_r($product, true))
+        'products-hiding',
+        sprintf('Скрытие продукта: %s', $product_id)
       );
 
       $i++;
