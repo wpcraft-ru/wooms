@@ -112,8 +112,6 @@ class Walker {
   public static function update_product( $product, $data_of_source, $data )
   {
     $product_id = $product->get_id();
-    // $product = new \WC_Product_Simple($product);
-    //XXX заменить на что то более стабильное
 
     //save data of source
     $product->update_meta_data( 'wooms_data_of_source', print_r( $data_of_source, true ) );
