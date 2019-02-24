@@ -347,17 +347,19 @@ class Walker {
       'scope'  => 'product',
     );
 
-    $url = add_query_arg( $ms_api_args, 'https://online.moysklad.ru/api/remap/1.1/entity/assortment' );
+    $url = 'https://online.moysklad.ru/api/remap/1.1/entity/assortment';
 
-    $url_api = apply_filters('wooms_url_get_products', $url);
+    $url = add_query_arg( $ms_api_args, $url );
+
+    $url = apply_filters('wooms_url_get_products', $url);
 
     try {
 
       delete_transient( 'wooms_end_timestamp' );
       set_transient( 'wooms_start_timestamp', time() );
-      $data = wooms_request( $url_api );
+      $data = wooms_request( $url );
 
-      do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url_api) );
+      do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url) );
 
       //Check for errors and send message to UI
       if ( isset( $data['errors'] ) ) {

@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 4.9
- * WooMS XT Latest: 4.9
+ * Version: 4.10
+ * WooMS XT Latest: 4.10
  */
 
 // Exit if accessed directly
@@ -282,8 +282,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
   if ( is_wp_error( $request ) ) {
     set_transient( 'wooms_error_background', $request->get_error_message() );
     do_action(
-      'wooms_logger',
-      $type = 'error_request_api',
+      'wooms_logger_error',
+      $type = 'Request',
       $title = 'Ошибка REST API',
       $desc = $request->get_error_message()
     );
@@ -293,8 +293,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
   if ( empty( $request['body'] ) ) {
     set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
     do_action(
-      'wooms_logger',
-      $type = 'error_request_api',
+      'wooms_logger_error',
+      $type = 'Request',
       $title = 'REST API вернулся без требуемых данных',
       $desc = ''
     );

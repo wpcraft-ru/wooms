@@ -76,7 +76,7 @@ class Hiding {
       return;
     }
 
-    if(get_transient('wooms_products_old_hide_pause')){
+    if( get_transient('wooms_products_old_hide_pause') ){
       return;
     }
 
