@@ -72,7 +72,7 @@ class Hiding {
     }
 
     //Если работает синк товаров, то блокируем работу
-    if( ! empty(get_option('wooms_start_timestamp'))){
+    if( ! empty(get_transient('wooms_start_timestamp'))){
       return;
     }
 
@@ -139,10 +139,7 @@ class Hiding {
       // $product->set_stock_status( 'outofstock' );
       $product->save();
 
-      do_action('wooms_logger',
-        'products-hiding',
-        sprintf('Скрытие продукта: %s', $product_id)
-      );
+      do_action('wooms_logger', __CLASS__, sprintf('Скрытие продукта: %s', $product_id) );
 
       $i++;
 
