@@ -27,11 +27,9 @@ class Categories {
     if ( ! empty( get_option( 'woomss_include_categories_sync' ) ) ) {
 
       add_filter( 'wooms_url_get_products', array( __CLASS__, 'add_filter_by_folder' ), 10 );
-      add_filter( 'wooms_url_get_variants', array( __CLASS__, 'add_filter_by_folder' ), 10 );
+      // add_filter( 'wooms_url_get_variants', array( __CLASS__, 'add_filter_by_folder' ), 10 );
 
       add_action( 'wooms_main_walker_started', array( __CLASS__, 'delete_parent_category' ) );
-
-      // add_shortcode('test', array(__CLASS__, 'delete_parent_category'));
 
       add_action( 'wooms_update_category', array( __CLASS__, 'update_meta_session_term' ) );
 
