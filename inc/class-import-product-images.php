@@ -224,8 +224,8 @@ class Images {
             $file = file_get_contents( $info['url'] );//если редирект есть то скачиваем файл по ссылке
 
             if( ! $file ){
-              do_action('wooms_logger',
-                'error_download_image_by_url',
+              do_action('wooms_logger_error',
+                __CLASS__,
                 'Загрузка картинки - не удалось закачать файл',
                 sprintf('Данные %s', PHP_EOL . print_r($info['url'], true))
               );
@@ -259,8 +259,8 @@ class Images {
         // If error storing permanently, unlink.
         if ( is_wp_error( $file_data ) ) {
             @unlink( $tmpfname );
-            do_action('wooms_logger',
-              'error_get_tmpfname_image_download',
+            do_action('wooms_logger_error',
+              __CLASS__,
               'Загрузка картинки - не удалось получить файл',
               sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
             );
@@ -269,8 +269,8 @@ class Images {
         }
 
         if(empty($file_data['url'])){
-          do_action('wooms_logger',
-            'error_get_url_image_download',
+          do_action('wooms_logger_error',
+            __CLASS__,
             'Загрузка картинки - не удалось получить URL',
             sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
           );
