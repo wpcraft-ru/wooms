@@ -16,20 +16,20 @@ class Images {
      */
     public static function init() {
 
-    /**
-     * Обновление данных о продукте
-     */
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 35, 3);
+      /**
+       * Обновление данных о продукте
+       */
+      add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 35, 3);
 
-        add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
+      add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
 
-        add_filter( 'cron_schedules', array( __CLASS__, 'add_schedule' ) );
-        add_action( 'init', array( __CLASS__, 'add_cron_hook' ) );
+      add_filter( 'cron_schedules', array( __CLASS__, 'add_schedule' ) );
+      add_action( 'init', array( __CLASS__, 'add_cron_hook' ) );
 
-        add_action( 'wooms_cron_image_downloads', array( __CLASS__, 'download_images_from_metafield' ) );
+      add_action( 'wooms_cron_image_downloads', array( __CLASS__, 'download_images_from_metafield' ) );
 
-        add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'ui_for_manual_start' ), 15 );
-        add_action( 'woomss_tool_actions_wooms_products_images_manual_start', array( __CLASS__, 'ui_action' ) );
+      add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'ui_for_manual_start' ), 15 );
+      add_action( 'woomss_tool_actions_wooms_products_images_manual_start', array( __CLASS__, 'ui_action' ) );
 
     }
 

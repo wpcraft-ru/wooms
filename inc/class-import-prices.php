@@ -18,26 +18,34 @@ class Prices {
       /**
       * Обновление данных о ценах
       */
-      add_filter( 'wooms_product_price', array( __CLASS__, 'chg_price' ), 10, 2 );
+      add_filter( 'wooms_product_price', array( __CLASS__, 'chg_price' ), 10, 3 );
       add_action( 'admin_init', array( __CLASS__, 'settings_init' ), $priority = 101, $accepted_args = 1 );
+
+
     }
 
     /**
      * Update prices for product
      * Check specifiec price and replace if isset price
      */
-    public static function chg_price( $price, $data ) {
+    public static function chg_price( $price, $data, $product_id ) {
 
         $price_name = get_option( 'wooms_price_id' );
         if ( empty( $price_name ) ) {
             return $price;
         } else {
-            $price_value = self::get_value_for_price_type( $data );
-            if ( empty( $price_value ) ) {
-                return $price;
-            } else {
-                return $price_value;
-            }
+
+          $price_value = self::get_value_for_price_type( $data );
+
+          do_action('wooms_logger', __CLASS__,
+            sprintf('Выбрана цена "%s" = %s. Для продукта ИД: %s', $price_name, $price_value, $product_id)
+          );
+
+          if ( empty( $price_value ) ) {
+              return $price;
+          } else {
+              return $price_value;
+          }
         }
     }
 
@@ -51,6 +59,7 @@ class Prices {
         if ( empty( $price_name ) ) {
             return 0;
         }
+
         $price_value = 0;
         foreach ( $data["salePrices"] as $price ) {
             if ( $price["priceType"] == $price_name ) {

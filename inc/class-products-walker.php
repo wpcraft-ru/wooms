@@ -25,7 +25,7 @@ class Walker {
 
     //Product data
     add_action( 'wooms_product_import_row', array( __CLASS__, 'load_product' ), 10, 3 );
-    add_filter( 'wooms_product_save', array( __CLASS__, 'update_product' ), 10, 3 );
+    add_filter( 'wooms_product_save', array( __CLASS__, 'update_product' ), 9, 3 );
 
     //UI and actions manually
     add_action( 'woomss_tool_actions_btns', array( __CLASS__, 'display_wrapper' ) );
@@ -93,11 +93,15 @@ class Walker {
     $product = wc_get_product($product_id);
 
     /**
+     * rename vars
+     */
+    $data_api = $value;
+    /**
      * Хук позволяет работать с методами WC_Product
      * Сохраняет в БД все изменения за 1 раз
      * Снижает нагрузку на БД
      */
-    $product = apply_filters('wooms_product_save', $product, $value, $data);
+    $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
     $product_id = $product->save();
 
     do_action('wooms_logger', __CLASS__,
@@ -109,8 +113,10 @@ class Walker {
   /**
    * Update product from source data
    */
-  public static function update_product( $product, $data_of_source, $data )
+  public static function update_product( $product, $data_api, $data = 'deprecated' )
   {
+
+    $data_of_source = $data_api;
     $product_id = $product->get_id();
 
     //save data of source
@@ -154,7 +160,7 @@ class Walker {
     //Price Retail 'salePrices'
     if ( isset( $data_of_source['salePrices'][0]['value'] ) ) {
       $price_source = floatval( $data_of_source['salePrices'][0]['value'] );
-      $price        = apply_filters( 'wooms_product_price', $price_source, $data_of_source );
+      $price        = apply_filters( 'wooms_product_price', $price_source, $data_api, $product_id );
 
       $price = $price / 100;
 
