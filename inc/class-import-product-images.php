@@ -165,6 +165,14 @@ class Images {
                 delete_post_meta( $value->ID, 'wooms_url_for_get_thumbnail' );
                 delete_post_meta( $value->ID, 'wooms_image_data' );
                 $result[] = $value->ID;
+
+                do_action('wooms_logger', __CLASS__,
+                  sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $value->ID, $check_id, $image_name )
+                );
+            } else {
+              do_action('wooms_logger_error', __CLASS__,
+                sprintf('Ошибка назначения картинки для продукта %s (url %s, filename: %s)', $value->ID, $url, $image_name )
+              );
             }
 
         }
@@ -215,6 +223,7 @@ class Images {
             require_once( ABSPATH . 'wp-admin/includes/image.php' );
         }
 
+        $file_name = sanitize_file_name($file_name);
         $tmpfname = wp_tempnam( $file_name );
         $fh       = fopen( $tmpfname, 'w' );
 
