@@ -425,7 +425,12 @@ class Categories {
     $checked_choice   = get_option( 'woomss_include_categories_sync' );
     $request_category = self::setting_request_category();
 
-    if ( $request_category && is_array( $request_category ) ) {
+
+    if ( is_wp_error($request_category) ) {
+
+      printf('<p><strong>%s</strong></p>', $request_category->get_error_message());
+
+    } elseif ( $request_category && is_array( $request_category ) ) {
 
       echo '<select class="woomss_include_categories_sync" name="woomss_include_categories_sync">';
       echo '<option value="">Выберите группу</option>';
@@ -491,6 +496,12 @@ class Categories {
     $url     = apply_filters( 'wooms_product_ms_api_url_category', $url );
 
     $data = wooms_request( $url );
+
+    if( ! empty($data["errors"][0]["error"]) ){
+      $error_msg = $data["errors"][0]["error"];
+      $error_code = $data["errors"][0]["code"];
+      return new \WP_Error($error_code, $error_msg);
+    }
 
     if ( empty( $data['rows'] ) ) {
       return false;
