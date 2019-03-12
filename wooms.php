@@ -247,6 +247,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 
     return false;
   }
+
   if ( empty( $request['body'] ) ) {
     set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
     do_action(
@@ -258,7 +259,18 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 
     return false;
   }
+
   $response = json_decode( $request['body'], true );
+
+  if( ! empty($response["errors"]) and is_array($response["errors"]) ){
+    foreach ($response["errors"] as $error) {
+      do_action(
+        'wooms_logger_error',
+        $type = 'Request',
+        $title = $error['error']
+      );
+    }
+  }
 
   return $response;
 }
