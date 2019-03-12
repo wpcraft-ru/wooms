@@ -200,49 +200,6 @@ class WooMS_Core {
 
 WooMS_Core::init();
 
-
-
-
-
-
-/**
- * Helper function for get data from moysklad.ru
- */
-function wooms_get_data_by_url( $url = '' ) {
-
-  if ( empty( $url ) ) {
-    return false;
-  }
-
-  $base64_string = base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) );
-  $args = array(
-    'timeout' => 45,
-    'headers' => array(
-      'Authorization' => 'Basic ' . $base64_string,
-    ),
-  );
-
-  $response = wp_remote_get( $url, $args );
-  if ( is_wp_error( $response ) ) {
-    set_transient( 'wooms_error_background', $response->get_error_message() );
-
-    return false;
-  }
-  if ( empty( $response['body'] ) ) {
-    set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
-
-    return false;
-  }
-  $data = json_decode( $response['body'], true );
-  if ( empty( $data ) ) {
-    set_transient( 'wooms_error_background', "REST API вернулся без JSON данных" );
-
-    return false;
-  } else {
-    return $data;
-  }
-}
-
 /**
  * Helper new function for responses data from moysklad.ru
  *
