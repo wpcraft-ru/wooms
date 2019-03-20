@@ -447,8 +447,7 @@ class Categories {
         } elseif ( is_array( $path_name ) && ( count( $path_name ) >= 2 ) ) {
           $path_name_margin = '&mdash;&mdash;&nbsp;';
         }
-        printf( '<option value="%s" %s>%s</option>', esc_attr( $value['meta']['href'] ), selected( $checked_choice, $value['meta']['href'], false ), $path_name_margin .
-                                                                                                                                                     $value['name'] );
+        printf( '<option value="%s" %s>%s</option>', esc_attr( $value['meta']['href'] ), selected( $checked_choice, $value['meta']['href'], false ), $path_name_margin . $value['name'] );
 
       }
       echo '</select>';
