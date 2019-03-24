@@ -435,11 +435,9 @@ class Walker {
     $timestamp = date( "YmdHis" );
     update_option( 'wooms_session_id', $timestamp, 'no' ); //set id session sync
     delete_transient( 'wooms_count_stat' );
-    delete_transient( 'wooms_error_background' );
+
     do_action('wooms_main_walker_started');
-
     do_action('wooms_logger', __CLASS__, 'Старт основного волкера: ' . $timestamp );
-
   }
 
   /**
@@ -488,7 +486,6 @@ class Walker {
    */
   public static function start_manually() {
     delete_transient( 'wooms_start_timestamp' );
-    delete_transient( 'wooms_error_background' );
     delete_transient( 'wooms_offset' );
     delete_transient( 'wooms_end_timestamp' );
     delete_transient( 'wooms_walker_stop' );
@@ -528,13 +525,6 @@ class Walker {
 
     }
 
-    $errors = get_transient( 'wooms_error_background' );
-    if(empty($errors)){
-      $errors = 'не обнаружено';
-  } else {
-      $errors = sprintf('<strong>%s</strong>', $errors);
-  }
-
     $session = get_option( 'wooms_session_id' );
     if(empty($session)){
       $session = 'отсутствует';
@@ -553,7 +543,6 @@ class Walker {
         <p>Статус: <?= $state ?></p>
         <p>Сессия (номер/дата): <?= $session ?></p>
         <p>Последняя успешная синхронизация (отметка времени): <?= $end_timestamp ?></p>
-        <p>Ошибки: <?= $errors ?></p>
         <p>Количество обработанных записей: <?php echo get_transient( 'wooms_count_stat' ); ?></p>
         <?php do_action('wooms_products_state_before'); ?>
         <?php if( ! empty($time_string) ): ?>

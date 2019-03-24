@@ -69,6 +69,7 @@ class WooMS_Core {
       require_once 'inc/class-menu-tool.php';
       require_once 'inc/class-products-walker.php';
       require_once 'inc/class-import-product-images.php';
+      require_once 'inc/class-import-product-categories.php';
       require_once 'inc/class-import-prices.php';
       require_once 'inc/class-hide-old-products.php';
 
@@ -236,7 +237,6 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 
   $request = wp_remote_request( $url, $args);
   if ( is_wp_error( $request ) ) {
-    set_transient( 'wooms_error_background', $request->get_error_message() );
     do_action(
       'wooms_logger_error',
       $type = 'Request',
@@ -248,12 +248,10 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
   }
 
   if ( empty( $request['body'] ) ) {
-    set_transient( 'wooms_error_background', "REST API вернулся без требуемых данных" );
     do_action(
       'wooms_logger_error',
       $type = 'Request',
-      $title = 'REST API вернулся без требуемых данных',
-      $desc = ''
+      $title = 'REST API вернулся без требуемых данных'
     );
 
     return false;
