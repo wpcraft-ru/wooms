@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 4.12
- * WooMS XT Latest: 4.12
+ * Version: 5.0
+ * WooMS XT Latest: 5.0
  */
 
 // Exit if accessed directly
@@ -68,7 +68,6 @@ class WooMS_Core {
       require_once 'inc/class-menu-settings.php';
       require_once 'inc/class-menu-tool.php';
       require_once 'inc/class-products-walker.php';
-      require_once 'inc/class-import-product-categories.php';
       require_once 'inc/class-import-product-images.php';
       require_once 'inc/class-import-prices.php';
       require_once 'inc/class-hide-old-products.php';

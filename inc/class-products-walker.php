@@ -394,13 +394,21 @@ class Walker {
 
       $i = 0;
       foreach ( $data['rows'] as $key => $value ) {
+        $i++;
 
         if( apply_filters('wooms_skip_product_import', false, $value) ){
           continue;
         }
 
+        /**
+         * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+         * птм нужна проверка что это точно продукт
+         */
+        if('product' != $value["meta"]["type"]){
+          continue;
+        }
+
         do_action( 'wooms_product_import_row', $value, $key, $data );
-        $i++;
       }
 
       if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
