@@ -184,7 +184,7 @@ class Walker {
    */
   public static function add_meta_boxes_post_type()
   {
-    add_meta_box( 'metabox_product', 'МойСклад', array( __CLASS__, 'display_metabox_for_product' ), 'product', 'side', 'low' );
+    add_meta_box( 'wooms_product', 'МойСклад', array( __CLASS__, 'display_metabox_for_product' ), 'product', 'side', 'low' );
   }
 
   /**
@@ -197,20 +197,21 @@ class Walker {
     $data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
     $data_updated = get_post_meta( $post->ID, 'wooms_updated', true );
     if ( $data_id ) {
-      $box_data = sprintf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
+      printf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
     } else {
-      $box_data = '<p>Товар еще не синхронизирован с МойСклад.</p> <p>Ссылка на товар отсутствует</p>';
+      echo '<p>Товар еще не синхронизирован с МойСклад.</p> <p>Ссылка на товар отсутствует</p>';
     }
 
     if ( $data_meta ) {
-      $box_data .= sprintf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
+      printf( '<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref'] );
     }
 
     if ( $data_updated ) {
-      $box_data .= sprintf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
+      printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
     }
 
-    echo $box_data;
+    do_action('wooms_display_product_metabox', $post);
+    // echo $box_data;
   }
 
   /**
@@ -408,6 +409,11 @@ class Walker {
           continue;
         }
 
+        do_action( 'wooms_product_data_item', $value );
+
+        /**
+         * deprecated - for remove
+         */
         do_action( 'wooms_product_import_row', $value, $key, $data );
       }
 
