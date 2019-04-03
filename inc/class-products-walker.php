@@ -210,7 +210,7 @@ class Walker {
       printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
     }
 
-    do_action('wooms_display_product_metabox', $post);
+    do_action('wooms_display_product_metabox', $post->ID);
     // echo $box_data;
   }
 
