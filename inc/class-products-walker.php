@@ -380,10 +380,20 @@ class Walker {
       }
 
       //If no rows, that send 'end' and stop walker
-      if ( empty( $data['rows'] ) ) {
+      if ( isset($data['rows']) && empty( $data['rows'] ) ) {
         self::walker_finish();
 
         return true;
+      }
+
+      if(empty( $data['rows'] )){
+
+        do_action('wooms_logger_error', __CLASS__,
+          'Ошибка - пустой data row',
+          print_r($data, true)
+        );
+
+        return false;
       }
 
       do_action( 'wooms_walker_start_iteration', $data );
