@@ -382,7 +382,6 @@ class Walker {
       //If no rows, that send 'end' and stop walker
       if ( isset($data['rows']) && empty( $data['rows'] ) ) {
         self::walker_finish();
-
         return true;
       }
 
