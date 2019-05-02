@@ -14,18 +14,8 @@ class Hiding {
   /**
    * The init
    */
-  public static function init() {
-
-    add_shortcode('test', function(){
-
-      // do_action('wooms_cron_clear_old_products_walker');
-
-      // $d = wp_get_post_terms(20788, 'product_visibility');
-      // echo '<pre>';
-      // var_dump($d);
-
-    });
-
+  public static function init()
+  {
     add_action( 'init', array( __CLASS__, 'cron_init' ) );
     add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
 
@@ -108,8 +98,6 @@ class Hiding {
       return;
     }
 
-    $i = 0;
-
     foreach ( $products as $product_id ) {
       $product = wc_get_product( $product_id );
 
@@ -122,9 +110,9 @@ class Hiding {
       // $product->set_stock_status( 'outofstock' );
       $product->save();
 
-      do_action('wooms_logger', __CLASS__, sprintf('Скрытие продукта: %s', $product_id) );
-
-      $i++;
+      do_action('wooms_logger', __CLASS__,
+        sprintf('Скрытие продукта: %s', $product_id)
+      );
 
     }
 
