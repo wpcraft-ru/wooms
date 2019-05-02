@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 5.1
- * WooMS XT Latest: 5.1
+ * Version: 5.2
+ * WooMS XT Latest: 5.2
  */
 
 // Exit if accessed directly
