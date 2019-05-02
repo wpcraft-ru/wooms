@@ -40,9 +40,10 @@ final class Logger {
 
     $data .= $title;
 
-    $description = wp_trim_words( $description, $num_words = 300, $more = null );
     if( ! empty($description) ){
-      $data .= ': ' . wc_print_r( $description, true );
+      $description = wc_print_r( $description, true );
+      $description = wp_trim_words( $description, $num_words = 300, $more = null );
+      $data .= ': ' . $description;
     }
 
     $source = 'wooms';
