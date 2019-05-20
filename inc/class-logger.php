@@ -43,7 +43,7 @@ final class Logger {
     if( ! empty($description) ){
       $description = wc_print_r( $description, true );
       $description = wp_trim_words( $description, $num_words = 300, $more = null );
-      $data .= ': ' . $description;
+      $data .= ': ' . '<pre>' . $description . '</pre>';
     }
 
     $source = 'wooms';

@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 5.2
- * WooMS XT Latest: 5.2
+ * Version: 5.3
+ * WooMS XT Latest: 5.3
  */
 
 // Exit if accessed directly
@@ -53,11 +53,14 @@ class WooMS_Core {
      */
     register_activation_hook( __FILE__, function(){
       do_action('wooms_activate');
-
     });
 
     register_deactivation_hook( __FILE__, function(){
       do_action('wooms_deactivate');
+    });
+
+    add_filter('woocommerce_status_log_items_per_page', function($per_page){
+      return 100;
     });
 
     add_action('plugins_loaded', function(){
