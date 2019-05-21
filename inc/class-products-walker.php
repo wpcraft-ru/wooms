@@ -505,6 +505,9 @@ class Walker {
     delete_transient( 'wooms_end_timestamp' );
     delete_transient( 'wooms_walker_stop' );
     set_transient( 'wooms_manual_sync', 1 );
+
+    do_action('wooms_products_sync_manual_start');
+
     self::walker();
     wp_redirect( admin_url( 'admin.php?page=moysklad' ) );
   }
