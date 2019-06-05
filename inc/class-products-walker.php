@@ -219,7 +219,7 @@ class Walker {
    */
   public static function get_product_id_by_uuid( $uuid ) {
 
-    $posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
+    $posts = get_posts( 'post_type=product&post_status=any&meta_key=wooms_id&meta_value=' . $uuid );
 
     if ( empty( $posts[0]->ID ) ) {
       return false;
@@ -434,10 +434,8 @@ class Walker {
 
       set_transient( 'wooms_offset', $offset + $i );
 
-      return;
     } catch ( \Exception $e ) {
       delete_transient( 'wooms_start_timestamp' );
-      set_transient( 'wooms_end_timestamp', date( "Y-m-d H:i:s" ), $timer );
 
       do_action('wooms_logger_error', __CLASS__, 'Главный обработчик завершился с ошибкой' . $e->getMessage() );
     }
