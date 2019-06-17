@@ -217,7 +217,7 @@ class Walker {
   /**
    * get_product_id_by_uuid
    */
-  public static function get_product_id_by_uuid( $uuid ) {
+  public static function get_product_id_by_uuid( $uuid ){
 
     $posts = get_posts( 'post_type=product&post_status=any&meta_key=wooms_id&meta_value=' . $uuid );
 
