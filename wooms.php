@@ -278,6 +278,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 /**
  * Get product id by UUID from metafield
  * or false
+ *
+ * XXX move to \WooMS\Products\Bundle::get_product_id_by_uuid
  */
 function wooms_get_product_id_by_uuid( $uuid ) {
 
