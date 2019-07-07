@@ -331,115 +331,124 @@ class Walker {
     }
   }
 
-  /**
-   * Walker for data from MoySklad
-   */
-  public static function walker() {
-    //Check stop tag and break the walker
-    if ( self::check_stop_manual() ) {
-      return;
-    }
-
-    $count = apply_filters( 'wooms_iteration_size', 20 );
-    if ( ! $offset = get_transient( 'wooms_offset' ) ) {
-      $offset = 0;
-      self::walker_started();
-      set_transient( 'wooms_offset', $offset );
-
-    }
-
-    $ms_api_args = array(
-      'offset' => $offset,
-      'limit'  => $count,
-      'scope'  => 'product',
-    );
-
-    $url = 'https://online.moysklad.ru/api/remap/1.1/entity/assortment';
-
-    $url = add_query_arg( $ms_api_args, $url );
-
-    $url = apply_filters('wooms_url_get_products', $url);
-
-    try {
-
-      delete_transient( 'wooms_end_timestamp' );
-      set_transient( 'wooms_start_timestamp', time() );
-      $data = wooms_request( $url );
-
-      do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url) );
-
-      //Check for errors and send message to UI
-      if ( isset( $data['errors'] ) ) {
-        $error_code = $data['errors'][0]["code"];
-        if ( $error_code == 1056 ) {
-          $msg = sprintf( 'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>', $error_code, admin_url( 'admin.php?page=mss-settings' ) );
-          throw new \Exception( $msg );
-        } else {
-          throw new \Exception( $error_code . ': ' . $data['errors'][0]["error"] );
+    /**
+     * Walker for data from MoySklad
+     */
+    public static function walker()
+    {
+        //Check stop tag and break the walker
+        if (self::check_stop_manual()) {
+            return;
         }
-      }
 
-      //If no rows, that send 'end' and stop walker
-      if ( isset($data['rows']) && empty( $data['rows'] ) ) {
-        self::walker_finish();
-        return true;
-      }
+        $count = apply_filters('wooms_iteration_size', 20);
+        if ( ! $offset = get_transient('wooms_offset')) {
+            $offset = 0;
+            self::walker_started();
+            set_transient('wooms_offset', $offset);
+        }
 
-      if(empty( $data['rows'] )){
-
-        do_action('wooms_logger_error', __CLASS__,
-          'Ошибка - пустой data row',
-          print_r($data, true)
+        $ms_api_args = array(
+            'offset' => $offset,
+            'limit'  => $count,
+            'scope'  => 'product',
         );
 
-        return false;
-      }
+        $url = 'https://online.moysklad.ru/api/remap/1.1/entity/assortment';
 
-      do_action( 'wooms_walker_start_iteration', $data );
+        $url = add_query_arg($ms_api_args, $url);
 
-      /**
-       * @TODO: deprecated. remove after tests
-       */
-      do_action( 'wooms_walker_start' );
+        $url = apply_filters('wooms_url_get_products', $url);
 
-      $i = 0;
-      foreach ( $data['rows'] as $key => $value ) {
-        $i++;
+        try {
 
-        if( apply_filters('wooms_skip_product_import', false, $value) ){
-          continue;
+            delete_transient('wooms_end_timestamp');
+            set_transient('wooms_start_timestamp', time());
+            $data = wooms_request($url);
+
+            do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
+
+            //Check for errors and send message to UI
+            if (isset($data['errors'])) {
+                $error_code = $data['errors'][0]["code"];
+                if ($error_code == 1056) {
+                    $msg = sprintf('Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>',
+                        $error_code, admin_url('admin.php?page=mss-settings'));
+                    throw new \Exception($msg);
+                } else {
+                    throw new \Exception($error_code . ': ' . $data['errors'][0]["error"]);
+                }
+            }
+
+            //If no rows, that send 'end' and stop walker
+            if (isset($data['rows']) && empty($data['rows'])) {
+                self::walker_finish();
+
+                return true;
+            }
+
+            if (empty($data['rows'])) {
+
+                do_action('wooms_logger_error', __CLASS__,
+                    'Ошибка - пустой data row',
+                    print_r($data, true)
+                );
+
+                return false;
+            }
+
+            do_action('wooms_walker_start_iteration', $data);
+
+            /**
+             * @TODO: deprecated. remove after tests
+             */
+            do_action('wooms_walker_start');
+
+            $i = 0;
+            foreach ($data['rows'] as $key => $value) {
+                $i++;
+
+                if (apply_filters('wooms_skip_product_import', false, $value)) {
+                    continue;
+                }
+
+                /**
+                 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+                 * птм нужна проверка что это точно продукт
+                 */
+                if ('product' != $value["meta"]["type"]) {
+                    continue;
+                }
+
+                do_action('wooms_product_data_item', $value);
+
+                /**
+                 * deprecated - for remove
+                 */
+                do_action('wooms_product_import_row', $value, $key, $data);
+            }
+
+            if ($count_saved = get_transient('wooms_count_stat')) {
+                set_transient('wooms_count_stat', $i + $count_saved);
+            } else {
+                set_transient('wooms_count_stat', $i);
+            }
+
+            set_transient('wooms_offset', $offset + $i);
+
+        } catch (\Exception $e) {
+            delete_transient('wooms_start_timestamp');
+
+            /**
+             * need to protect the site
+             * from incorrectly hidden products
+             */
+            delete_option('wooms_session_id');
+            delete_transient('wooms_session_id');
+
+            do_action('wooms_logger_error', __CLASS__, 'Главный обработчик завершился с ошибкой' . $e->getMessage());
         }
-
-        /**
-         * в выдаче могут быть не только товары, но и вариации и мб что-то еще
-         * птм нужна проверка что это точно продукт
-         */
-        if('product' != $value["meta"]["type"]){
-          continue;
-        }
-
-        do_action( 'wooms_product_data_item', $value );
-
-        /**
-         * deprecated - for remove
-         */
-        do_action( 'wooms_product_import_row', $value, $key, $data );
-      }
-
-      if ( $count_saved = get_transient( 'wooms_count_stat' ) ) {
-        set_transient( 'wooms_count_stat', $i + $count_saved );
-      } else {
-        set_transient( 'wooms_count_stat', $i );
-      }
-
-      set_transient( 'wooms_offset', $offset + $i );
-
-    } catch ( \Exception $e ) {
-      delete_transient( 'wooms_start_timestamp' );
-
-      do_action('wooms_logger_error', __CLASS__, 'Главный обработчик завершился с ошибкой' . $e->getMessage() );
     }
-  }
 
   /**
    * walker_started
