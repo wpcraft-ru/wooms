@@ -194,6 +194,13 @@ class Images {
             return $check_id;
         }
 
+        if ( ! function_exists('curl_init')) {
+            do_action('wooms_logger_error', __CLASS__,
+                'Не удалось обнаружить curl_init. Нужно настроить curl на сервера.'
+            );
+            return false;
+        }
+
         if( ! function_exists('wp_read_image_metadata')){
           require_once ABSPATH . '/wp-admin/includes/image.php';
         }
