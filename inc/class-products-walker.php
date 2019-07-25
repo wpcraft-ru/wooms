@@ -384,7 +384,7 @@ class Walker {
             if (isset($data['rows']) && empty($data['rows'])) {
                 self::walker_finish();
 
-                return true;
+                return;
             }
 
             if (empty($data['rows'])) {
@@ -394,7 +394,7 @@ class Walker {
                     print_r($data, true)
                 );
 
-                return false;
+                return;
             }
 
             do_action('wooms_walker_start_iteration', $data);

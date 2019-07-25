@@ -20,8 +20,6 @@ class Prices {
       */
       add_filter( 'wooms_product_price', array( __CLASS__, 'chg_price' ), 10, 3 );
       add_action( 'admin_init', array( __CLASS__, 'settings_init' ), $priority = 101, $accepted_args = 1 );
-
-
     }
 
     /**
