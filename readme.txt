@@ -75,6 +75,11 @@ PHP 5.6
 
 == Changelog ==
 
+
+= 5.6 =
+* исправлена ошибка параметров типа product.id https://github.com/wpcraft-ru/wooms/issues/177
+* XT: исправлена ошибка синка остатков
+
 = 5.5 =
 * XT: добавлена опция для передачи доп данных в примечании к Заказу https://github.com/wpcraft-ru/wooms/issues/175
 * XT: добавлена опция для передачи стоимости доставки в Заказы https://github.com/wpcraft-ru/wooms/issues/174

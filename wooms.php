@@ -15,8 +15,8 @@
  * WP requires at least: 4.8
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 5.5
- * WooMS XT Latest: 5.5
+ * Version: 5.6
+ * WooMS XT Latest: 5.6
  */
 
 // Exit if accessed directly
@@ -103,7 +103,6 @@ class WooMS_Core {
    * Проверка происходит на базе данных в комментарии базовой версии
    */
   public static function xt_plugin_update_message( $data, $response ) {
-
 
     $data = get_file_data( __FILE__, array('xt_version' => 'WooMS XT Latest') );
     $xt_version_remote = $data['xt_version'];
@@ -217,6 +216,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     return false;
   }
 
+  $url = wooms_fix_url($url);
+
   if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
     $type = 'POST';
   }
@@ -289,4 +290,22 @@ function wooms_get_product_id_by_uuid( $uuid ) {
   } else {
     return $posts[0]->ID;
   }
+}
+
+/**
+ * fix bug with url
+ *
+ * @link https://github.com/wpcraft-ru/wooms/issues/177
+ *
+ * @return mixed
+ */
+function wooms_fix_url($url = ''){
+    $url = str_replace('product_id', 'product.id', $url);
+    $url = str_replace('productid', 'product.id', $url);
+    $url = str_replace('store_id', 'store.id', $url);
+    $url = str_replace('storeid', 'store.id', $url);
+    $url = str_replace('consignment_id', 'consignment.id', $url);
+    $url = str_replace('variant_id', 'variant.id', $url);
+    $url = str_replace('productFolder_id', 'productFolder.id', $url);
+    return $url;
 }
