@@ -295,9 +295,7 @@ function wooms_get_product_id_by_uuid( $uuid ) {
 /**
  * fix bug with url
  *
- * @link https://github.com/wpcraft-ru/wooms/issues/177
- *
- * @return mixed
+ * @link https://github.com/wpcraft-ru/wooms/issues/177 
  */
 function wooms_fix_url($url = ''){
     $url = str_replace('product_id', 'product.id', $url);
