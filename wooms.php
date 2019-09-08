@@ -299,9 +299,7 @@ function wooms_get_product_id_by_uuid( $uuid ) {
  */
 function wooms_fix_url($url = ''){
     $url = str_replace('product_id', 'product.id', $url);
-    $url = str_replace('productid', 'product.id', $url);
     $url = str_replace('store_id', 'store.id', $url);
-    $url = str_replace('storeid', 'store.id', $url);
     $url = str_replace('consignment_id', 'consignment.id', $url);
     $url = str_replace('variant_id', 'variant.id', $url);
     $url = str_replace('productFolder_id', 'productFolder.id', $url);
