@@ -76,6 +76,10 @@ PHP 5.6
 == Changelog ==
 
 
+= 5.7 =
+* XT добавлен фильтр для расширения типов данных по атрибутам https://github.com/wpcraft-ru/wooms/issues/184
+* мелкие исправления и рефакторинг
+
 = 5.6 =
 * исправлена ошибка параметров типа product.id https://github.com/wpcraft-ru/wooms/issues/177
 * XT: исправлена ошибка синка остатков
