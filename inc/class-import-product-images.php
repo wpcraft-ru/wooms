@@ -237,7 +237,17 @@ class Images {
         if ( $url_api == $info['url'] ) {//если редиректа нет записываем файл
             fwrite( $fh, $output );
         } else {
-            $file = file_get_contents( $info['url'] );//если редирект есть то скачиваем файл по ссылке
+
+            // fix https://github.com/wpcraft-ru/wooms/issues/203
+            $context_options=array(
+                "ssl" => array(
+                    "verify_peer"=>false,
+                    "verify_peer_name"=>false,
+                ),
+            );
+
+            //если редирект есть то скачиваем файл по ссылке
+            $file = file_get_contents( $info['url'], false, stream_context_create($context_options) );
 
             if( ! $file ){
               do_action('wooms_logger_error',
