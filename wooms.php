@@ -46,7 +46,8 @@ class WooMS_Core {
      * Этот класс должен работать до хука plugins_loaded
      * Птм что иначе хук wooms_activate не срабатывает
      */
-    require_once 'inc/class-logger.php';
+    require_once __DIR__ . '/inc/class-logger.php';
+    require_once __DIR__ . '/functions.php';
 
     /**
      * Add hook for activate plugin
@@ -68,13 +69,13 @@ class WooMS_Core {
       /**
        * Подключение компонентов
        */
-      require_once 'inc/class-menu-settings.php';
-      require_once 'inc/class-menu-tool.php';
-      require_once 'inc/class-products-walker.php';
-      require_once 'inc/class-import-product-images.php';
-      require_once 'inc/class-import-product-categories.php';
-      require_once 'inc/class-import-prices.php';
-      require_once 'inc/class-hide-old-products.php';
+      require_once __DIR__ . '/inc/class-menu-settings.php';
+      require_once __DIR__ . '/inc/class-menu-tool.php';
+      require_once __DIR__ . '/inc/class-products-walker.php';
+      require_once __DIR__ . '/inc/class-import-product-images.php';
+      require_once __DIR__ . '/inc/class-import-product-categories.php';
+      require_once __DIR__ . '/inc/class-import-prices.php';
+      require_once __DIR__ . '/inc/class-hide-old-products.php';
 
       add_action( 'admin_notices', array(__CLASS__, 'show_notices_35') );
       add_action( 'admin_notices', array(__CLASS__, 'show_error_notice') );
@@ -201,107 +202,3 @@ class WooMS_Core {
 }
 
 WooMS_Core::init();
-
-/**
- * Helper new function for responses data from moysklad.ru
- *
- * @param string $url
- * @param array $data
- * @param string $type
- *
- * @return array|bool|mixed|object
- */
-function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
-  if ( empty( $url ) ) {
-    return false;
-  }
-
-  $url = wooms_fix_url($url);
-
-  if ( isset( $data ) && ! empty( $data ) && 'GET' == $type ) {
-    $type = 'POST';
-  }
-  if ( 'GET' == $type ) {
-    $data = null;
-  } else {
-    $data = json_encode( $data );
-  }
-
-    $args = array(
-    'method'      => $type,
-    'timeout'     => 45,
-    'redirection' => 5,
-    'headers'     => array(
-      "Content-Type"  => 'application/json',
-      'Authorization' => 'Basic ' .
-                         base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
-    ),
-    'body'        => $data,
-  );
-
-  $request = wp_remote_request( $url, $args);
-  if ( is_wp_error( $request ) ) {
-    do_action(
-      'wooms_logger_error',
-      $type = 'Request',
-      $title = 'Ошибка REST API',
-      $desc = $request->get_error_message()
-    );
-
-    return false;
-  }
-
-  if ( empty( $request['body'] ) ) {
-    do_action(
-      'wooms_logger_error',
-      $type = 'Request',
-      $title = 'REST API вернулся без требуемых данных'
-    );
-
-    return false;
-  }
-
-  $response = json_decode( $request['body'], true );
-
-  if( ! empty($response["errors"]) and is_array($response["errors"]) ){
-    foreach ($response["errors"] as $error) {
-      do_action(
-        'wooms_logger_error',
-        $type = 'Request',
-        $title = $error['error']
-      );
-    }
-  }
-
-  return $response;
-}
-
-/**
- * Get product id by UUID from metafield
- * or false
- *
- * XXX move to \WooMS\Products\Bundle::get_product_id_by_uuid
- */
-function wooms_get_product_id_by_uuid( $uuid ) {
-
-  $posts = get_posts( 'post_type=product&meta_key=wooms_id&meta_value=' . $uuid );
-  if ( empty( $posts[0]->ID ) ) {
-    return false;
-  } else {
-    return $posts[0]->ID;
-  }
-}
-
-/**
- * fix bug with url
- *
- * @link https://github.com/wpcraft-ru/wooms/issues/177 
- */
-function wooms_fix_url($url = ''){
-    $url = str_replace('product_id', 'product.id', $url);
-    $url = str_replace('store_id', 'store.id', $url);
-    $url = str_replace('consignment_id', 'consignment.id', $url);
-    $url = str_replace('variant_id', 'variant.id', $url);
-    $url = str_replace('productFolder_id', 'productFolder.id', $url);
-    return $url;
-}
