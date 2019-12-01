@@ -35,15 +35,14 @@ final class Logger {
       return;
     }
 
-
     $data = '';
 
-    $data .= $title;
+    $data .= strval($title);
 
     if( ! empty($description) ){
       $description = wc_print_r( $description, true );
       $description = wp_trim_words( $description, $num_words = 300, $more = null );
-      $data .= ': ' . '<pre>' . $description . '</pre>';
+      $data .= ':' . PHP_EOL . $description;
     }
 
     $source = 'wooms';
@@ -66,14 +65,14 @@ final class Logger {
       return;
     }
 
-    $description = wp_trim_words( $description, $num_words = 300, $more = null );
-
     $data = '';
 
-    $data .= $title;
+    $data .= strval($title);
 
     if( ! empty($description) ){
-      $data .= ': ' . wc_print_r( $description, true );
+      $description = wc_print_r( $description, true );
+      $description = wp_trim_words( $description, $num_words = 300, $more = null );
+      $data .= ':' . PHP_EOL . $description;
     }
 
     $source = 'wooms';

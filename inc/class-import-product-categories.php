@@ -16,7 +16,7 @@ class Categories {
    */
   public static function init() {
 
-    add_filter('wooms_product_save', array(__CLASS__, 'load_category_for_product'), 10, 3);
+    add_filter('wooms_product_save', array(__CLASS__, 'product_save'), 10, 3);
 
     /**
      * Other
@@ -30,7 +30,7 @@ class Categories {
   /**
    * Загрузка данных категории для продукта
    */
-  public static function load_category_for_product($product, $value, $data){
+  public static function product_save($product, $value, $data){
 
     //Если опция отключена - пропускаем обработку
     if ( get_option( 'woomss_categories_sync_enabled' ) ) {
@@ -52,9 +52,17 @@ class Categories {
       if(is_wp_error($result)){
         do_action('wooms_logger_error', __CLASS__, $result->get_error_code(), $result->get_error_message() );
       } elseif($result === false) {
-        do_action('wooms_logger_error', __CLASS__, 'Не удалось выбрать термин', $term_id );
+        do_action('wooms_logger_error', __CLASS__, 'Не удалось выбрать категорию', $term_id );
       } else {
-        do_action( 'wooms_logger', __CLASS__, sprintf('Выбран термин %s, для продукта %s (url: %s)', $term_id, $product_id, $url) );
+        do_action( 'wooms_logger', __CLASS__, 
+          'Выбор категории продукта', 
+          [
+            '$url' => $url,
+            '$term_id' => $term_id,
+            '$product_id' => $product_id,
+            'select_cat_pid' => $product_id,
+          ]
+        );
       }
     }
 
