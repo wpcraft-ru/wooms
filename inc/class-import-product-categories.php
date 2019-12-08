@@ -59,6 +59,7 @@ class Categories {
           [
             '$url' => $url,
             '$term_id' => $term_id,
+            'term_name' => get_term_by('id', $term_id, 'product_cat')->name,
             '$product_id' => $product_id,
             'select_cat_pid' => $product_id,
           ]
