@@ -51,13 +51,13 @@ class ImagesGallery
 
     foreach ($data_api['rows'] as $image) {
 
-      $product_gallery_data[$image['filename']] = $image['meta']['href'];
+      $product_gallery_data[$image['filename']] = $image['meta']['downloadHref'];
     }
 
     // encoding array to json
     $product_gallery_data = json_encode($product_gallery_data);
 
-    
+
     self::download_images_from_metafield();
 
     // check current meta is set already or not
@@ -113,7 +113,7 @@ class ImagesGallery
       foreach ($img_data_list as $image_name => $url) {
         $media_id_list[] = self::download_img($url, $image_name, $value->ID);
       }
-      
+
       if (!empty($media_id_list)) {
 
         // Set the gallery images
@@ -154,12 +154,12 @@ class ImagesGallery
    */
   public static function download_img($url_api, $file_name, $post_id)
   {
-    
+
     if ($check_id = self::check_exist_image_by_url($url_api)) {
       return $check_id;
     }
-    
-    
+
+
     if (!function_exists('curl_init')) {
       do_action(
         'wooms_logger_error',
@@ -172,7 +172,7 @@ class ImagesGallery
     if (!function_exists('wp_read_image_metadata')) {
       require_once ABSPATH . '/wp-admin/includes/image.php';
     }
-    
+
     $header_array = [
       'Authorization' => 'Basic ' . base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
     ];
@@ -192,18 +192,23 @@ class ImagesGallery
     $output = curl_exec($ch);
     $info   = curl_getinfo($ch); // Получим информацию об операции
     curl_close($ch);
-    
+
+
     if (!function_exists('wp_tempnam')) {
       require_once(ABSPATH . 'wp-admin/includes/file.php');
       require_once(ABSPATH . 'wp-admin/includes/image.php');
     }
-    
+
     $file_name = sanitize_file_name($file_name);
     $tmpfname = wp_tempnam($file_name);
-    $fh       = fopen($tmpfname, 'w');
+    $fh       = fopen($tmpfname, 'wb');
 
-    
-      
+
+
+    if ($url_api == $info['url']) { //если редиректа нет записываем файл
+      fwrite($fh, $output);
+    } else {
+
       // fix https://github.com/wpcraft-ru/wooms/issues/203
       $context_options = array(
         "ssl" => array(
@@ -226,7 +231,8 @@ class ImagesGallery
       }
 
       fwrite($fh, $file);
-    
+    }
+
 
     fclose($fh);
 
