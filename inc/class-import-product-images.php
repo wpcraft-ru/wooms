@@ -215,11 +215,12 @@ class Images {
         }
 
         $ch = \curl_init();
-        curl_setopt( $ch, CURLOPT_URL, $url_api );
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-        curl_setopt( $ch, CURLOPT_BINARYTRANSFER, true );
-        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
-        curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
+        curl_setopt($ch, CURLOPT_URL, $url_api);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $output = curl_exec( $ch );
         $info   = curl_getinfo( $ch ); // Получим информацию об операции

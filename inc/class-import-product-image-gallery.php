@@ -18,10 +18,13 @@ class ImagesGallery
   public static function init()
   {
 
-    /**
-     * Обновление данных о продукте
-     */
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 3);
+
+    add_filter('cron_schedules', array(__CLASS__, 'add_schedule'));
+
+    add_action('init', array(__CLASS__, 'add_cron_hook'));
+
+    add_action( 'wooms_cron_image_downloads', array( __CLASS__, 'download_images_from_metafield' ) );
   }
 
   /**
@@ -58,8 +61,6 @@ class ImagesGallery
     $product_gallery_data = json_encode($product_gallery_data);
 
 
-    self::download_images_from_metafield();
-
     // check current meta is set already or not
     if (!empty(get_post_meta($product_id, 'wooms_data_for_get_gallery'))) {
       return $product;
@@ -68,6 +69,61 @@ class ImagesGallery
     }
 
     return $product;
+  }
+
+  /**
+   * Setup cron
+   *
+   * @param $schedules
+   *
+   * @return mixed
+   */
+  public static function add_schedule($schedules)
+  {
+
+    $schedules['wooms_cron_worker_images'] = array(
+      'interval' => 60,
+      'display'  => 'WooMS Cron Load Images 60 sec',
+    );
+
+    return $schedules;
+  }
+
+  /**
+   * Init Cron
+   */
+  public static function add_cron_hook()
+  {
+
+    if (empty(get_option('woomss_images_sync_enabled'))) {
+      return;
+    }
+
+    if (!wp_next_scheduled('wooms_cron_image_downloads')) {
+      wp_schedule_event(time(), 'wooms_cron_worker_images', 'wooms_cron_image_downloads');
+    }
+  }
+
+
+  /**
+   * Action for UI
+   */
+  public static function ui_action()
+  {
+
+    $data = self::download_images_from_metafield();
+
+    echo '<hr>';
+
+    if (empty($data)) {
+      echo '<p>Нет картинок для загрузки</p>';
+    } else {
+      echo "<p>Загружены миниатюры для продуктов:</p>";
+      foreach ($data as $key => $value) {
+        printf('<p><a href="%s">ID %s</a></p>', get_edit_post_link($value), $value);
+      }
+      echo "<p>Чтобы повторить загрузку - обновите страницу</p>";
+    }
   }
 
   /**
@@ -185,14 +241,18 @@ class ImagesGallery
     $ch = \curl_init();
     curl_setopt($ch, CURLOPT_URL, $url_api);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $output = curl_exec($ch);
     $info   = curl_getinfo($ch); // Получим информацию об операции
     curl_close($ch);
 
+    var_dump($output);
+    var_dump($info);
+    //exit;
 
     if (!function_exists('wp_tempnam')) {
       require_once(ABSPATH . 'wp-admin/includes/file.php');
@@ -201,37 +261,12 @@ class ImagesGallery
 
     $file_name = sanitize_file_name($file_name);
     $tmpfname = wp_tempnam($file_name);
-    $fh       = fopen($tmpfname, 'wb');
+    $fh       = fopen($tmpfname, 'w');
 
 
 
-    if ($url_api == $info['url']) { //если редиректа нет записываем файл
-      fwrite($fh, $output);
-    } else {
 
-      // fix https://github.com/wpcraft-ru/wooms/issues/203
-      $context_options = array(
-        "ssl" => array(
-          "verify_peer" => false,
-          "verify_peer_name" => false,
-        ),
-      );
-
-      //если редирект есть то скачиваем файл по ссылке
-      $file = file_get_contents($info['url'], false, stream_context_create($context_options));
-
-      if (!$file) {
-        do_action(
-          'wooms_logger_error',
-          __CLASS__,
-          'Загрузка картинки - не удалось закачать файл',
-          sprintf('Данные %s', PHP_EOL . print_r($info['url'], true))
-        );
-        return false;
-      }
-
-      fwrite($fh, $file);
-    }
+    fwrite($fh, $output);
 
 
     fclose($fh);
