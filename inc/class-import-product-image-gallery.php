@@ -20,11 +20,13 @@ class ImagesGallery
 
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 3);
 
+    add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
+
     add_filter('cron_schedules', array(__CLASS__, 'add_schedule'));
 
     add_action('init', array(__CLASS__, 'add_cron_hook'));
 
-    add_action( 'wooms_cron_image_downloads', array( __CLASS__, 'download_images_from_metafield' ) );
+    add_action('wooms_cron_image_downloads', array(__CLASS__, 'download_images_from_metafield'));
   }
 
   /**
@@ -34,7 +36,7 @@ class ImagesGallery
   {
 
 
-    if (empty(get_option('woomss_images_sync_enabled'))) {
+    if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return $product;
     }
     $product_id = $product->get_id();
@@ -95,7 +97,7 @@ class ImagesGallery
   public static function add_cron_hook()
   {
 
-    if (empty(get_option('woomss_images_sync_enabled'))) {
+    if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return;
     }
 
@@ -134,7 +136,7 @@ class ImagesGallery
   public static function download_images_from_metafield()
   {
 
-    if (empty(get_option('woomss_images_sync_enabled'))) {
+    if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return;
     }
 
@@ -378,6 +380,53 @@ class ImagesGallery
     } else {
       return $posts[0]->ID;
     }
+  }
+
+  /**
+   * Settings UI
+   */
+  public static function settings_init()
+  {
+    add_settings_section('woomss_section_images', 'Изображения', null, 'mss-settings');
+
+    register_setting('mss-settings', 'woomss_gallery_sync_enabled');
+    add_settings_field(
+      $id = 'woomss_gallery_sync_enabled',
+      $title = 'Включить синхронизацию Галлереи',
+      $callback = array(__CLASS__, 'setting_images_sync_enabled'),
+      $page = 'mss-settings',
+      $section = 'woomss_section_images'
+    );
+
+    register_setting('mss-settings', 'woomss_gallery_replace_to_sync');
+    add_settings_field(
+      'woomss_gallery_replace_to_sync',
+      'Замена изображений Галлереи при синхронизации',
+      array(__CLASS__, 'setting_images_replace_to_sync'),
+      $page = 'mss-settings',
+      $section = 'woomss_section_images'
+    );
+  }
+
+  /**
+   * setting_images_replace_to_sync
+   */
+  public static function setting_images_replace_to_sync()
+  {
+
+    $option = 'woomss_gallery_sync_enabled';
+    $desc = '<small>Если включить опцию, то плагин будет обновлять изображения галереи, если они изменились в МойСклад.</small><p><small><strong>Внимание!</strong> Для корректной перезаписи изображений, необходимо провести повторную синхронизацию товаров. Если синхронизация товаров происходит по крону, то дождаться окончания очередной сессии синхронизации товаров</small></p>';
+    printf('<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked(1, get_option($option), false), $desc);
+  }
+
+  /**
+   * setting_images_sync_enabled
+   */
+  public static function setting_images_sync_enabled()
+  {
+    $option = 'woomss_gallery_replace_to_sync';
+    $desc = '<small>Если включить опцию, то плагин будет загружать изображения галереи из МойСклад.</small>';
+    printf('<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked(1, get_option($option), false), $desc);
   }
 }
 
