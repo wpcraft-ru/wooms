@@ -54,9 +54,11 @@ class ImagesGallery
     // Making array with image data
     $product_gallery_data = [];
 
-    foreach ($data_api['rows'] as $image) {
-
-      $product_gallery_data[$image['filename']] = $image['meta']['downloadHref'];
+    foreach ($data_api['rows'] as $key => $image) {
+      // First key is the first image that already downloading with another class https://github.com/uptimizt/dev-wms-local/issues/4
+      if( $key !== 0){
+        $product_gallery_data[$image['filename']] = $image['meta']['downloadHref'];
+      }
     }
 
     // encoding array to json
