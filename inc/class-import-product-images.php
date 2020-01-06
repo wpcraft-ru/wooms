@@ -23,7 +23,6 @@ class Images {
 
       add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
 
-      add_filter( 'cron_schedules', array( __CLASS__, 'add_schedule' ) );
       add_action( 'init', array( __CLASS__, 'add_cron_hook' ) );
 
       add_action( 'wooms_cron_image_downloads', array( __CLASS__, 'download_images_from_metafield' ) );
@@ -62,24 +61,6 @@ class Images {
     return $product;
   }
 
-
-    /**
-     * Setup cron
-     *
-     * @param $schedules
-     *
-     * @return mixed
-     */
-    public static function add_schedule( $schedules ) {
-
-        $schedules['wooms_cron_worker_images'] = array(
-            'interval' => 60,
-            'display'  => 'WooMS Cron Load Images 60 sec',
-        );
-
-        return $schedules;
-    }
-
     /**
      * Init Cron
      */
@@ -90,7 +71,7 @@ class Images {
         }
 
         if ( ! wp_next_scheduled( 'wooms_cron_image_downloads' ) ) {
-            wp_schedule_event( time(), 'wooms_cron_worker_images', 'wooms_cron_image_downloads' );
+            wp_schedule_event( time(), 'every_minute', 'wooms_cron_image_downloads' );
         }
     }
 
