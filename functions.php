@@ -276,7 +276,6 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
    */
   function check_exist_image_by_url($url_api)
   {
-
     $posts = get_posts('post_type=attachment&meta_key=wooms_url&meta_value=' . $url_api);
 
     if (empty($posts)) {
