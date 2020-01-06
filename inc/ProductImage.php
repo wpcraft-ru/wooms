@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Import Product Images
+ * Import Product Image
  */
 class ProductImage
 {
