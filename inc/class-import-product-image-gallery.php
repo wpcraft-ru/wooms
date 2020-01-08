@@ -27,6 +27,16 @@ class ImagesGallery
     add_action('init', array(__CLASS__, 'add_cron_hook'));
 
     add_action('wooms_cron_image_downloads', array(__CLASS__, 'download_images_from_metafield'));
+
+    add_action('init', function(){
+      if( ! isset($_GET['ee']) ) {
+        return;
+      }
+
+      self::download_images_from_metafield();
+
+      exit;
+    });
   }
 
   /**
@@ -135,7 +145,7 @@ class ImagesGallery
    *
    * @return void
    */
-  public static function download_images_from_metafield()
+  public static function download_images_from_metafield($pid = 0)
   {
 
     if (empty(get_option('woomss_gallery_sync_enabled'))) {
@@ -173,6 +183,7 @@ class ImagesGallery
       foreach ($img_data_list as $image_name => $url) {
         $media_id_list[] = download_img($url, $image_name, $value->ID);
       }
+
       if (!empty($media_id_list)) {
 
         // Set the gallery images
