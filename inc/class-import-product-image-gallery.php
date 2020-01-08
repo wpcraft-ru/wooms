@@ -43,7 +43,7 @@ class ImagesGallery
 
     // Getting data from mysklad product directly using id of product
     $pm_id = get_post_meta($product_id, 'wooms_id', true);
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product/' . $pm_id . '/images';
+    $url = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/product/%s/images',$pm_id);
     $data_api = wooms_request($url);
 
     //Check image

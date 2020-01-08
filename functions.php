@@ -150,15 +150,17 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    // Checking operation system if windows add needed parameter or it will not work
+    //If PHP_SHLIB_SUFFIX is equal to "dll",
+    //then PHP is running on a Windows operating system.
+    if(strtolower(PHP_SHLIB_SUFFIX) === 'dll'){
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    }
 
     $output = curl_exec($ch);
     $info   = curl_getinfo($ch); // Получим информацию об операции
     curl_close($ch);
-
-    var_dump($output);
-    var_dump($info);
-    //exit;
 
     if (!function_exists('wp_tempnam')) {
       require_once(ABSPATH . 'wp-admin/includes/file.php');
