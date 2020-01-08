@@ -28,15 +28,15 @@ class ImagesGallery
 
     add_action('wooms_cron_image_downloads', array(__CLASS__, 'download_images_from_metafield'));
 
-    add_action('init', function(){
-      if( ! isset($_GET['ee']) ) {
-        return;
-      }
+    // add_action('init', function(){
+    //   if( ! isset($_GET['ee']) ) {
+    //     return;
+    //   }
 
-      self::download_images_from_metafield();
+    //   self::download_images_from_metafield();
 
-      exit;
-    });
+    //   exit;
+    // });
   }
 
   /**
