@@ -20,7 +20,7 @@ class ImagesGallery
 
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 3);
 
-    add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
+    add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 70 );
 
     add_filter('cron_schedules', array(__CLASS__, 'add_schedule'));
 
@@ -247,7 +247,7 @@ class ImagesGallery
   {
 
     $option = 'woomss_gallery_sync_enabled';
-    $desc = '<small>Если включить опцию, то плагин будет обновлять изображения галереи, если они изменились в МойСклад.</small><p><small><strong>Внимание!</strong> Для корректной перезаписи изображений, необходимо провести повторную синхронизацию товаров. Если синхронизация товаров происходит по крону, то дождаться окончания очередной сессии синхронизации товаров</small></p>';
+    $desc = '<small>Внимание! Это тест опция! Если включить опцию, то плагин будет обновлять изображения галереи, если они изменились в МойСклад.</small><p><small><strong>Внимание!</strong> Для корректной перезаписи изображений, необходимо провести повторную синхронизацию товаров. Если синхронизация товаров происходит по крону, то дождаться окончания очередной сессии синхронизации товаров</small></p>';
     printf('<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked(1, get_option($option), false), $desc);
   }
 
@@ -257,7 +257,7 @@ class ImagesGallery
   public static function setting_images_sync_enabled()
   {
     $option = 'woomss_gallery_replace_to_sync';
-    $desc = '<small>Если включить опцию, то плагин будет загружать изображения галереи из МойСклад.</small>';
+    $desc = '<small>Внимание! Это тест опция! Если включить опцию, то плагин будет загружать изображения галереи из МойСклад.</small>';
     printf('<input type="checkbox" name="%s" value="1" %s /> %s', $option, checked(1, get_option($option), false), $desc);
   }
 }
