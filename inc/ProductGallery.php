@@ -85,7 +85,7 @@ class ImagesGallery
     if (!empty(get_post_meta($product_id, 'wooms_data_for_get_gallery'))) {
       return false;
     } else {
-      update_post_meta($product_id,'wooms_data_for_get_gallery', $product_gallery_data);
+      update_post_meta($product_id, 'wooms_data_for_get_gallery', $product_gallery_data);
     }
   }
 
@@ -200,37 +200,35 @@ class ImagesGallery
     $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
     //var_dump($img_data_list);
 
-    if(empty($img_data_list)){
+    if (empty($img_data_list)) {
       self::get_gallery_from_api($product_id);
       $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
     }
 
     $img_data_list = json_decode($img_data_list, true);
 
-    $count = 0;
     //var_dump($img_data_list);
-    
+
+    $media_data_list = [];
+
     foreach ($img_data_list as $image_name => $url) {
 
-      if ($count == 0 && $url !== 0 && !is_numeric($url)) {
-        $media_id = download_img($url, $image_name, $product_id);
+      $media_id = download_img($url, $image_name, $product_id);
 
-        if (!empty($media_id)) {
-          //var_dump($image_name);
-          $img_data_list[$image_name] = $media_id;
-          //var_dump($img_data_list);
-        } else {
-          $img_data_list[$image_name] = 0;
-          //var_dump($img_data_list);
-        }
-
-        $img_data_list = json_encode($img_data_list);
-        update_post_meta($product_id, 'wooms_data_for_get_gallery', $img_data_list);
-        $count = 1;
+      if (!empty($media_id)) {
+        $media_data_list[] = $media_id;
       }
+
     }
 
-    if (!empty($media_id)) {
+    if (!empty($media_data_list)) {
+
+      // Set the gallery images
+      update_post_meta($product_id, '_product_image_gallery', implode(',', $media_data_list));
+
+      // Delete meta for correct query work
+      delete_post_meta($product_id, 'wooms_data_for_get_gallery');
+
       do_action(
         'wooms_logger',
         __CLASS__,
@@ -244,7 +242,7 @@ class ImagesGallery
       );
     }
 
-    self::update_product_gallery($product_id);
+    //self::update_product_gallery($product_id);
 
     return $product_id;
   }
@@ -257,22 +255,17 @@ class ImagesGallery
 
     $media_id_list = [];
 
-    $left_image_for_download = false;
+    $left_image_for_download = true;
 
     foreach ($img_data_list as $image_name => $media_id) {
-      if (is_numeric($media_id)) {
+      if (is_numeric($media_id) && $media_id !== 0) {
         $media_id_list[] = $media_id;
       } else {
-        $left_image_for_download = true;
+        $left_image_for_download = false;
       }
     }
 
-    // Set the gallery images
-    update_post_meta($product_id, '_product_image_gallery', implode(',', $media_id_list));
-
     if (!$left_image_for_download) {
-      // Delete meta for correct query work
-      delete_post_meta($product_id, 'wooms_data_for_get_gallery');
     }
   }
 
