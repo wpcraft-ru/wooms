@@ -72,7 +72,7 @@ class WooMS_Core {
       require_once __DIR__ . '/inc/class-menu-settings.php';
       require_once __DIR__ . '/inc/class-menu-tool.php';
       require_once __DIR__ . '/inc/class-products-walker.php';
-      require_once __DIR__ . '/inc/class-import-product-image-gallery.php';
+      require_once __DIR__ . '/inc/ProductGallery.php';
       require_once __DIR__ . '/inc/class-import-product-categories.php';
       require_once __DIR__ . '/inc/class-import-prices.php';
       require_once __DIR__ . '/inc/class-hide-old-products.php';

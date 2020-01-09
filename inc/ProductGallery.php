@@ -20,7 +20,7 @@ class ImagesGallery
 
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 3);
 
-    add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 70 );
+    add_action('admin_init', array(__CLASS__, 'settings_init'), 70);
 
     add_filter('cron_schedules', array(__CLASS__, 'add_schedule'));
 
@@ -33,7 +33,7 @@ class ImagesGallery
     //     return;
     //   }
 
-    //   self::download_images_from_metafield();
+    //   self::download_images_by_id(281);
 
     //   exit;
     // });
@@ -51,14 +51,21 @@ class ImagesGallery
     }
     $product_id = $product->get_id();
 
+    self::get_gallery_from_api($product_id);
+
+    return $product;
+  }
+
+  public static function get_gallery_from_api($product_id)
+  {
     // Getting data from mysklad product directly using id of product
     $pm_id = get_post_meta($product_id, 'wooms_id', true);
-    $url = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/product/%s/images',$pm_id);
+    $url = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/product/%s/images', $pm_id);
     $data_api = wooms_request($url);
 
     //Check image
     if (empty($data_api['rows'])) {
-      return $product;
+      return false;
     }
 
     // Making array with image data
@@ -66,7 +73,7 @@ class ImagesGallery
 
     foreach ($data_api['rows'] as $key => $image) {
       // First key is the first image that already downloading with another class https://github.com/uptimizt/dev-wms-local/issues/4
-      if( $key !== 0){
+      if ($key !== 0) {
         $product_gallery_data[$image['filename']] = $image['meta']['downloadHref'];
       }
     }
@@ -74,15 +81,12 @@ class ImagesGallery
     // encoding array to json
     $product_gallery_data = json_encode($product_gallery_data);
 
-
     // check current meta is set already or not
     if (!empty(get_post_meta($product_id, 'wooms_data_for_get_gallery'))) {
-      return $product;
+      return false;
     } else {
-      $product->update_meta_data('wooms_data_for_get_gallery', $product_gallery_data);
+      update_post_meta($product_id,'wooms_data_for_get_gallery', $product_gallery_data);
     }
-
-    return $product;
   }
 
   /**
@@ -175,42 +179,100 @@ class ImagesGallery
     $result = [];
 
     foreach ($list as $key => $value) {
-      $img_data_list = get_post_meta($value->ID, 'wooms_data_for_get_gallery', true);
-      $img_data_list = json_decode($img_data_list);
-
-      $media_id_list = [];
-
-      foreach ($img_data_list as $image_name => $url) {
-        $media_id_list[] = download_img($url, $image_name, $value->ID);
-      }
-
-      if (!empty($media_id_list)) {
-
-        // Set the gallery images
-        update_post_meta($value->ID, '_product_image_gallery', implode(',', $media_id_list));
-        // Delte meta for correct query work
-        delete_post_meta($value->ID, 'wooms_data_for_get_gallery');
-
-        $result[] = $value->ID;
-
-        do_action(
-          'wooms_logger',
-          __CLASS__,
-          sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $value->ID, $media_id_list, $image_name)
-        );
-      } else {
-        do_action(
-          'wooms_logger_error',
-          __CLASS__,
-          sprintf('Ошибка назначения картинки для продукта %s (url %s, filename: %s)', $value->ID, $url, $image_name)
-        );
-      }
+      $result[] = self::download_images_by_id($value->ID);
     }
 
     if (empty($result)) {
       return false;
     } else {
       return $result;
+    }
+  }
+
+  /**
+   * Downloading gallery images from meta product
+   *
+   * @param [type] $product_id
+   * @return void
+   */
+  public static function download_images_by_id($product_id, $all = false)
+  {
+    $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
+    //var_dump($img_data_list);
+
+    if(empty($img_data_list)){
+      self::get_gallery_from_api($product_id);
+      $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
+    }
+
+    $img_data_list = json_decode($img_data_list, true);
+
+    $count = 0;
+    //var_dump($img_data_list);
+    
+    foreach ($img_data_list as $image_name => $url) {
+
+      if ($count == 0 && $url !== 0 && !is_numeric($url)) {
+        $media_id = download_img($url, $image_name, $product_id);
+
+        if (!empty($media_id)) {
+          //var_dump($image_name);
+          $img_data_list[$image_name] = $media_id;
+          //var_dump($img_data_list);
+        } else {
+          $img_data_list[$image_name] = 0;
+          //var_dump($img_data_list);
+        }
+
+        $img_data_list = json_encode($img_data_list);
+        update_post_meta($product_id, 'wooms_data_for_get_gallery', $img_data_list);
+        $count = 1;
+      }
+    }
+
+    if (!empty($media_id)) {
+      do_action(
+        'wooms_logger',
+        __CLASS__,
+        sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $product_id, $media_id, $image_name)
+      );
+    } else {
+      do_action(
+        'wooms_logger_error',
+        __CLASS__,
+        sprintf('Ошибка нозначения галереи продукта %s', $product_id)
+      );
+    }
+
+    self::update_product_gallery($product_id);
+
+    return $product_id;
+  }
+
+  public function update_product_gallery($product_id)
+  {
+
+    $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
+    $img_data_list = json_decode($img_data_list);
+
+    $media_id_list = [];
+
+    $left_image_for_download = false;
+
+    foreach ($img_data_list as $image_name => $media_id) {
+      if (is_numeric($media_id)) {
+        $media_id_list[] = $media_id;
+      } else {
+        $left_image_for_download = true;
+      }
+    }
+
+    // Set the gallery images
+    update_post_meta($product_id, '_product_image_gallery', implode(',', $media_id_list));
+
+    if (!$left_image_for_download) {
+      // Delete meta for correct query work
+      delete_post_meta($product_id, 'wooms_data_for_get_gallery');
     }
   }
 
