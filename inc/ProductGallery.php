@@ -158,6 +158,7 @@ class ImagesGallery
 
     $args = array(
       'post_type'              => 'product',
+      'numberposts'            => 1,
       'meta_query'             => array(
         array(
           'key'     => 'wooms_data_for_get_gallery',
@@ -198,7 +199,6 @@ class ImagesGallery
   public static function download_images_by_id($product_id, $all = false)
   {
     $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
-    //var_dump($img_data_list);
 
     if (empty($img_data_list)) {
       self::get_gallery_from_api($product_id);
@@ -206,8 +206,6 @@ class ImagesGallery
     }
 
     $img_data_list = json_decode($img_data_list, true);
-
-    //var_dump($img_data_list);
 
     $media_data_list = [];
 
@@ -218,7 +216,6 @@ class ImagesGallery
       if (!empty($media_id)) {
         $media_data_list[] = $media_id;
       }
-
     }
 
     if (!empty($media_data_list)) {
@@ -241,8 +238,6 @@ class ImagesGallery
         sprintf('Ошибка нозначения галереи продукта %s', $product_id)
       );
     }
-
-    //self::update_product_gallery($product_id);
 
     return $product_id;
   }
