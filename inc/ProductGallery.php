@@ -1,6 +1,7 @@
 <?php
 
 namespace WooMS\Products;
+use MSImages;
 
 if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
@@ -211,8 +212,7 @@ class ImagesGallery
 
     foreach ($img_data_list as $image_name => $url) {
 
-      $media_id = self::uploadRemoteImageAndAttach($url, $product_id, $image_name);
-      // $media_id = download_img($url, $image_name, $product_id);
+      $media_id = MSImages::uploadRemoteImageAndAttach($url, $product_id, $image_name);
 
       if (!empty($media_id)) {
         $media_data_list[] = $media_id;

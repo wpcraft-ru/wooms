@@ -1,6 +1,7 @@
 <?php
 
 namespace WooMS;
+use MSImages;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
@@ -147,7 +148,8 @@ class ProductImage
 
             $image_name = $image_data['filename'];
 
-            $check_id = self::download_img($url, $image_name, $value->ID);
+            //$check_id = self::download_img($url, $image_name, $value->ID);
+            $check_id = MSImages::uploadRemoteImageAndAttach($url, $value->ID, $image_name);
 
             if (!empty($check_id)) {
 
