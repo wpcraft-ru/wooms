@@ -207,12 +207,16 @@ class ProductImage
             );
             return false;
         }
-        if (!function_exists('wp_read_image_metadata')) {
-            require_once ABSPATH . '/wp-admin/includes/image.php';
+        
+        if (!function_exists('wp_read_image_metadata') || !function_exists('wp_tempnam')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
         }
+
         $header_array = [
             'Authorization' => 'Basic ' . base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
         ];
+
         $headers = array();
         foreach ($header_array as $name => $value) {
             $headers[] = "{$name}: $value";
@@ -227,13 +231,11 @@ class ProductImage
         $output = curl_exec($ch);
         $info   = curl_getinfo($ch); // Получим информацию об операции
         curl_close($ch);
-        if (!function_exists('wp_tempnam')) {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-        }
+
         $file_name = sanitize_file_name($file_name);
         $tmpfname = wp_tempnam($file_name);
         $fh       = fopen($tmpfname, 'w');
+
         if ($url_api == $info['url']) { //если редиректа нет записываем файл
             fwrite($fh, $output);
         } else {
@@ -257,6 +259,7 @@ class ProductImage
             }
             fwrite($fh, $file);
         }
+        
         fclose($fh);
         $filetype = wp_check_filetype($file_name);
         // Array based on $_FILE as seen in PHP file uploads.

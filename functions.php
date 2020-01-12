@@ -133,6 +133,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
 
     if (!function_exists('wp_read_image_metadata')) {
       require_once ABSPATH . '/wp-admin/includes/image.php';
+      require_once ABSPATH . 'wp-admin/includes/file.php';
     }
 
     $header_array = [
@@ -162,20 +163,11 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     $info   = curl_getinfo($ch); // Получим информацию об операции
     curl_close($ch);
 
-    if (!function_exists('wp_tempnam')) {
-      require_once(ABSPATH . 'wp-admin/includes/file.php');
-      require_once(ABSPATH . 'wp-admin/includes/image.php');
-    }
-
     $file_name = sanitize_file_name($file_name);
     $tmpfname = wp_tempnam($file_name);
     $fh       = fopen($tmpfname, 'w');
 
-
-
-
     fwrite($fh, $output);
-
 
     fclose($fh);
 
