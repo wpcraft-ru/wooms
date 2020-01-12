@@ -1,4 +1,11 @@
 <?php
+
+namespace WooMS;
+
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+  }
+  
 trait MSImages
 {
     /**
