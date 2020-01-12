@@ -64,7 +64,7 @@ class ImagesGallery
     $data_api = wooms_request($url);
 
     //Check image
-    if (empty($data_api['rows'])) {
+    if (empty($data_api['rows']) || count($data_api['rows']) == 1 ) {
       return false;
     }
 
