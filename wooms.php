@@ -69,6 +69,7 @@ class WooMS_Core {
       /**
        * Подключение компонентов
        */
+      require_once __DIR__ . '/libraries/action-scheduler/action-scheduler.php';
       require_once __DIR__ . '/inc/class-menu-settings.php';
       require_once __DIR__ . '/inc/class-menu-tool.php';
       require_once __DIR__ . '/inc/class-products-walker.php';

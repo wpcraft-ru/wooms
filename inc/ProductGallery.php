@@ -20,25 +20,13 @@ class ImagesGallery
   public static function init()
   {
 
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 3);
+    add_filter('wooms_product_save', [__CLASS__, 'update_product'], 40, 3);
 
-    add_action('admin_init', array(__CLASS__, 'settings_init'), 70);
+    add_action('admin_init', [__CLASS__, 'settings_init'], 70);
 
-    add_filter('cron_schedules', array(__CLASS__, 'add_schedule'));
+    add_action('init', [__CLASS__, 'add_schedule_hook']);
 
-    add_action('init', array(__CLASS__, 'add_cron_hook'));
-
-    add_action('wooms_cron_image_downloads', array(__CLASS__, 'download_images_from_metafield'));
-
-    // add_action('init', function(){
-    //   if( ! isset($_GET['ee']) ) {
-    //     return;
-    //   }
-
-    //   self::download_images_by_id(126);
-
-    //   exit;
-    // });
+    add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
   }
 
   /**
@@ -66,7 +54,7 @@ class ImagesGallery
     $data_api = wooms_request($url);
 
     //Check image
-    if (empty($data_api['rows']) || count($data_api['rows']) == 1 ) {
+    if (empty($data_api['rows']) || count($data_api['rows']) == 1) {
       return false;
     }
 
@@ -98,52 +86,21 @@ class ImagesGallery
    *
    * @return mixed
    */
-  public static function add_schedule($schedules)
-  {
-
-    $schedules['wooms_cron_worker_images'] = array(
-      'interval' => 60,
-      'display'  => 'WooMS Cron Load Images 60 sec',
-    );
-
-    return $schedules;
-  }
-
-  /**
-   * Init Cron
-   */
-  public static function add_cron_hook()
+  public static function add_schedule_hook()
   {
 
     if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return;
     }
 
-    if (!wp_next_scheduled('wooms_cron_image_downloads')) {
-      wp_schedule_event(time(), 'wooms_cron_worker_images', 'wooms_cron_image_downloads');
+    if (!as_next_scheduled_action('gallery_images_download_schedule')) {
+      as_schedule_recurring_action(
+        time(),
+        60,
+        'gallery_images_download_schedule'
+      );
     }
-  }
 
-
-  /**
-   * Action for UI
-   */
-  public static function ui_action()
-  {
-
-    $data = self::download_images_from_metafield();
-
-    echo '<hr>';
-
-    if (empty($data)) {
-      echo '<p>Нет картинок для загрузки</p>';
-    } else {
-      echo "<p>Загружены миниатюры для продуктов:</p>";
-      foreach ($data as $key => $value) {
-        printf('<p><a href="%s">ID %s</a></p>', get_edit_post_link($value), $value);
-      }
-      echo "<p>Чтобы повторить загрузку - обновите страницу</p>";
-    }
   }
 
   /**
