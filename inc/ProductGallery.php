@@ -80,9 +80,7 @@ class ImagesGallery
   }
 
   /**
-   * Setup cron
-   *
-   * @param $schedules
+   * Setup schedule
    *
    * @return mixed
    */
