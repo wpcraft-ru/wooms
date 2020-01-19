@@ -10,13 +10,13 @@
  * Text Domain: wooms
  * Domain Path: /languages
  * WC requires at least: 3.3
- * WC tested up to: 3.5
+ * WC tested up to: 3.6
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 5.8
- * WooMS XT Latest: 5.8
+ * Version: 6.0
+ * WooMS XT Latest: 6.0
  */
 
 // Exit if accessed directly
