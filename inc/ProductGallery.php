@@ -91,14 +91,27 @@ class ImagesGallery
       return;
     }
 
-    if (!as_next_scheduled_action('gallery_images_download_schedule')) {
+    // If next schedule is not this one and the sync is active and the all gallery images is downloaded
+    if (
+      !as_next_scheduled_action('gallery_images_download_schedule', [], 'ProductGallery')
+      && !empty(get_transient('wooms_start_timestamp'))
+      && !get_transient('gallery_images_downloaded')
+    ) {
+
+      // Adding schedule hook
       as_schedule_recurring_action(
         time(),
         60,
-        'gallery_images_download_schedule'
+        'gallery_images_download_schedule',
+        [],
+        'ProductGallery'
       );
-    }
+    } else {
 
+      as_unschedule_all_actions('gallery_images_download_schedule', [], 'ProductGallery');
+      set_transient('gallery_images_downloaded', false);
+
+    }
   }
 
   /**
@@ -130,7 +143,22 @@ class ImagesGallery
 
     $list = get_posts($args);
 
+    // If no images left to download
     if (empty($list)) {
+
+      // If sync product already finished
+      if (empty(get_transient('wooms_start_timestamp'))) {
+
+        // Adding the option that all images downloaded and the sync is over
+        set_transient('gallery_images_downloaded', true);
+
+        do_action(
+          'wooms_logger',
+          __CLASS__,
+          sprintf('All images is downloaded and sync is over ')
+        );
+      }
+
       return false;
     }
 
