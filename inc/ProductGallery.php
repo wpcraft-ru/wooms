@@ -94,6 +94,8 @@ class ImagesGallery
     // If next schedule is not this one and the sync is active and the all gallery images is downloaded
     if (
       !as_next_scheduled_action('gallery_images_download_schedule', [], 'ProductGallery')
+      // Checking if there is any of this type pending schedules
+      && empty(as_get_scheduled_actions(['hook'=>'gallery_images_download_schedule','status'=>\ActionScheduler_Store::STATUS_PENDING,'group' => 'ProductGallery']))
       && !empty(get_transient('wooms_start_timestamp'))
       && !get_transient('gallery_images_downloaded')
     ) {
@@ -106,7 +108,9 @@ class ImagesGallery
         [],
         'ProductGallery'
       );
-    } else {
+    }
+    
+    if(get_transient('gallery_images_downloaded') && empty(get_transient('wooms_start_timestamp'))){
 
       as_unschedule_all_actions('gallery_images_download_schedule', [], 'ProductGallery');
       set_transient('gallery_images_downloaded', false);
@@ -155,7 +159,7 @@ class ImagesGallery
         do_action(
           'wooms_logger',
           __CLASS__,
-          sprintf('All images is downloaded and sync is over ')
+          sprintf('All gallery images is downloaded and sync is over ')
         );
       }
 
