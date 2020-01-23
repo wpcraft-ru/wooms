@@ -91,15 +91,8 @@ class ImagesGallery
       return;
     }
 
-    // If next schedule is not this one and the sync is active and the all gallery images is downloaded
-    if (
-      !as_next_scheduled_action('gallery_images_download_schedule', [], 'ProductGallery')
-      // Checking if there is any of this type pending schedules
-      && empty(as_get_scheduled_actions(['hook'=>'gallery_images_download_schedule','status'=>\ActionScheduler_Store::STATUS_PENDING,'group' => 'ProductGallery']))
-      && !empty(get_transient('wooms_start_timestamp'))
-      && !get_transient('gallery_images_downloaded')
-    ) {
 
+    if (self::check_schedule_needed()) {
       // Adding schedule hook
       as_schedule_recurring_action(
         time(),
@@ -109,13 +102,49 @@ class ImagesGallery
         'ProductGallery'
       );
     }
-    
-    if(get_transient('gallery_images_downloaded') && empty(get_transient('wooms_start_timestamp'))){
+
+    if (get_transient('gallery_images_downloaded') && empty(get_transient('wooms_start_timestamp'))) {
 
       as_unschedule_all_actions('gallery_images_download_schedule', [], 'ProductGallery');
       set_transient('gallery_images_downloaded', false);
-
     }
+  }
+
+  /**
+   * Checking if schedule can be created or not
+   *
+   * @return void
+   */
+  public static function check_schedule_needed()
+  {
+
+    // If next schedule is not this one and the sync is active and the all gallery images is downloaded
+    if (as_next_scheduled_action('gallery_images_download_schedule', [], 'ProductGallery')) {
+      return false;
+    }
+
+    // Checking if there is any of this type pending schedules
+    $future_schedules = as_get_scheduled_actions(
+      [
+        'hook' => 'gallery_images_download_schedule',
+        'status' => \ActionScheduler_Store::STATUS_PENDING,
+        'group' => 'ProductGallery'
+      ]
+    );
+
+    if (!empty($future_schedules)) {
+      return false;
+    }
+
+    if (empty(get_transient('wooms_start_timestamp'))) {
+      return false;
+    }
+
+    if (get_transient('gallery_images_downloaded')) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
