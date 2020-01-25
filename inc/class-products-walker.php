@@ -587,12 +587,14 @@ class Walker {
     echo '<h2>Продукты (Товары)</h2>';
 
     do_action('wooms_products_display_state');
-
+ 
     if ( empty( get_transient( 'wooms_start_timestamp' ) ) ) {
-      echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>";
+      echo "<p>Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную</p>"; 
       printf( '<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) ) );
+
     } else {
       printf( '<a href="%s" class="button button-secondary">Остановить</a>', add_query_arg( 'a', 'wooms_products_stop_import', admin_url( 'admin.php?page=moysklad' ) ) );
+    
     }
   }
 }
