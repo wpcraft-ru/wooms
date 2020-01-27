@@ -27,6 +27,7 @@ class ImagesGallery
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
+
   }
 
   /**
@@ -229,6 +230,10 @@ class ImagesGallery
 
     foreach ($img_data_list as $image_name => $url) {
 
+      if ($check_id = self::check_exist_image_by_url($image_name)) {
+        return $check_id;
+      }
+
       $media_id = self::uploadRemoteImageAndAttach($url, $product_id, $image_name);
 
       if (!empty($media_id)) {
@@ -247,13 +252,13 @@ class ImagesGallery
       do_action(
         'wooms_logger',
         __CLASS__,
-        sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $product_id, $media_id, $image_name)
+        sprintf('Image is attach to the product %s (ID %s, filename: %s)', $product_id, $media_id, $image_name)
       );
     } else {
       do_action(
         'wooms_logger_error',
         __CLASS__,
-        sprintf('Ошибка нозначения галереи продукта %s', $product_id)
+        sprintf('Error image attachment %s', $product_id)
       );
     }
 
