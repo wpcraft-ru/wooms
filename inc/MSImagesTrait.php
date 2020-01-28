@@ -16,6 +16,9 @@ trait MSImages
      */
     public static function uploadRemoteImageAndAttach($image_url, $product_id, $filename = 'image.jpg')
     {
+        if ($check_id = self::check_exist_image_by_url($image_url)) {
+            return $check_id;
+        }
 
         $uploads_dir = wp_upload_dir();
         $post_name = get_post_field('post_name', $product_id);
@@ -70,10 +73,37 @@ trait MSImages
 
         $attach_data = wp_generate_attachment_metadata($attach_id, $mirror['file']);
 
-        var_dump($attach_data);
+        update_post_meta($attach_id, 'wooms_url', $image_url);
 
         wp_update_attachment_metadata($attach_id, $attach_data);
 
+        do_action(
+            'wooms_logger',
+            __CLASS__,
+            sprintf('Image is downloaded %s (ИД %s, filename: %s)', $product_id, $attach_id, $filename)
+          );
+
         return $attach_id;
+    }
+
+
+    /**
+     * Check exist image by URL
+     */
+    public static function check_exist_image_by_url($url_api)
+    {
+        $posts = get_posts('post_type=attachment&meta_key=wooms_url&meta_value=' . $url_api);
+        if (empty($posts)) {
+            return false;
+        } else {
+
+            do_action(
+                'wooms_logger',
+                __CLASS__,
+                sprintf('We have such image (%s) already', $posts[0]->ID)
+              );
+
+            return $posts[0]->ID;
+        }
     }
 }
