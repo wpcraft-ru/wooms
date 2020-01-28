@@ -252,13 +252,13 @@ class ImagesGallery
       do_action(
         'wooms_logger',
         __CLASS__,
-        sprintf('Image is attach to the product %s (ID %s, filename: %s)', $product_id, $media_id, $image_name)
+        sprintf('Image is attach to the product %s (Image id list [%s], filename: %s)', $product_id, implode(',', $media_data_list), $image_name)
       );
     } else {
       do_action(
         'wooms_logger_error',
         __CLASS__,
-        sprintf('Error image attachment %s', $product_id)
+        sprintf('Error image attachments %s', $product_id)
       );
     }
 
