@@ -78,7 +78,8 @@ class SiteHealth
                 'label' => sprintf(__('%s Notices', 'wooms'),$base_plugin_data['Name']),
                 'color' => 'blue',
             ],
-            'description' => sprintf(__('All is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'description' => sprintf(__('Everything is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'test' => 'wooms_check_different_versions' // this is only for class in html block
         ];
 
         if($base_version !== $xt_version){
@@ -132,20 +133,25 @@ class SiteHealth
                 'label' => sprintf(__('%s Notices', 'wooms'),$base_plugin_data['Name']),
                 'color' => 'blue',
             ],
-            'description' => sprintf(__('All is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'description' => sprintf(__('Everything is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'test' => 'wooms_check_credentials' // this is only for class in html block
         ];
+
+        if(!array_key_exists('errors', $data_api)){
+            wp_send_json_success($result);
+        }
 
         if(array_key_exists('errors', $data_api)){
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
             $result['description'] = sprintf(__('Something went wrong when connecting to the MoySklad','wooms'),'🤔');
-        }
+        } 
 
         /**
          * 1056 is mean that login or the password is not correct
          */
         if($data_api["errors"][0]['code'] === 1056){
-            $result['description'] = sprintf(__('Login or password are not correct for entering to MoySklad %s','wooms'),'🤔');
+            $result['description'] = sprintf(__('Login or password is not correct for entering to MoySklad %s','wooms'),'🤔');
             $result['actions'] .= sprintf(
                 '<p><a href="%s">%s</a></p>',
                 self::$settings_page_url,

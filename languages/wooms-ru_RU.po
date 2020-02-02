@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-02 08:54+0000\n"
-"PO-Revision-Date: 2020-02-02 08:55+0000\n"
+"POT-Creation-Date: 2020-02-02 13:16+0000\n"
+"PO-Revision-Date: 2020-02-02 13:20+0000\n"
 "Last-Translator: root <dev-email@flywheel.local>\n"
 "Language-Team: Русский\n"
 "Language: ru_RU\n"
@@ -39,8 +39,26 @@ msgstr ""
 
 #: inc/SiteHealth.php:42
 msgid "Wooms Notice"
-msgstr ""
+msgstr "Уведомление Wooms "
 
 #. Author of the plugin
 msgid "WPCraft"
 msgstr ""
+
+msgid "Everything is ok! Thank you for using our plugin %s"
+msgstr "Все хорошо! Спасибо что используете наш плагин %s"
+
+msgid "Update plugin"
+msgstr "Обновить плагин"
+
+msgid "Please update the plugin %s for better performance"
+msgstr "Пожалуйста, обновите плагин %s для лучшей производительности"
+
+msgid "Checking MC login and password"
+msgstr "Проверка логина и пароля МойСклад"
+
+msgid "Something went wrong when connecting to the MoySklad"
+msgstr "Что то пошло не так при подключении к МойСклад"
+
+msgid "Login or password is not correct for entering to MoySklad %s"
+msgstr "Неверный логин или пароль от МойСклад %s"

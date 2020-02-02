@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-02 08:54+0000\n"
+"POT-Creation-Date: 2020-02-02 13:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -43,4 +43,22 @@ msgstr ""
 
 #. Author of the plugin
 msgid "WPCraft"
+msgstr ""
+
+msgid "Everything is ok! Thank you for using our plugin %s"
+msgstr ""
+
+msgid "Update plugin"
+msgstr ""
+
+msgid "Please update the plugin %s for better performance"
+msgstr ""
+
+msgid "Checking MC login and password"
+msgstr ""
+
+msgid "Something went wrong when connecting to the MoySklad"
+msgstr ""
+
+msgid "Login or password is not correct for entering to MoySklad %s"
 msgstr ""
