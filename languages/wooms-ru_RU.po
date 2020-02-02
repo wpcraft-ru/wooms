@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-02 13:16+0000\n"
-"PO-Revision-Date: 2020-02-02 13:20+0000\n"
+"POT-Creation-Date: 2020-02-02 13:41+0000\n"
+"PO-Revision-Date: 2020-02-02 13:42+0000\n"
 "Last-Translator: root <dev-email@flywheel.local>\n"
 "Language-Team: Русский\n"
 "Language: ru_RU\n"
@@ -62,3 +62,6 @@ msgstr "Что то пошло не так при подключении к Мо
 
 msgid "Login or password is not correct for entering to MoySklad %s"
 msgstr "Неверный логин или пароль от МойСклад %s"
+
+msgid "Change credentials"
+msgstr "Поменять доступы"
