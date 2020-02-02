@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 class SiteHealth
 {
 
+    
     public static $plugin_dir = ABSPATH . "wp-content/plugins/";
     public static $base_plugin_url = "wooms/wooms.php";
     public static $xt_plugin_url = "wooms-extra/wooms-extra.php";
