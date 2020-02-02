@@ -1,0 +1,46 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WooMS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-02-02 08:54+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.3.1; wp-5.3.2"
+
+#: inc/SiteHealth.php:39
+msgid "Different versions of plugins"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://wpcraft.ru/"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://wpcraft.ru/product/wooms/"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST "
+"API (wooms)"
+msgstr ""
+
+#. Name of the plugin
+msgid "WooMS"
+msgstr ""
+
+#: inc/SiteHealth.php:42
+msgid "Wooms Notice"
+msgstr ""
+
+#. Author of the plugin
+msgid "WPCraft"
+msgstr ""
