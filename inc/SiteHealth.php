@@ -64,7 +64,7 @@ class SiteHealth
         $xt_version = $xt_plugin_data['Version'];
 
         $result = [
-            'label' => 'Разные версии плагина',
+            'label' => 'Разные версии плагина WooMS & WooMS XT',
             'status'      => 'good',
             'badge'       => [
                 'label' => 'Уведомление WooMS',
@@ -77,7 +77,7 @@ class SiteHealth
         if($base_version !== $xt_version){
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
-            $result['actions'] .= sprintf(
+            $result['actions'] = sprintf(
                 '<p><a href="%s">%s</a></p>',
                 admin_url('plugins.php'),
                 sprintf("Обновить плагин")
@@ -144,7 +144,7 @@ class SiteHealth
          */
         if($data_api["errors"][0]['code'] === 1056){
             $result['description'] = sprintf("Неверный логин или пароль от МойСклад %s",'🤔');
-            $result['actions'] .= sprintf(
+            $result['actions'] = sprintf(
                 '<p><a href="%s">%s</a></p>',
                 self::$settings_page_url,
                 sprintf("Поменять доступы")
