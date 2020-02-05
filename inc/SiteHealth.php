@@ -46,9 +46,6 @@ class SiteHealth
             'test'  => 'wooms_check_different_versions_of_plugins',
         ];
 
-        // var_dump($tests);
-        // exit;
-
         return $tests;
     }
 
@@ -72,13 +69,13 @@ class SiteHealth
         $xt_version = $xt_plugin_data['Version'];
 
         $result = [
-            'label' => __('Different versions of plugins', 'wooms'),
+            'label' => 'Разные версии плагина',
             'status'      => 'good',
             'badge'       => [
-                'label' => sprintf(__('%s Notices', 'wooms'),$base_plugin_data['Name']),
+                'label' => sprintf('%s Notices',$base_plugin_data['Name']),
                 'color' => 'blue',
             ],
-            'description' => sprintf(__('Everything is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'description' => sprintf('Все хорошо! Спасибо что выбрали наш плагин %s', '🙂'),
             'test' => 'wooms_check_different_versions' // this is only for class in html block
         ];
 
@@ -88,7 +85,7 @@ class SiteHealth
             $result['actions'] .= sprintf(
                 '<p><a href="%s">%s</a></p>',
                 admin_url('plugins.php'),
-                sprintf(__('Update plugin', 'wooms'))
+                sprintf("Обновить плагин")
             );
         }
 
@@ -97,14 +94,14 @@ class SiteHealth
          */
         if ($base_version < $xt_version) {
             
-            $result['description'] = sprintf(__('Please update the plugin %s for better performance', 'wooms'), $base_plugin_data['Name']);
+            $result['description'] = sprintf('Пожалуйста, обновите плагин %s для лучшей производительности', $base_plugin_data['Name']);
         }
 
         /**
          * if xt version is lower
          */
         if ($base_version > $xt_version) {
-            $result['description'] = sprintf(__('Please update the plugin %s for better performance', 'wooms'), $xt_plugin_data['Name']);
+            $result['description'] = sprintf('Пожалуйста, обновите плагин %s для лучшей производительности', $xt_plugin_data['Name']);
         }
 
         wp_send_json_success($result);
@@ -127,13 +124,13 @@ class SiteHealth
         $data_api = wooms_request($url,[],'POST');
     
         $result = [
-            'label' => __('Checking MC login and password', 'wooms'),
+            'label' => "Проверка логина и пароля МойСклад",
             'status'      => 'good',
             'badge'       => [
-                'label' => sprintf(__('%s Notices', 'wooms'),$base_plugin_data['Name']),
+                'label' => 'Уведомление Wooms',
                 'color' => 'blue',
             ],
-            'description' => sprintf(__('Everything is ok! Thank you for using our plugin %s', 'wooms'), '🙂'),
+            'description' => sprintf("Все хорошо! Спасибо что используете наш плагин %s", '🙂'),
             'test' => 'wooms_check_credentials' // this is only for class in html block
         ];
 
@@ -144,18 +141,18 @@ class SiteHealth
         if(array_key_exists('errors', $data_api)){
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
-            $result['description'] = sprintf(__('Something went wrong when connecting to the MoySklad','wooms'),'🤔');
+            $result['description'] = sprintf("Что то пошло не так при подключении к МойСклад",'🤔');
         } 
 
         /**
          * 1056 is mean that login or the password is not correct
          */
         if($data_api["errors"][0]['code'] === 1056){
-            $result['description'] = sprintf(__('Login or password is not correct for entering to MoySklad %s','wooms'),'🤔');
+            $result['description'] = sprintf("Неверный логин или пароль от МойСклад %s",'🤔');
             $result['actions'] .= sprintf(
                 '<p><a href="%s">%s</a></p>',
                 self::$settings_page_url,
-                sprintf(__('Change credentials', 'wooms'))
+                sprintf("Поменять доступы")
             );
         }
 
