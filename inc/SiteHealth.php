@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+
 /**
  * Import Product Images
  */
@@ -23,7 +24,7 @@ class SiteHealth
     {
         add_filter('site_status_tests', [__CLASS__, 'new_health_tests']);
 
-        add_action('wp_ajax_health-check-wooms-check_different_versions_of_plugins', [__CLASS__, 'wooms_check_different_versions_of_plugins']);
+        add_action('wooms-check_different_versions_of_plugins', [__CLASS__, 'wooms_check_different_versions_of_plugins']);
         
         add_action('wp_ajax_health-check-wooms-check_login_password', [__CLASS__, 'wooms_check_login_password']);
 
@@ -42,8 +43,8 @@ class SiteHealth
             'test'  => 'wooms_check_login_password',
         ];
 
-        $tests['async']['wooms_check_different_versions'] = [
-            'test'  => 'wooms_check_different_versions_of_plugins',
+        $tests['direct']['wooms_check_different_versions'] = [
+            'test'  => [__CLASS__,'wooms_check_different_versions_of_plugins'],
         ];
 
         return $tests;
@@ -56,12 +57,6 @@ class SiteHealth
      */
     public static function wooms_check_different_versions_of_plugins()
     {
-
-        check_ajax_referer('health-check-site-status');
-
-        if (!current_user_can('view_site_health_checks')) {
-            wp_send_json_error();
-        }
 
         $base_plugin_data = get_plugin_data(self::$plugin_dir . self::$base_plugin_url);
         $xt_plugin_data = get_plugin_data(self::$plugin_dir . self::$xt_plugin_url);
@@ -104,7 +99,7 @@ class SiteHealth
             $result['description'] = sprintf('Пожалуйста, обновите плагин %s для лучшей производительности', $xt_plugin_data['Name']);
         }
 
-        wp_send_json_success($result);
+        return $result;
     }
 
     /**
