@@ -1,6 +1,6 @@
 <?php
 
-namespace WooMS\Products;
+namespace WooMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
   exit; // Exit if accessed directly
@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Hide old products
  */
-class Hiding {
+class ProductsHiding {
 
   /**
    * The init
@@ -205,4 +205,4 @@ class Hiding {
 
 }
 
-Hiding::init();
+ProductsHiding::init();

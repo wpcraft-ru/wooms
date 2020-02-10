@@ -49,7 +49,7 @@ class WooMS_Core
      * Этот класс должен работать до хука plugins_loaded
      * Птм что иначе хук wooms_activate не срабатывает
      */
-    require_once __DIR__ . '/inc/class-logger.php';
+    require_once __DIR__ . '/inc/Logger.php';
     require_once __DIR__ . '/functions.php';
 
     /**
@@ -74,12 +74,12 @@ class WooMS_Core
       /**
        * Подключение компонентов
        */
-      require_once __DIR__ . '/inc/class-menu-settings.php';
-      require_once __DIR__ . '/inc/class-menu-tool.php';
+      require_once __DIR__ . '/inc/MenuSettings.php';
+      require_once __DIR__ . '/inc/MenuTools.php';
       require_once __DIR__ . '/inc/ProductsWalker.php';
-      require_once __DIR__ . '/inc/class-import-product-categories.php';
-      require_once __DIR__ . '/inc/class-import-prices.php';
-      require_once __DIR__ . '/inc/class-hide-old-products.php';
+      require_once __DIR__ . '/inc/ProductsCategories.php';
+      require_once __DIR__ . '/inc/ProductsPrices.php';
+      require_once __DIR__ . '/inc/ProductsHiding.php';
 
       require_once __DIR__ . '/inc/MSImagesTrait.php';
       require_once __DIR__ . '/inc/ProductGallery.php';

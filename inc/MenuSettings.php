@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Settings
  */
-class Settings {
+class MenuSettings {
 
   /**
    * The Init
@@ -246,4 +246,4 @@ class Settings {
 
 }
 
-Settings::init();
+MenuSettings::init();
