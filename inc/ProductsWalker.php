@@ -268,7 +268,7 @@ class ProductsWalker
   public static function add_schedule_hook()
   {
 
-    if (self::check_schedule_needed()) {
+    if (!as_next_scheduled_action('wooms_cron_walker_schedule', [], 'ProductWalker')) {
       // Adding schedule hook
       as_schedule_recurring_action(
         time(),
@@ -278,44 +278,7 @@ class ProductsWalker
         'ProductWalker'
       );
     }
-
-    if (empty(get_transient('wooms_start_timestamp'))) {
-
-      as_unschedule_all_actions('wooms_cron_walker_schedule', [], 'ProductWalker');
-    }
-  }
-
-  /**
-   * Checking if schedule can be created or not
-   *
-   * @return void
-   */
-  public static function check_schedule_needed()
-  {
-
-    // If next schedule is not this one and the sync is active and the all gallery images is downloaded
-    if (as_next_scheduled_action('wooms_cron_walker_schedule', [], 'ProductWalker')) {
-      return false;
-    }
-
-    // Checking if there is any of this type pending schedules
-    $future_schedules = as_get_scheduled_actions(
-      [
-        'hook' => 'wooms_cron_walker_schedule',
-        'status' => \ActionScheduler_Store::STATUS_PENDING,
-        'group' => 'ProductWalker'
-      ]
-    );
-
-    if (!empty($future_schedules)) {
-      return false;
-    }
-
-    if (empty(get_transient('wooms_start_timestamp'))) {
-      return false;
-    }
-
-    return true;
+    
   }
 
   /**

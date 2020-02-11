@@ -16,8 +16,8 @@ class ProductsHiding {
    */
   public static function init()
   {
-    add_action( 'init', array( __CLASS__, 'cron_init' ) );
-    add_action( 'wooms_cron_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
+    add_action( 'init', array( __CLASS__, 'add_schedule_hook' ) );
+    add_action( 'wooms_schedule_clear_old_products_walker', array( __CLASS__, 'walker_starter' ) );
 
     add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
     add_action('wooms_main_walker_finish', array(__CLASS__, 'finis_main_walker'));
@@ -28,10 +28,19 @@ class ProductsHiding {
   /**
    * Cron task restart
    */
-  public static function cron_init() {
-    if ( ! wp_next_scheduled( 'wooms_cron_clear_old_products_walker' ) ) {
-      wp_schedule_event( time(), 'wooms_cron_walker_shedule', 'wooms_cron_clear_old_products_walker' );
+  public static function add_schedule_hook() {
+    
+    if (!as_next_scheduled_action('wooms_schedule_clear_old_products_walker', [], 'ProductWalker')) {
+      // Adding schedule hook
+      as_schedule_recurring_action(
+        time(),
+        60,
+        'wooms_schedule_clear_old_products_walker',
+        [],
+        'ProductWalker'
+      );
     }
+
   }
 
   /**
