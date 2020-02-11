@@ -20,23 +20,23 @@ class ProductsWalker
   {
 
     //Main Walker
-    add_action('wooms_cron_walker_schedule', array(__CLASS__, 'walker_cron_starter'));
-    add_action('init', array(__CLASS__, 'add_schedule_hook'));
+    add_action('wooms_walker_schedule', [__CLASS__, 'walker_schedule_starter']);
+    add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     //Product data
-    add_action('wooms_product_import_row', array(__CLASS__, 'load_product'), 10, 3);
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 9, 3);
+    add_action('wooms_product_import_row', [__CLASS__, 'load_product'], 10, 3);
+    add_filter('wooms_product_save', [__CLASS__, 'update_product'], 9, 3);
 
     //UI and actions manually
-    add_action('woomss_tool_actions_btns', array(__CLASS__, 'display_wrapper'));
-    add_action('woomss_tool_actions_wooms_products_start_import', array(__CLASS__, 'start_manually'));
-    add_action('woomss_tool_actions_wooms_products_stop_import', array(__CLASS__, 'stop_manually'));
+    add_action('woomss_tool_actions_btns', [__CLASS__, 'display_wrapper']);
+    add_action('woomss_tool_actions_wooms_products_start_import', [__CLASS__, 'start_manually']);
+    add_action('woomss_tool_actions_wooms_products_stop_import', [__CLASS__, 'stop_manually']);
 
     //Notices
-    add_action('wooms_products_display_state', array(__CLASS__, 'display_state'));
+    add_action('wooms_products_display_state', [__CLASS__, 'display_state']);
 
     //Other
-    add_action('add_meta_boxes', array(__CLASS__, 'add_meta_boxes_post_type'));
+    add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes_post_type']);
   }
 
   /**
@@ -178,7 +178,7 @@ class ProductsWalker
    */
   public static function add_meta_boxes_post_type()
   {
-    add_meta_box('wooms_product', 'МойСклад', array(__CLASS__, 'display_metabox_for_product'), 'product', 'side', 'low');
+    add_meta_box('wooms_product', 'МойСклад', [__CLASS__, 'display_metabox_for_product'], 'product', 'side', 'low');
   }
 
   /**
@@ -268,23 +268,22 @@ class ProductsWalker
   public static function add_schedule_hook()
   {
 
-    if (!as_next_scheduled_action('wooms_cron_walker_schedule', [], 'ProductWalker')) {
+    if (!as_next_scheduled_action('wooms_walker_schedule', [], 'ProductWalker')) {
       // Adding schedule hook
       as_schedule_recurring_action(
         time(),
         60,
-        'wooms_cron_walker_schedule',
+        'wooms_walker_schedule',
         [],
         'ProductWalker'
       );
     }
-    
   }
 
   /**
    * Starter walker by cron if option enabled
    */
-  public static function walker_cron_starter()
+  public static function walker_schedule_starter()
   {
 
     if (self::can_cron_start()) {
@@ -345,11 +344,11 @@ class ProductsWalker
       set_transient('wooms_offset', $offset);
     }
 
-    $ms_api_args = array(
+    $ms_api_args = [
       'offset' => $offset,
       'limit'  => $count,
       'scope'  => 'product',
-    );
+    ];
 
     $url = 'https://online.moysklad.ru/api/remap/1.1/entity/assortment';
 
