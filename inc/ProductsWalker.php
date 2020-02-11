@@ -268,6 +268,19 @@ class ProductsWalker
   public static function add_schedule_hook()
   {
 
+    // Checking if there is any of this type pending schedules
+    $future_schedules = as_get_scheduled_actions(
+      [
+        'hook' => 'wooms_walker_schedule',
+        'status' => \ActionScheduler_Store::STATUS_PENDING,
+        'group' => 'ProductWalker'
+      ]
+    );
+
+    if (!empty($future_schedules)) {
+      return false;
+    }
+
     if (!as_next_scheduled_action('wooms_walker_schedule', [], 'ProductWalker')) {
       // Adding schedule hook
       as_schedule_recurring_action(
@@ -278,6 +291,7 @@ class ProductsWalker
         'ProductWalker'
       );
     }
+    
   }
 
   /**
