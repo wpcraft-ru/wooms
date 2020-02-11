@@ -31,6 +31,41 @@ class ProductsHiding
    */
   public static function add_schedule_hook()
   {
+    
+    if (self::check_schedule_needed()) {
+      // Adding schedule hook
+      as_schedule_recurring_action(
+        time(),
+        60,
+        'wooms_schedule_clear_old_products_walker',
+        [],
+        'ProductWalker'
+      );
+    } else {
+      as_unschedule_all_actions('wooms_schedule_clear_old_products_walker', [], 'ProductWalker');
+    }
+
+  }
+
+  /**
+   * Checking shedule nedded or not
+   *
+   * @return void
+   */
+  public static function check_schedule_needed(){
+
+    if (get_transient('wooms_product_hiding_disable')) {
+      return false;
+    }
+
+    //Если работает синк товаров, то блокируем работу
+    if (!empty(get_transient('wooms_start_timestamp'))) {
+      return false;
+    }
+
+    if (get_transient('wooms_products_old_hide_pause')) {
+      return false;
+    }
 
     // Checking if there is any of this type pending schedules
     $future_schedules = as_get_scheduled_actions(
@@ -45,17 +80,11 @@ class ProductsHiding
       return false;
     }
 
-
-    if (!as_next_scheduled_action('wooms_schedule_clear_old_products_walker', [], 'ProductWalker')) {
-      // Adding schedule hook
-      as_schedule_recurring_action(
-        time(),
-        60,
-        'wooms_schedule_clear_old_products_walker',
-        [],
-        'ProductWalker'
-      );
+    if(as_next_scheduled_action('wooms_schedule_clear_old_products_walker', [], 'ProductWalker')){
+      return false;
     }
+
+    return true;
   }
 
   /**
@@ -63,19 +92,6 @@ class ProductsHiding
    */
   public static function walker_starter()
   {
-    if (get_transient('wooms_product_hiding_disable')) {
-      return;
-    }
-
-    //Если работает синк товаров, то блокируем работу
-    if (!empty(get_transient('wooms_start_timestamp'))) {
-      return;
-    }
-
-    if (get_transient('wooms_products_old_hide_pause')) {
-      return;
-    }
-
     self::set_hidden_old_product();
   }
 
