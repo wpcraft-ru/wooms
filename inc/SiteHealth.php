@@ -71,7 +71,7 @@ class SiteHealth
             'test' => 'wooms_check_wordpress_version_for_wooms' // this is only for class in html block
         ];
 
-        if ($wp_version > 3.6) {
+        if ($wp_version < 3.6) {
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
             $result['actions'] = sprintf(
