@@ -80,7 +80,7 @@ PHP 5.6
 
 = 6.1 = 
 * добавлен вывод ошибок 'не правильный пароль' в раздел Здоровье Cайта https://github.com/wpcraft-ru/wooms/issues/216
-* добавлена вывод ошибок при разных версиях базого и XT в раздел Здоровье Cайта https://github.com/wpcraft-ru/wooms/issues/216
+* добавлен вывод ошибок при разных версиях базого и XT в раздел Здоровье Cайта https://github.com/wpcraft-ru/wooms/issues/216
 
 = 6.0 =
 * добавлена поддержка галлереи изображений продукта https://github.com/wpcraft-ru/wooms/issues/27
