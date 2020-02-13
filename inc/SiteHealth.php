@@ -36,8 +36,8 @@ class SiteHealth
     public static function new_health_tests($tests)
     {
 
-        $tests['direct']['wooms_check_wordpress_version_for_wooms'] = [
-            'test'  => [__CLASS__, 'wooms_check_wordpress_version_for_wooms'],
+        $tests['direct']['wooms_check_WooCommerce_version_for_wooms'] = [
+            'test'  => [__CLASS__, 'wooms_check_WooCommerce_version_for_wooms'],
         ];
 
         $tests['direct']['wooms_check_different_versions'] = [
@@ -52,34 +52,34 @@ class SiteHealth
     }
 
     /**
-     * Checking version wordpress
+     * Checking version WooCommerce
      *
      * @return void
      */
-    public static function wooms_check_wordpress_version_for_wooms()
+    public static function wooms_check_WooCommerce_version_for_wooms()
     {
 
-        global $wp_version;
+        $wc_version = WC()->version;
         $result = [
-            'label' => 'Проверка версии Wordpress для работы плагина WooMS & WooMS XT',
+            'label' => 'Проверка версии WooCommerce для работы плагина WooMS & WooMS XT',
             'status'      => 'good',
             'badge'       => [
                 'label' => 'Уведомление WooMS',
                 'color' => 'blue',
             ],
             'description' => sprintf('Все хорошо! Спасибо что выбрали наш плагин %s', '🙂'),
-            'test' => 'wooms_check_wordpress_version_for_wooms' // this is only for class in html block
+            'test' => 'wooms_check_WooCommerce_version_for_wooms' // this is only for class in html block
         ];
 
-        if ($wp_version < 3.6) {
+        if ($wc_version < 3.6) {
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
             $result['actions'] = sprintf(
                 '<p><a href="%s">%s</a></p>',
-                admin_url('update-core.php'),
-                sprintf("Обновить Wordpress")
+                admin_url('plugins.php'),
+                sprintf("Обновить WooCommerce")
             );
-            $result['description'] = sprintf('Обновите пожалуйста Wordpress чтобы WooMS & WooMS XT работали ');
+            $result['description'] = sprintf('Обновите пожалуйста WooCommerce чтобы WooMS & WooMS XT работали ');
         }
 
         return $result;
