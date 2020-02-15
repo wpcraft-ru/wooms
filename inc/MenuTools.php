@@ -4,7 +4,7 @@ namespace WooMS;
 /**
  *  Tool for MoySklad
  */
-class Tools {
+class MenuTools {
 
   /**
    * URL action
@@ -71,4 +71,4 @@ class Tools {
 
 }
 
-Tools::init();
+MenuTools::init();

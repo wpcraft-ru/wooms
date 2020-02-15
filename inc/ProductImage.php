@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  */
 class ProductImage
 {
-    
+
     use MSImages;
 
     /**
@@ -26,7 +26,7 @@ class ProductImage
         //     }
 
         //     self::download_images_from_metafield();
-        
+
 
         //     die('end');
         // });
@@ -34,16 +34,16 @@ class ProductImage
         /**
          * Обновление данных о продукте
          */
-        add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 35, 3);
+        add_filter('wooms_product_save', [__CLASS__, 'update_product'], 35, 3);
 
-        add_action('admin_init', array(__CLASS__, 'settings_init'), 50);
+        add_action('admin_init', [__CLASS__, 'settings_init'], 50);
 
-        add_action('init', array(__CLASS__, 'add_cron_hook'));
+        add_action('init', [__CLASS__, 'add_schedule_hook']);
 
-        add_action('wooms_cron_image_downloads', array(__CLASS__, 'download_images_from_metafield'));
+        add_action('main_image_download_schedule', [__CLASS__, 'download_images_from_metafield']);
 
-        add_action('woomss_tool_actions_btns', array(__CLASS__, 'ui_for_manual_start'), 15);
-        add_action('woomss_tool_actions_wooms_products_images_manual_start', array(__CLASS__, 'ui_action'));
+        add_action('woomss_tool_actions_btns', [__CLASS__, 'ui_for_manual_start'], 15);
+        add_action('woomss_tool_actions_wooms_products_images_manual_start', [__CLASS__, 'ui_action']);
     }
 
     /**
@@ -75,17 +75,67 @@ class ProductImage
     }
 
     /**
-     * Init Cron
+     * Init Scheduler
      */
-    public static function add_cron_hook()
+    public static function add_schedule_hook()
     {
         if (empty(get_option('woomss_images_sync_enabled'))) {
             return;
         }
 
-        if (!wp_next_scheduled('wooms_cron_image_downloads')) {
-            wp_schedule_event(time(), 'every_minute', 'wooms_cron_image_downloads');
+        if (self::check_schedule_needed()) {
+            // Adding schedule hook
+            as_schedule_recurring_action(
+                time(),
+                60,
+                'main_image_download_schedule',
+                [],
+                'ProductImage'
+            );
         }
+
+        if (get_transient('main_images_downloaded') && empty(get_transient('wooms_start_timestamp'))) {
+
+            as_unschedule_all_actions('main_image_download_schedule', [], 'ProductImage');
+            set_transient('main_images_downloaded', false);
+        }
+    }
+
+    /**
+     * Checking if schedule can be created or not
+     *
+     * @return void
+     */
+    public static function check_schedule_needed()
+    {
+
+        // If next schedule is not this one and the sync is active and the all gallery images is downloaded
+        if (as_next_scheduled_action('main_image_download_schedule', [], 'ProductImage')) {
+            return false;
+        }
+
+        // Checking if there is any of this type pending schedules
+        $future_schedules = as_get_scheduled_actions(
+            [
+                'hook' => 'main_image_download_schedule',
+                'status' => \ActionScheduler_Store::STATUS_PENDING,
+                'group' => 'ProductImage'
+            ]
+        );
+
+        if (!empty($future_schedules)) {
+            return false;
+        }
+
+        if (empty(get_transient('wooms_start_timestamp'))) {
+            return false;
+        }
+
+        if (get_transient('main_images_downloaded')) {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -139,6 +189,16 @@ class ProductImage
         $list = get_posts($args);
 
         if (empty($list)) {
+
+            // Adding the option that all images downloaded
+            set_transient('main_images_downloaded', true);
+
+            do_action(
+                'wooms_logger',
+                __CLASS__,
+                sprintf('Main images is downloaded')
+            );
+
             return false;
         }
 
@@ -194,153 +254,6 @@ class ProductImage
         }
     }
 
-    /**
-     * Download Image by URL and retrun att id or false or WP_Error
-     */
-    public static function download_img($url_api, $file_name, $post_id)
-    {
-        if ($check_id = self::check_exist_image_by_url($url_api)) {
-            return $check_id;
-        }
-
-        if (!function_exists('curl_init')) {
-            do_action(
-                'wooms_logger_error',
-                __CLASS__,
-                'Не удалось обнаружить curl_init. Нужно настроить curl на сервера.'
-            );
-            return false;
-        }
-        
-        if (!function_exists('wp_read_image_metadata') || !function_exists('wp_tempnam')) {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-            require_once(ABSPATH . 'wp-admin/includes/image.php');
-        }
-
-        $header_array = [
-            'Authorization' => 'Basic ' . base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
-        ];
-
-        $headers = array();
-        foreach ($header_array as $name => $value) {
-            $headers[] = "{$name}: $value";
-        }
-
-        $ch = \curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url_api);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $output = curl_exec($ch);
-        $info   = curl_getinfo($ch); // Получим информацию об операции
-        curl_close($ch);
-
-        $file_name = sanitize_file_name($file_name);
-        $tmpfname = wp_tempnam($file_name);
-        $fh       = fopen($tmpfname, 'w');
-
-        if ($url_api == $info['url']) { //если редиректа нет записываем файл
-            fwrite($fh, $output);
-        } else {
-            // fix https://github.com/wpcraft-ru/wooms/issues/203
-            $context_options = array(
-                "ssl" => array(
-                    "verify_peer" => false,
-                    "verify_peer_name" => false,
-                ),
-            );
-            //если редирект есть то скачиваем файл по ссылке
-            $file = file_get_contents($info['url'], false, stream_context_create($context_options));
-            if (!$file) {
-                do_action(
-                    'wooms_logger_error',
-                    __CLASS__,
-                    'Загрузка картинки - не удалось закачать файл',
-                    sprintf('Данные %s', PHP_EOL . print_r($info['url'], true))
-                );
-                return false;
-            }
-            fwrite($fh, $file);
-        }
-        
-        fclose($fh);
-        $filetype = wp_check_filetype($file_name);
-        // Array based on $_FILE as seen in PHP file uploads.
-        $file_args = array(
-            'name'     => $file_name, // ex: wp-header-logo.png
-            'type'     => $filetype['type'], //todo do right
-            'tmp_name' => $tmpfname,
-            'error'    => 0,
-            'size'     => filesize($tmpfname),
-        );
-        $overrides = array(
-            'test_form'   => false,
-            'test_size'   => false,
-            'test_upload' => false,
-        );
-        $file_data = wp_handle_sideload($file_args, $overrides);
-        // If error storing permanently, unlink.
-        if (is_wp_error($file_data)) {
-            @unlink($tmpfname);
-            do_action(
-                'wooms_logger_error',
-                __CLASS__,
-                'Загрузка картинки - не удалось получить файл',
-                sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
-            );
-            return false;
-        }
-        if (empty($file_data['url'])) {
-            do_action(
-                'wooms_logger_error',
-                __CLASS__,
-                'Загрузка картинки - не удалось получить URL',
-                sprintf('Данные %s', PHP_EOL . print_r($file_data, true))
-            );
-            @unlink($tmpfname);
-            return false;
-        }
-
-        $url     = $file_data['url'];
-        $type    = $file_data['type'];
-        $file    = $file_data['file'];
-        $title   = preg_replace('/\.[^.]+$/', '', basename($file));
-        $content = '';
-        // Use image exif/iptc data for title and caption defaults if possible.
-        if ($image_meta = \wp_read_image_metadata($file)) {
-            if (trim($image_meta['title']) && !is_numeric(sanitize_title($image_meta['title']))) {
-                $title = $image_meta['title'];
-            }
-            if (trim($image_meta['caption'])) {
-                $content = $image_meta['caption'];
-            }
-        }
-        if (isset($desc)) {
-            $title = $desc;
-        }
-        // Construct the attachment array.
-        $attachment = array(
-            'post_mime_type' => $type,
-            'guid'           => $url,
-            'post_parent'    => $post_id,
-            'post_title'     => $title,
-            'post_content'   => $content,
-        );
-        // This should never be set as it would then overwrite an existing attachment.
-        unset($attachment['ID']);
-        // Save the attachment metadata
-        $id = wp_insert_attachment($attachment, $file, $post_id);
-        if (!is_wp_error($id)) {
-            wp_update_attachment_metadata($id, wp_generate_attachment_metadata($id, $file));
-        } else {
-            return false;
-        }
-        @unlink($tmpfname);
-        update_post_meta($id, 'wooms_url', $url_api);
-        return $id;
-    }
-
 
     /**
      * Manual start images download
@@ -353,8 +266,8 @@ class ProductImage
 
         <h2>Изображения</h2>
         <p>Ручная загрузка изображений по 5 штук за раз.</p>
-        
-        <?php printf('<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg('a', 'wooms_products_images_manual_start', admin_url('admin.php?page=moysklad')));
+
+<?php printf('<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg('a', 'wooms_products_images_manual_start', admin_url('admin.php?page=moysklad')));
     }
 
     /**

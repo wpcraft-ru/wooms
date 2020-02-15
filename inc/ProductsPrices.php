@@ -1,5 +1,5 @@
 <?php
-namespace WooMS\Products;
+namespace WooMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Select specific price is setup
  */
-class Prices {
+class ProductsPrices {
 
   /**
    * The init
@@ -95,4 +95,4 @@ class Prices {
     }
 }
 
-Prices::init();
+ProductsPrices::init();
