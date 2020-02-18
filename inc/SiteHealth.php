@@ -36,8 +36,8 @@ class SiteHealth
     public static function new_health_tests($tests)
     {
 
-        $tests['direct']['wooms_check_WooCommerce_version_for_wooms'] = [
-            'test'  => [__CLASS__, 'wooms_check_WooCommerce_version_for_wooms'],
+        $tests['direct']['wooms_check_woocommerce_version_for_wooms'] = [
+            'test'  => [__CLASS__, 'wooms_check_woocommerce_version_for_wooms'],
         ];
 
         $tests['direct']['wooms_check_different_versions'] = [
@@ -56,7 +56,7 @@ class SiteHealth
      *
      * @return void
      */
-    public static function wooms_check_WooCommerce_version_for_wooms()
+    public static function wooms_check_woocommerce_version_for_wooms()
     {
 
         $wc_version = WC()->version;
@@ -68,10 +68,10 @@ class SiteHealth
                 'color' => 'blue',
             ],
             'description' => sprintf('Все хорошо! Спасибо что выбрали наш плагин %s', '🙂'),
-            'test' => 'wooms_check_WooCommerce_version_for_wooms' // this is only for class in html block
+            'test' => 'wooms_check_woocommerce_version_for_wooms' // this is only for class in html block
         ];
 
-        if ($wc_version < 3.6) {
+        if (version_compare($wc_version, '3.6.0', '<=')) {
             $result['status'] = 'critical';
             $result['badge']['color'] = 'red';
             $result['actions'] = sprintf(
@@ -79,7 +79,7 @@ class SiteHealth
                 admin_url('plugins.php'),
                 sprintf("Обновить WooCommerce")
             );
-            $result['description'] = sprintf('Обновите пожалуйста WooCommerce чтобы WooMS & WooMS XT работали ');
+            $result['description'] = sprintf('Ваша версия WooCommerce плагина %s. Обновите пожалуйста WooCommerce чтобы WooMS & WooMS XT работали ', $wc_version);
         }
 
         return $result;
