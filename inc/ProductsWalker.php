@@ -37,7 +37,6 @@ class ProductsWalker
 
     //Other
     add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes_post_type']);
-
   }
 
   /**
@@ -279,12 +278,7 @@ class ProductsWalker
     );
 
     if (!empty($future_schedules)) {
-      if (count($future_schedules) == 1) {
-        return false;
-      }
-      if (count($future_schedules) > 1) {
-        as_unschedule_all_actions('wooms_walker_schedule', [], 'ProductWalker');
-      }
+      return false;
     }
 
     if (!as_next_scheduled_action('wooms_walker_schedule', [], 'ProductWalker')) {
@@ -297,6 +291,7 @@ class ProductsWalker
         'ProductWalker'
       );
     }
+    
   }
 
   /**
