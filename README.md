@@ -19,3 +19,16 @@
 ## Todo
 - посты в блог/чаво https://github.com/wpcraft-ru/wooms/labels/question
 - задачи https://github.com/wpcraft-ru/wooms/issues
+
+
+## SVN 
+
+- клонирование
+```
+svn co https://plugins.svn.wordpress.org/wooms .
+```
+
+- комит
+```
+svn ci -m 'update 6.1'
+```
