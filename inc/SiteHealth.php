@@ -18,6 +18,7 @@ class SiteHealth
     public static $base_plugin_url = "wooms/wooms.php";
     public static $xt_plugin_url = "wooms-extra/wooms-extra.php";
     public static $settings_page_url = 'admin.php?page=mss-settings';
+    
 
 
     public static function init()
