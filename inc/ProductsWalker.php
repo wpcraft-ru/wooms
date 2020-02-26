@@ -37,6 +37,12 @@ class ProductsWalker
 
     //Other
     add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes_post_type']);
+
+    // let only one schedule
+    add_filter( 'action_scheduler_queue_runner_concurrent_batches', function($concurrent_batches){
+      return 1;
+    });
+    
   }
 
   /**
