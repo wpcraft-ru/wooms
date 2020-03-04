@@ -27,11 +27,11 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 [Инструкция по правильному запуску Интернет магазина на базе WordPress & WooCommerce](https://wpcraft.ru/blog/internet-magazin-na-wordpress-woocommerce-storefront-mojsklad/)
 
-Для больших возможностей можно приобрести расширенную версию https://wpcraft.ru/product/wooms-extra/
+Для больших возможностей можно приобрести [расширенную версию](https://wpcraft.ru/product/wooms-extra/)
 
-Исходники https://github.com/wpcraft-ru/wooms/ (для желающих принять участие в разработке)
+Исходники [для желающих принять участие в разработке] (https://github.com/wpcraft-ru/wooms/)
 
-По вопросам доработки [https://github.com/wpcraft-ru/wooms/issues](https://github.com/wpcraft-ru/wooms/issues)
+[По вопросам доработки](https://github.com/wpcraft-ru/wooms/issues)
 Плагин спроектирован таким образом, что относительно просто позволяет дорабатывать механику под задачи и автоматизацию конкретного магазина/каталога.
 
 == Installation ==
