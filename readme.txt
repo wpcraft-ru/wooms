@@ -80,8 +80,10 @@ PHP 5.6
 
 == Changelog ==
 
-= unreleased =
-* исправлена ошибка по неправильной стоимости доставки https://github.com/wpcraft-ru/wooms/issues/244
+= 6.2 =
+* улучшена работа плановых заданий
+* тест WooCommerce 4.0 https://github.com/wpcraft-ru/wooms/issues/242
+* XT исправлена ошибка по неправильной стоимости доставки https://github.com/wpcraft-ru/wooms/issues/244
 
 = 6.1 = 
 * исправлена ошибка по дублированию картинок https://github.com/wpcraft-ru/wooms/issues/221
