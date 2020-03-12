@@ -81,7 +81,7 @@ PHP 5.6
 == Changelog ==
 
 = unreleased =
- исправлена ошибка по неправильной стоимости доставки https://github.com/wpcraft-ru/wooms/issues/244
+* исправлена ошибка по неправильной стоимости доставки https://github.com/wpcraft-ru/wooms/issues/244
 
 = 6.1 = 
 * исправлена ошибка по дублированию картинок https://github.com/wpcraft-ru/wooms/issues/221
