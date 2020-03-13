@@ -3,7 +3,7 @@ Contributors: casepress
 Donate link: https://wpcraft.ru/product/wooms-extra/
 Tags: moysklad, woocommerce, sync, integration
 Requires at least: 4.0
-Tested up to: 4.9.4
+Tested up to: 5.3
 Stable tag: 4.3
 Requires PHP: 5.6
 License: GPLv2 or later
