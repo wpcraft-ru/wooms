@@ -82,6 +82,9 @@ PHP 5.6
 
 == Changelog ==
 
+= unreleased =
+* XT исправление проблемы с множеством вебхуков и статусами Заказов https://github.com/wpcraft-ru/wooms/issues/246
+
 = 6.2 =
 * улучшена работа плановых заданий
 * тест WooCommerce 4.0 https://github.com/wpcraft-ru/wooms/issues/242
