@@ -45,6 +45,10 @@ class SiteHealth
             'test'  => [__CLASS__, 'wooms_check_different_versions_of_plugins'],
         ];
 
+        $tests['direct']['wooms_check_base_plugin'] = [
+            'test'  => [__CLASS__,'wooms_check_base_plugin'],
+        ];
+
         $tests['async']['wooms_check_credentials'] = [
             'test'  => 'wooms_check_login_password',
         ];
@@ -190,6 +194,41 @@ class SiteHealth
 
         wp_send_json_success($result);
     }
+
+    /**
+     * check_base_plugin
+     */
+    public static function wooms_check_base_plugin()
+    {
+        if ( ! function_exists('get_plugin_data') ) {
+            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
+        $result = [
+            'label' => 'Для работы плагина WooMS XT требуется основной плагин WooMS',
+            'status'      => 'good',
+            'badge'       => [
+                'label' => 'Уведомление WooMS',
+                'color' => 'blue',
+            ],
+            'description' => sprintf('Все хорошо! Спасибо что выбрали наш плагин %s', '🙂'),
+            'test' => 'wooms_check_base_plugin' // this is only for class in html block
+        ];
+
+        if (!is_plugin_active('wooms/wooms.php')) {
+            $result['status'] = 'critical';
+            $result['badge']['color'] = 'red';
+            $result['actions'] = sprintf(
+                '<p><a href="%s" target="_blank">%s</a></p>',
+                '//wordpress.org/plugins/wooms/',
+                sprintf("Установить плагин")
+            );
+            $result['description'] = 'Для работы плагина WooMS XT требуется основной плагин WooMS.';
+        }
+
+        return $result;
+    }
+
 }
 
 SiteHealth::init();
