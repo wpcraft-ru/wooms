@@ -30,6 +30,8 @@ class SiteHealthDebugSection
         add_filter('add_wooms_plugin_debug', [__CLASS__, 'wooms_debug_check_version_for_wooms']);
 
         add_filter('add_wooms_plugin_debug', [__CLASS__, 'wooms_check_different_versions_of_plugins']);
+
+        add_filter('add_wooms_plugin_debug', [__CLASS__, 'check_login_and_password']);
     }
 
     public static function wooms_debug_check_version_for_wooms($debug_info)
@@ -65,13 +67,13 @@ class SiteHealthDebugSection
 
         $result = [
             'label'    => 'Версии плагинов',
-            'value'   => sprintf('Wooms(%s) %s WoomsXT(%s) %s', $base_version,'=',$xt_version,'✔️'),
+            'value'   => sprintf('Wooms(%s) %s WoomsXT(%s) %s', $base_version, '=', $xt_version, '✔️'),
         ];
 
         if ($base_version !== $xt_version) {
             $result = [
                 'label'    => 'Версии плагинов',
-                'value'   => sprintf('Wooms(%s) WoomsXT(%s) %s', $base_version,$xt_version, '❌'),
+                'value'   => sprintf('Wooms(%s) WoomsXT(%s) %s', $base_version, $xt_version, '❌'),
             ];
         }
 
@@ -112,6 +114,27 @@ class SiteHealthDebugSection
 
         return $debug_info;
     }
+
+    /**
+     * checking login and password moy sklad
+     *
+     * @param [type] $debug_info
+     * @return void
+     */
+    public static function check_login_and_password($debug_info)
+    {
+
+        if (!get_transient('wooms_check_login_password')) {
+            return $debug_info;
+        }
+
+        $debug_info['wooms-plugin-debug']['fields']['wooms-login-check'] = [
+            'label'    => 'Версия Wooms',
+            'value'   => sprintf('Ваш логин и пароль от мой склад неверен %s', '❌'),
+        ];
+        return $debug_info;
+    }
+    
 }
 
 SiteHealthDebugSection::init();

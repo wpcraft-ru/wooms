@@ -28,7 +28,6 @@ class SiteHealth
         add_filter('site_status_tests', [__CLASS__, 'new_health_tests']);
 
         add_action('wp_ajax_health-check-wooms-check_login_password', [__CLASS__, 'wooms_check_login_password']);
-
     }
 
     /**
@@ -190,10 +189,11 @@ class SiteHealth
                 sprintf("Поменять доступы")
             );
         }
+        
+        set_transient('wooms_check_login_password', true, 60 * 30);
 
         wp_send_json_success($result);
     }
-
 }
 
 SiteHealth::init();
