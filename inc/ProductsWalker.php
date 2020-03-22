@@ -273,31 +273,15 @@ class ProductsWalker
    */
   public static function add_schedule_hook()
   {
-
-    // Checking if there is any of this type pending schedules
-    $future_schedules = as_get_scheduled_actions(
-      [
-        'hook' => 'wooms_walker_schedule',
-        'status' => \ActionScheduler_Store::STATUS_PENDING,
-        'group' => 'ProductWalker'
-      ]
-    );
-
-    if (!empty($future_schedules)) {
-      return false;
+    if (as_next_scheduled_action('wooms_walker_schedule', [], 'ProductWalker')) {
+      return;
     }
 
-    if (!as_next_scheduled_action('wooms_walker_schedule', [], 'ProductWalker')) {
-      // Adding schedule hook
-      as_schedule_recurring_action(
-        time(),
-        60,
-        'wooms_walker_schedule',
-        [],
-        'ProductWalker'
-      );
+    if(self::walker_is_waiting()){
+      return;
     }
-    
+
+    as_schedule_single_action( time() + 60, 'wooms_walker_schedule', [], 'ProductWalker' );
   }
 
   /**
@@ -309,6 +293,18 @@ class ProductsWalker
     if (self::can_cron_start()) {
       self::walker();
     }
+  }
+
+  /**
+   * Проверяем стоит ли обработчик на паузе?
+   */
+  public static function walker_is_waiting(){
+
+    if(get_transient('wooms_end_timestamp')){
+      return true;
+    }
+
+    return false;
   }
 
   /**
