@@ -18,7 +18,9 @@ class SiteHealth
     public static $base_plugin_url = "wooms/wooms.php";
     public static $xt_plugin_url = "wooms-extra/wooms-extra.php";
     public static $settings_page_url = 'admin.php?page=mss-settings';
-    
+    public static $wooms_check_login_password;
+    public static $wooms_check_woocommerce_version_for_wooms;
+
 
 
     public static function init()
@@ -26,6 +28,7 @@ class SiteHealth
         add_filter('site_status_tests', [__CLASS__, 'new_health_tests']);
 
         add_action('wp_ajax_health-check-wooms-check_login_password', [__CLASS__, 'wooms_check_login_password']);
+
     }
 
     /**
@@ -43,10 +46,6 @@ class SiteHealth
 
         $tests['direct']['wooms_check_different_versions'] = [
             'test'  => [__CLASS__, 'wooms_check_different_versions_of_plugins'],
-        ];
-
-        $tests['direct']['wooms_check_base_plugin'] = [
-            'test'  => [__CLASS__,'wooms_check_base_plugin'],
         ];
 
         $tests['async']['wooms_check_credentials'] = [
@@ -193,40 +192,6 @@ class SiteHealth
         }
 
         wp_send_json_success($result);
-    }
-
-    /**
-     * check_base_plugin
-     */
-    public static function wooms_check_base_plugin()
-    {
-        if ( ! function_exists('get_plugin_data') ) {
-            require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        }
-
-        $result = [
-            'label' => 'Для работы плагина WooMS XT требуется основной плагин WooMS',
-            'status'      => 'good',
-            'badge'       => [
-                'label' => 'Уведомление WooMS',
-                'color' => 'blue',
-            ],
-            'description' => sprintf('Все хорошо! Спасибо что выбрали наш плагин %s', '🙂'),
-            'test' => 'wooms_check_base_plugin' // this is only for class in html block
-        ];
-
-        if (!is_plugin_active('wooms/wooms.php')) {
-            $result['status'] = 'critical';
-            $result['badge']['color'] = 'red';
-            $result['actions'] = sprintf(
-                '<p><a href="%s" target="_blank">%s</a></p>',
-                '//wordpress.org/plugins/wooms/',
-                sprintf("Установить плагин")
-            );
-            $result['description'] = 'Для работы плагина WooMS XT требуется основной плагин WooMS.';
-        }
-
-        return $result;
     }
 
 }
