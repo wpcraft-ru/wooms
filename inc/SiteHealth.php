@@ -247,7 +247,7 @@ class SiteHealth
                 $description = "У данного пользователя не хватает прав для работы с вебхуками";
                 $result['description'] = sprintf('%s %s', $description, '❌');
                 if (!empty($api_result['errors'])) {
-                    $result['description'] = sprintf("%s <br> 1.%s <br> 2.%s", '❌', $api_result['errors'][0]['error'], $description);
+                    $result['description'] = sprintf("1. %s 2. %s %s", $api_result['errors'][0]['error'], $description, '❌');
                 }
             }
 
