@@ -95,7 +95,7 @@ class SiteHealth
     }
 
     /**
-     * check differences of versions
+     * Check different versions of plugins WooMS and WoomsXT
      *
      * @return void
      */
