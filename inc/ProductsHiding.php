@@ -21,7 +21,7 @@ class ProductsHiding
     add_action('wooms_schedule_clear_old_products_walker', array(__CLASS__, 'walker_starter'));
 
     add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
-    add_action('wooms_main_walker_finish', array(__CLASS__, 'finis_main_walker'));
+    add_action('wooms_main_walker_finish', array(__CLASS__, 'finish_main_walker'));
 
     add_action('admin_init', array(__CLASS__, 'settings_init'));
   }
@@ -34,16 +34,13 @@ class ProductsHiding
     
     if (self::check_schedule_needed()) {
       // Adding schedule hook
-      as_schedule_recurring_action(
-        time(),
-        60,
+      as_schedule_single_action(
+        time() + 60,
         'wooms_schedule_clear_old_products_walker',
         [],
         'ProductWalker'
       );
-    } else {
-      as_unschedule_all_actions('wooms_schedule_clear_old_products_walker', [], 'ProductWalker');
-    }
+    } 
 
   }
 
@@ -67,19 +64,6 @@ class ProductsHiding
       return false;
     }
 
-    // Checking if there is any of this type pending schedules
-    $future_schedules = as_get_scheduled_actions(
-      [
-        'hook' => 'wooms_schedule_clear_old_products_walker',
-        'status' => \ActionScheduler_Store::STATUS_PENDING,
-        'group' => 'ProductWalker'
-      ]
-    );
-
-    if (!empty($future_schedules)) {
-      return false;
-    }
-
     if(as_next_scheduled_action('wooms_schedule_clear_old_products_walker', [], 'ProductWalker')){
       return false;
     }
@@ -98,7 +82,7 @@ class ProductsHiding
   /**
    * Убираем паузу для сокрытия продуктов
    */
-  public static function finis_main_walker()
+  public static function finish_main_walker()
   {
     delete_transient('wooms_products_old_hide_pause');
   }
