@@ -94,6 +94,8 @@ class WooMS_Core
 
       add_filter("plugin_action_links_" . plugin_basename(__FILE__), array(__CLASS__, 'plugin_add_settings_link'));
     });
+
+    add_action('init', [__CLASS__, 'delete_old_schedules']);
   }
 
   /**
@@ -218,6 +220,32 @@ class WooMS_Core
 
     return;
   }
+
+  /**
+   * Deleting old schedules
+   *
+   * @return void
+   */
+  public static function delete_old_schedules()
+  {
+    if (!is_admin()) {
+      return;
+    }
+
+    if (!function_exists('get_plugin_data')) {
+      require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    $base_plugin_data = get_plugin_data(ABSPATH . "wp-content/plugins/wooms/wooms.php");
+    $base_version = $base_plugin_data['Version'];
+
+    if ($base_version <= 6.3) {
+      as_unschedule_all_actions('wooms_cron_status_order_sender', [], 'ProductWalker');
+      as_unschedule_all_actions('wooms_cron_variations_hiding', [], 'ProductWalker');
+      as_unschedule_all_actions('wooms_cron_variation_walker', [], 'ProductWalker');
+      as_unschedule_all_actions('wooms_product_single_update', [], 'ProductWalker');
+    }
+  }
+
 }
 
 WooMS_Core::init();
