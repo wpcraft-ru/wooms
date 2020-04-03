@@ -51,6 +51,9 @@ class MenuTools {
       <a href="<?php echo admin_url('admin.php?page=mss-settings') ?>">Настройки</a>
       <span> | </span>
       <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
+      <span> | </span>
+      <a href="<?php echo admin_url('site-health.php') ?>">Диагностика проблем</a>
+
     </p>
 
     <?php
