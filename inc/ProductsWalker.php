@@ -105,6 +105,7 @@ class ProductsWalker
      */
     $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
 
+    //save data of source
     $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT));
 
     $product_id = $product->save();
@@ -124,9 +125,6 @@ class ProductsWalker
 
     $data_of_source = $data_api;
     $product_id = $product->get_id();
-
-    //save data of source
-    $product->update_meta_data('wooms_data_of_source', print_r($data_of_source, true));
 
     //Set session id for product
     if ($session_id = get_option('wooms_session_id')) {
