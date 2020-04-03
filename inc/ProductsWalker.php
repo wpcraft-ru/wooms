@@ -24,7 +24,7 @@ class ProductsWalker
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     //Product data
-    add_action('wooms_product_import_row', [__CLASS__, 'load_product'], 10, 3);
+    add_action('wooms_product_data_item', [__CLASS__, 'load_product']);
     add_filter('wooms_product_save', [__CLASS__, 'update_product'], 9, 3);
 
     //UI and actions manually
@@ -52,7 +52,7 @@ class ProductsWalker
    * @param $key
    * @param $data
    */
-  public static function load_product($value, $key, $data)
+  public static function load_product($value)
   {
     if (!empty($value['archived'])) {
       return;
@@ -381,18 +381,8 @@ class ProductsWalker
       do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
 
       //Check for errors and send message to UI
-      if (isset($data['errors'])) {
-        $error_code = $data['errors'][0]["code"];
-        if ($error_code == 1056) {
-          $msg = sprintf(
-            'Ошибка проверки имени и пароля. Код %s, исправьте в <a href="%s">настройках</a>',
-            $error_code,
-            admin_url('admin.php?page=mss-settings')
-          );
-          throw new \Exception($msg);
-        } else {
-          throw new \Exception($error_code . ': ' . $data['errors'][0]["error"]);
-        }
+      if (isset($data['errors'][0]["error"])) {
+          throw new \Exception($data['errors'][0]["error"]);
       }
 
       //If no rows, that send 'end' and stop walker
@@ -433,7 +423,7 @@ class ProductsWalker
          * в выдаче могут быть не только товары, но и вариации и мб что-то еще
          * птм нужна проверка что это точно продукт
          */
-        if ('product' != $value["meta"]["type"]) {
+        if ('variant' == $value["meta"]["type"]) {
           continue;
         }
 
