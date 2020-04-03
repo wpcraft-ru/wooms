@@ -104,6 +104,9 @@ class ProductsWalker
      * Снижает нагрузку на БД
      */
     $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
+
+    $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT));
+
     $product_id = $product->save();
 
     do_action(
