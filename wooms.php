@@ -17,8 +17,8 @@
  * Tested up to: 5.6
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 6.4
- * WooMS XT Latest: 6.4
+ * Version: 7.0
+ * WooMS XT Latest: 7.0
  */
 
 // Exit if accessed directly
