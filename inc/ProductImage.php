@@ -14,23 +14,13 @@ class ProductImage
 
     use MSImages;
 
+    public static $walker_hook_name = 'wooms_product_image_sync';
+
     /**
      * WooMS_Import_Product_Images constructor.
      */
     public static function init()
     {
-
-        // add_action('init', function () {
-        //     if (!isset($_GET['ee'])) {
-        //         return;
-        //     }
-
-        //     self::download_images_from_metafield();
-
-
-        //     die('end');
-        // });
-
         /**
          * Обновление данных о продукте
          */
@@ -40,20 +30,21 @@ class ProductImage
 
         add_action('init', [__CLASS__, 'add_schedule_hook']);
 
-        add_action('main_image_download_schedule', [__CLASS__, 'download_images_from_metafield']);
+        add_action('wooms_product_image_sync', [__CLASS__, 'download_images_from_metafield']);
 
         add_action('woomss_tool_actions_btns', [__CLASS__, 'ui_for_manual_start'], 15);
         add_action('woomss_tool_actions_wooms_products_images_manual_start', [__CLASS__, 'ui_action']);
     }
 
     /**
-     * update_product
+     * add image to metafield for download
      */
     public static function update_product($product, $value, $data)
     {
         if (empty(get_option('woomss_images_sync_enabled'))) {
             return $product;
         }
+
         $product_id = $product->get_id();
 
         //Check image
@@ -77,28 +68,23 @@ class ProductImage
     /**
      * Init Scheduler
      */
-    public static function add_schedule_hook()
+    public static function add_schedule_hook($force = false)
     {
-        if (empty(get_option('woomss_images_sync_enabled'))) {
+        if ( ! self::is_enable() ) {
             return;
         }
 
-        if (self::check_schedule_needed()) {
-            // Adding schedule hook
-            as_schedule_recurring_action(
-                time(),
-                60,
-                'main_image_download_schedule',
-                [],
-                'ProductImage'
-            );
+        if( self::is_wait()){
+            return;
         }
 
-        if (get_transient('main_images_downloaded') && empty(get_transient('wooms_start_timestamp'))) {
 
-            as_unschedule_all_actions('main_image_download_schedule', [], 'ProductImage');
-            set_transient('main_images_downloaded', false);
+        if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
+            return;
         }
+
+        as_schedule_single_action( time() + 11, self::$walker_hook_name, [], 'WooMS' );
+
     }
 
     /**
@@ -124,10 +110,6 @@ class ProductImage
         );
 
         if (!empty($future_schedules)) {
-            return false;
-        }
-
-        if (empty(get_transient('wooms_start_timestamp'))) {
             return false;
         }
 
@@ -159,16 +141,55 @@ class ProductImage
         }
     }
 
+
+
+    /**
+     * checking the option activation
+     */
+    public static function is_enable(){
+        if (empty(get_option('woomss_images_sync_enabled'))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    
+    /**
+     * checking the pause state
+     */
+    public static function is_wait(){
+        $args = array(
+            'post_type'              => 'product',
+            'meta_query'             => array(
+                array(
+                    'key'     => 'wooms_url_for_get_thumbnail',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+            'no_found_rows'          => true,
+            'update_post_term_cache' => false,
+            'update_post_meta_cache' => false,
+            'cache_results'          => false,
+        );
+
+        $list = get_posts($args);
+
+        if (empty($list)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+
     /**
      * Download images from meta
-     *
-     * @TODO - переписать на методы CRUD WooCommerce
-     *
-     * @return array|bool|void
      */
     public static function download_images_from_metafield()
     {
-        if (empty(get_option('woomss_images_sync_enabled'))) {
+        if ( ! self::is_enable() ) {
             return;
         }
 
@@ -190,13 +211,10 @@ class ProductImage
 
         if (empty($list)) {
 
-            // Adding the option that all images downloaded
-            set_transient('main_images_downloaded', true);
-
             do_action(
                 'wooms_logger',
                 __CLASS__,
-                sprintf('Main images is downloaded')
+                sprintf('Главные изображения продуктов загружены')
             );
 
             return false;
@@ -234,6 +252,8 @@ class ProductImage
             }
         }
 
+        self::add_schedule_hook(true);
+
         if (empty($result)) {
             return false;
         } else {
@@ -260,14 +280,41 @@ class ProductImage
      */
     public static function ui_for_manual_start()
     {
-        if (empty(get_option('woomss_images_sync_enabled'))) {
+        if ( ! self::is_enable()) {
             return;
-        } ?>
+        } 
+        
+        $strings = [];
+
+        $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_product_image_sync&orderby=schedule&order=desc'));
+    
+        if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
+          $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=wooms-WooMS-ProductImage'));
+        } else {
+          $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+        }
+        
+        ?>
 
         <h2>Изображения</h2>
         <p>Ручная загрузка изображений по 5 штук за раз.</p>
 
-<?php printf('<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg('a', 'wooms_products_images_manual_start', admin_url('admin.php?page=moysklad')));
+        <?php printf('<a href="%s" class="button button-primary">Выполнить</a>', add_query_arg('a', 'wooms_products_images_manual_start', admin_url('admin.php?page=moysklad')));
+
+
+        ?>
+        <div class="wrap">
+        <div id="message" class="notice notice-warning">
+            <?php 
+
+            foreach($strings as $string){
+                printf('<p>%s</p>', $string);
+            } 
+            
+            ?>
+        </div>
+        </div>
+        <?php
     }
 
     /**
