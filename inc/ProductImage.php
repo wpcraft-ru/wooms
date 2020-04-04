@@ -34,7 +34,13 @@ class ProductImage
 
         add_action('woomss_tool_actions_btns', [__CLASS__, 'ui_for_manual_start'], 15);
         add_action('woomss_tool_actions_wooms_products_images_manual_start', [__CLASS__, 'ui_action']);
+
+
+
     }
+
+
+
 
     /**
      * add image to metafield for download
@@ -78,7 +84,7 @@ class ProductImage
             return;
         }
 
-        if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
+        if (as_next_scheduled_action(self::$walker_hook_name) && ! $force) {
             return;
         }
 
@@ -124,6 +130,8 @@ class ProductImage
      * checking the pause state
      */
     public static function is_wait(){
+
+
         $args = array(
             'post_type'              => 'product',
             'meta_query'             => array(
@@ -181,6 +189,7 @@ class ProductImage
                 __CLASS__,
                 sprintf('Главные изображения продуктов загружены')
             );
+
 
             return false;
         }
