@@ -8,11 +8,10 @@ if (!defined('ABSPATH')) {
 
 
 /**
- * Import Product Images
+ * SiteHealth
  */
 class SiteHealth
 {
-
 
     public static $plugin_dir = ABSPATH . "wp-content/plugins/";
     public static $base_plugin_url = "wooms/wooms.php";
@@ -20,7 +19,6 @@ class SiteHealth
     public static $settings_page_url = 'admin.php?page=mss-settings';
     public static $wooms_check_login_password;
     public static $wooms_check_woocommerce_version_for_wooms;
-
 
 
     public static function init()

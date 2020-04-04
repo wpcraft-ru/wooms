@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 
 /**
- * Import Product Images
+ * SiteHealthDebugSection
  */
 class SiteHealthDebugSection
 {
