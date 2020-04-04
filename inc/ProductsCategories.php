@@ -18,9 +18,6 @@ class ProductsCategories {
 
     add_filter('wooms_product_save', array(__CLASS__, 'product_save'), 10, 3);
 
-    /**
-     * Other
-     */
     add_action( 'admin_init', array( __CLASS__, 'settings_init' ), 50 );
     add_action( 'product_cat_edit_form_fields', array( __CLASS__, 'display_data_category' ), 30 );
   }
