@@ -12,6 +12,8 @@ if (!defined('ABSPATH')) {
 class ProductsHiding
 {
 
+  public static $walker_hook = 'wooms_schedule_clear_old_products_walker';
+
   /**
    * The init
    */
@@ -21,85 +23,119 @@ class ProductsHiding
     add_action('wooms_schedule_clear_old_products_walker', array(__CLASS__, 'walker_starter'));
 
     add_action('wooms_products_state_before', array(__CLASS__, 'display_state'));
-    add_action('wooms_main_walker_finish', array(__CLASS__, 'finish_main_walker'));
 
     add_action('admin_init', array(__CLASS__, 'settings_init'));
+
+    add_action('wooms_main_walker_finish', array(__CLASS__, 'add_task_for_hide'));
+    add_action('wooms_main_walker_started', array(__CLASS__, 'remove_task_for_hide'));
+
+  }
+
+  public static function add_task_for_hide(){
+    set_transient('wooms_product_need_hide', 1);
+    self::add_schedule_hook();
+  }
+
+  public static function remove_task_for_hide(){
+    delete_transient('wooms_product_need_hide');
+  }
+
+
+  public static function is_wait(){
+
+    if(as_next_scheduled_action('wooms_products_walker_batch') ){
+      return true;
+    }
+
+
+    if(empty(get_transient('wooms_product_need_hide'))){
+      return true;
+    }
+
+    return false;
+  
   }
 
   /**
    * Cron task restart
    */
-  public static function add_schedule_hook()
+  public static function add_schedule_hook($force = false)
   {
-    
-    if (self::check_schedule_needed()) {
-      // Adding schedule hook
-      as_schedule_single_action(
-        time() + 60,
-        'wooms_schedule_clear_old_products_walker',
-        [],
-        'ProductWalker'
-      );
-    } 
+
+    if( self::is_disable()){
+      return;
+    }
+
+    if(self::is_wait()){
+      return;
+    }
+
+    if(as_next_scheduled_action(self::$walker_hook) && ! $force){
+      return;
+    }
+  
+    // Adding schedule hook
+    as_schedule_single_action( time() + 5, self::$walker_hook, [], 'WooMS' );
 
   }
 
-  /**
-   * Checking shedule nedded or not
-   *
-   * @return void
-   */
-  public static function check_schedule_needed(){
-
-    if (get_transient('wooms_product_hiding_disable')) {
-      return false;
-    }
-
-    //Если работает синк товаров, то блокируем работу
-    if (!empty(get_transient('wooms_start_timestamp'))) {
-      return false;
-    }
-
-    if (get_transient('wooms_products_old_hide_pause')) {
-      return false;
-    }
-
-    if(as_next_scheduled_action('wooms_schedule_clear_old_products_walker', [], 'ProductWalker')){
-      return false;
-    }
-
-    return true;
-  }
 
   /**
    * Starter walker by cron if option enabled
    */
   public static function walker_starter()
   {
+    if( self::is_disable()){
+      return;
+    }
+
     self::set_hidden_old_product();
   }
 
-  /**
-   * Убираем паузу для сокрытия продуктов
-   */
-  public static function finish_main_walker()
-  {
-    delete_transient('wooms_products_old_hide_pause');
-  }
 
   /**
    * display_state
    */
   public static function display_state()
   {
-
-    if ($timestamp = get_transient('wooms_products_old_hide_pause')) {
-      $msg = sprintf('<p>Скрытие устаревших продуктов: успешно завершено в последний раз %s</p>', $timestamp);
-    } else {
-      $msg = sprintf('<p>Скрытие устаревших продуктов: <strong>%s</strong></p>', 'выполняется');
+    if( self::is_disable()){
+      return;
     }
 
-    echo $msg;
+    $strings = [];
+
+    // self::$walker_hook
+    if(as_next_scheduled_action(self::$walker_hook)){
+      $strings[] = 'Продукты скрываются в фоне очередями';
+    } 
+    
+    if(self::is_wait()){
+      $strings[] = 'Обработчик ожидает задач';
+    }
+
+    $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_schedule_clear_old_products_walker&orderby=schedule&order=desc'));
+        
+        
+    if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=wooms-WooMS-ProductsHiding'));
+    } else {
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+    }
+
+    ?>
+    <hr>
+    <div>
+      <br>
+      <strong>Скрытие продуктов:</strong>
+      <ul>
+        <li>
+        <?php 
+        echo implode('</li><li>', $strings);
+        ?>
+        </li>
+      </ul>
+    </div>
+<?php 
   }
 
   /**
@@ -116,8 +152,10 @@ class ProductsHiding
     $products = self::get_products_old_session();
 
     if (empty($products)) {
-      delete_transient('wooms_offset_hide_product');
-      set_transient('wooms_products_old_hide_pause', date("Y-m-d H:i:s"), HOUR_IN_SECONDS);
+      
+
+      delete_transient('wooms_product_need_hide');
+
       do_action('wooms_recount_terms');
       do_action(
         'wooms_logger',
@@ -145,6 +183,8 @@ class ProductsHiding
         sprintf('Скрытие продукта: %s', $product_id)
       );
     }
+
+    self::add_schedule_hook(true);
 
     do_action('wooms_hide_old_product', $products);
   }
@@ -208,32 +248,40 @@ class ProductsHiding
   }
 
   /**
+   * проверяем надо ли скрывать продукты
+   */
+  public static function is_disable(){
+    if(get_option('wooms_product_hiding_disable')){
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * settings_init
    */
   public static function settings_init()
   {
-    register_setting('mss-settings', 'wooms_product_hiding_disable');
+    $option_name = 'wooms_product_hiding_disable';
+    register_setting('mss-settings', $option_name);
     add_settings_field(
-      $id = 'wooms_product_hiding_disable',
+      $id = $option_name,
       $title = 'Отключить скрытие продуктов',
-      $callback = array(__CLASS__, 'display_field_wooms_product_hiding_disable'),
+      $callback = function($args)
+      {
+        printf('<input type="checkbox" name="%s" value="1" %s />', $args['name'], checked(1, $args['value'], false));
+        printf( '<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.' );
+      },
       $page = 'mss-settings',
-      $section = 'woomss_section_other'
+      $section = 'woomss_section_other',
+      $args = [
+        'name' => $option_name,
+        'value' => get_option($option_name),
+      ]
     );
   }
 
-  /**
-   * display_field_wooms_product_hiding_disable
-   */
-  public static function display_field_wooms_product_hiding_disable()
-  {
-    $option = 'wooms_product_hiding_disable';
-    printf('<input type="checkbox" name="%s" value="1" %s />', $option, checked(1, get_option($option), false));
-    printf(
-      '<p><small>%s</small></p>',
-      'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.'
-    );
-  }
 }
 
 ProductsHiding::init();
