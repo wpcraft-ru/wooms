@@ -9,10 +9,11 @@ if (!defined('ABSPATH')) {
 /**
  * Import Product Images
  */
-class ImagesGallery
+class ProductGallery
 {
-
   use MSImages;
+
+  public static $walker_hook_name = 'gallery_images_download_schedule';
 
   /**
    * WooMS_Import_Product_Images constructor.
@@ -20,13 +21,71 @@ class ImagesGallery
   public static function init()
   {
 
+    add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
+
     add_filter('wooms_product_save', [__CLASS__, 'update_product'], 40, 3);
 
     add_action('admin_init', [__CLASS__, 'settings_init'], 70);
 
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
-    add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
+
+    add_action('wooms_product_images_info', [__CLASS__, 'render_state_info']);
+
+  }
+
+
+  /**
+   * check disable option
+   */
+  public static function is_disable(){
+    if (empty(get_option('woomss_gallery_sync_enabled'))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * render_state_info
+   */
+  public static function render_state_info(){
+
+    if(self::is_disable()){
+      return;
+    }
+
+    $strings = [];
+
+    if (as_next_scheduled_action(self::$walker_hook_name) ) {
+        $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
+    } else{
+        $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
+    }
+
+    $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=gallery_images_download_schedule&orderby=schedule&order=desc'));
+
+    if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=wooms-WooMS-ProductGallery'));
+    } else {
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+    }
+
+    ?>
+    <hr>
+    <div>
+      <br>
+      <strong>Галлереи:</strong>
+      <ul>
+        <li>
+        <?php 
+        echo implode('</li><li>', $strings);
+        ?>
+        </li>
+      </ul>
+    </div>
+  <?php 
+
 
   }
 
@@ -35,7 +94,6 @@ class ImagesGallery
    */
   public static function update_product($product, $value, $data)
   {
-
 
     if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return $product;
@@ -88,27 +146,23 @@ class ImagesGallery
   public static function add_schedule_hook()
   {
 
-    if (empty(get_option('woomss_gallery_sync_enabled'))) {
+    if (self::is_disable()) {
+      as_unschedule_all_actions(self::$walker_hook_name);
       return;
     }
 
-
-    if (self::check_schedule_needed()) {
-      // Adding schedule hook
-      as_schedule_recurring_action(
-        time(),
-        60,
-        'gallery_images_download_schedule',
-        [],
-        'ProductGallery'
-      );
+    if(self::is_wait()){
+      as_unschedule_all_actions(self::$walker_hook_name);
+      return;
     }
 
-    if (get_transient('gallery_images_downloaded') && empty(get_transient('wooms_start_timestamp'))) {
-
-      as_unschedule_all_actions('gallery_images_download_schedule', [], 'ProductGallery');
-      set_transient('gallery_images_downloaded', false);
+    if (as_next_scheduled_action(self::$walker_hook_name)) {
+      return;
     }
+
+    // Adding schedule hook
+    as_schedule_recurring_action(time(), 60, self::$walker_hook_name, [], 'WooMS' );
+
   }
 
   /**
@@ -148,6 +202,34 @@ class ImagesGallery
     return true;
   }
 
+
+  /**
+   * check new task for walker
+   */
+  public static function is_wait(){
+    $args = array(
+      'post_type'              => 'product',
+      'numberposts'            => 1,
+      'meta_query'             => array(
+        array(
+          'key'     => 'wooms_data_for_get_gallery',
+          'compare' => 'EXISTS',
+        ),
+      ),
+      'no_found_rows'          => true,
+      'cache_results'          => false,
+    );
+
+    $list = get_posts($args);
+
+    // If no images left to download
+    if (empty($list)) {
+      return true;
+    }
+
+    return false;
+  }
+
   /**
    * Download images from meta
    *
@@ -181,17 +263,15 @@ class ImagesGallery
     if (empty($list)) {
 
       // If sync product already finished
-      if (empty(get_transient('wooms_start_timestamp'))) {
 
-        // Adding the option that all images downloaded and the sync is over
-        set_transient('gallery_images_downloaded', true);
+      // Adding the option that all images downloaded and the sync is over
+      set_transient('gallery_images_downloaded', true);
 
-        do_action(
-          'wooms_logger',
-          __CLASS__,
-          sprintf('All gallery images is downloaded and sync is over ')
-        );
-      }
+      do_action(
+        'wooms_logger',
+        __CLASS__,
+        sprintf('All gallery images is downloaded and sync is over ')
+      );
 
       return false;
     }
@@ -313,4 +393,4 @@ class ImagesGallery
   }
 }
 
-ImagesGallery::init();
+ProductGallery::init();

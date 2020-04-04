@@ -290,6 +290,8 @@ class ProductImage
             foreach($strings as $string){
                 printf('<p>%s</p>', $string);
             } 
+
+            do_action('wooms_product_images_info');
             
             ?>
         </div>
