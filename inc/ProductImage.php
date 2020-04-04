@@ -78,7 +78,6 @@ class ProductImage
             return;
         }
 
-
         if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
             return;
         }
@@ -251,6 +250,12 @@ class ProductImage
         } 
         
         $strings = [];
+
+        if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') ) {
+            $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
+        } else{
+            $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
+        }
 
         $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_product_image_sync&orderby=schedule&order=desc'));
     
