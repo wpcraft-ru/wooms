@@ -41,7 +41,7 @@ class ProductImage
      */
     public static function update_product($product, $value, $data)
     {
-        if (empty(get_option('woomss_images_sync_enabled'))) {
+        if ( ! self::is_enable() ) {
             return $product;
         }
 
@@ -86,40 +86,6 @@ class ProductImage
         as_schedule_single_action( time() + 11, self::$walker_hook_name, [], 'WooMS' );
 
     }
-
-    /**
-     * Checking if schedule can be created or not
-     *
-     * @return void
-     */
-    public static function check_schedule_needed()
-    {
-
-        // If next schedule is not this one and the sync is active and the all gallery images is downloaded
-        if (as_next_scheduled_action('main_image_download_schedule', [], 'ProductImage')) {
-            return false;
-        }
-
-        // Checking if there is any of this type pending schedules
-        $future_schedules = as_get_scheduled_actions(
-            [
-                'hook' => 'main_image_download_schedule',
-                'status' => \ActionScheduler_Store::STATUS_PENDING,
-                'group' => 'ProductImage'
-            ]
-        );
-
-        if (!empty($future_schedules)) {
-            return false;
-        }
-
-        if (get_transient('main_images_downloaded')) {
-            return false;
-        }
-
-        return true;
-    }
-
 
     /**
      * Action for UI
