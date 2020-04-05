@@ -392,7 +392,6 @@ class ProductsWalker
       return;
     }
 
-
     if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
       return;
     }
@@ -409,8 +408,8 @@ class ProductsWalker
    */
   public static function walker_is_waiting()
   {
-    //reset state if lock deleted
-    if( empty(get_transient('wooms_end_timestamp')) ){
+    //reset state if lock deleted and isset state
+    if( empty(get_transient('wooms_end_timestamp')) and ! empty(self::get_state('end_timestamp')) ){
       delete_transient(self::$state_transient_key);
     }
 
@@ -499,7 +498,7 @@ class ProductsWalker
     as_unschedule_all_actions(self::$walker_hook_name);
     self::set_state('stop_manual', 1);
     self::walker_finish();
-    delete_transient( 'wooms_end_timestamp' );
+    // delete_transient( 'wooms_end_timestamp' );
 
     wp_redirect(admin_url('admin.php?page=moysklad'));
     exit;
