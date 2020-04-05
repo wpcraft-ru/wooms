@@ -13,7 +13,9 @@ if (!defined('ABSPATH')) {
 class ProductsWalker
 {
 
+  
   public static $state_transient_key = 'wooms_products_walker_state';
+
   public static $walker_hook_name = 'wooms_products_walker_batch';
   
 
@@ -22,15 +24,6 @@ class ProductsWalker
    */
   public static function init()
   {
-
-    add_action('init', function(){
-      if(isset($_GET['dd'])){
-        delete_transient('wooms_end_timestamp');
-
-        // self::add_schedule_hook();
-        var_dump(0); exit;
-      }
-    });
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     //Main Walker
@@ -51,12 +44,9 @@ class ProductsWalker
     
   }
 
+
   /**
    * Load data and set product type simple
-   *
-   * @param $value
-   * @param $key
-   * @param $data
    */
   public static function load_product($value)
   {
@@ -104,6 +94,7 @@ class ProductsWalker
      * rename vars
      */
     $data_api = $value;
+
     /**
      * Хук позволяет работать с методами WC_Product
      * Сохраняет в БД все изменения за 1 раз
@@ -122,6 +113,7 @@ class ProductsWalker
       sprintf('Продукт: %s (%s) сохранен', $product->get_title(), $product_id)
     );
   }
+
 
   /**
    * Update product from source data
@@ -500,7 +492,6 @@ class ProductsWalker
     as_unschedule_all_actions(self::$walker_hook_name);
     self::set_state('stop_manual', 1);
     self::walker_finish();
-    // delete_transient( 'wooms_end_timestamp' );
 
     wp_redirect(admin_url('admin.php?page=moysklad'));
     exit;
@@ -557,6 +548,7 @@ class ProductsWalker
     <?php
   }
 
+
   /**
    * User interface for manually actions
    */
@@ -605,6 +597,7 @@ class ProductsWalker
     return $state[$key];
     
   }
+
 
   /**
    * set state data
