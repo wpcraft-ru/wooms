@@ -22,7 +22,14 @@ class ProductsWalker
    */
   public static function init()
   {
-    add_action('init', [__CLASS__, 'reload_as_hook']);
+
+    add_action('init', function(){
+      if(isset($_GET['dd'])){
+        self::add_schedule_hook();
+        var_dump(0); exit;
+      }
+    });
+    add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     //Main Walker
     add_action('wooms_products_walker_batch', [__CLASS__, 'batch_handler']);
@@ -190,7 +197,6 @@ class ProductsWalker
     //the lock stands if the handler is currently running
     set_transient('wooms_walker_lock', 1, 60);
 
-
     $count = apply_filters('wooms_iteration_size', 10);
     $state = self::get_state();
 
@@ -202,6 +208,8 @@ class ProductsWalker
       self::set_state('timestamp', date("YmdHis"));
       self::set_state('end_timestamp', 0);
       self::set_state('count', 0);
+
+      delete_transient('wooms_end_timestamp');
 
       $query_arg_default = [
         'offset' => 0,
@@ -222,7 +230,6 @@ class ProductsWalker
 
     try {
 
-      delete_transient('wooms_end_timestamp');
       
       $data = wooms_request($url);
 
@@ -269,12 +276,11 @@ class ProductsWalker
 
       //update offset 
       $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
-
       self::set_state('query_arg', $query_arg);
 
       delete_transient('wooms_walker_lock');
 
-      self::reload_as_hook(true);
+      self::add_schedule_hook(true);
 
     } catch (\Exception $e) {
       delete_transient('wooms_walker_lock');
@@ -378,17 +384,14 @@ class ProductsWalker
   }
 
   /**
-   * AS hook restart
+   * hook restart
    */
-  public static function reload_as_hook($force = false)
+  public static function add_schedule_hook($force = false)
   {
-    if( ! get_transient('wooms_end_timestamp')){
-      self::set_state('end_timestamp', 0);
-    }
-
     if(self::walker_is_waiting()){
       return;
     }
+
 
     if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
       return;
@@ -406,6 +409,11 @@ class ProductsWalker
    */
   public static function walker_is_waiting()
   {
+    //reset state if lock deleted
+    if( empty(get_transient('wooms_end_timestamp')) ){
+      delete_transient(self::$state_transient_key);
+    }
+
     if(self::get_state('end_timestamp')){
       return true;
     }
@@ -418,45 +426,6 @@ class ProductsWalker
     return false;
   }
 
-  /**
-   * Can cron start? true or false
-   */
-  // public static function can_walker_start()
-  // {
-
-  //   //Если стоит отметка о ручном запуске - крон может стартовать
-  //   if (!empty(get_transient('wooms_manual_sync'))) {
-  //     return true;
-  //   }
-
-  //   return false;
-
-  //   //XXX improve?
-
-  //   //Если работа по расписанию отключена - не запускаем
-  //   if (empty(get_option('woomss_walker_cron_enabled'))) {
-  //     return false;
-  //   }
-  //   if ($end_stamp = get_transient('wooms_end_timestamp')) {
-
-  //     $interval_hours = get_option('woomss_walker_cron_timer');
-  //     $interval_hours = (int) $interval_hours;
-  //     if (empty($interval_hours)) {
-  //       return false;
-  //     }
-  //     $now       = new \DateTime();
-  //     $end_stamp = new \DateTime($end_stamp);
-  //     $end_stamp = $now->diff($end_stamp);
-  //     $diff_hours = $end_stamp->format('%h');
-  //     if ($diff_hours > $interval_hours) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } else {
-  //     return true;
-  //   }
-  // }
 
   /**
    * walker_started
@@ -487,10 +456,6 @@ class ProductsWalker
     }
     set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
 
-
-    // delete_transient('wooms_manual_sync');fff
-
- 
     do_action('wooms_main_walker_finish');
 
     do_action('wooms_recount_terms');
@@ -520,8 +485,6 @@ class ProductsWalker
     self::batch_handler();
 
     delete_transient('wooms_end_timestamp');
-    // delete_transient('wooms_walker_stop');
-    // set_transient('wooms_manual_sync', 1);
 
     do_action('wooms_products_sync_manual_start');
 
@@ -540,12 +503,8 @@ class ProductsWalker
 
     wp_redirect(admin_url('admin.php?page=moysklad'));
     exit;
-
-    //XXX remove?
-    // set_transient('wooms_walker_stop', 1, 60 * 60);
-    // delete_transient('wooms_manual_sync');
-
   }
+
 
   /**
    * display_state
