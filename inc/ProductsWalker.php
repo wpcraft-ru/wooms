@@ -519,7 +519,7 @@ class ProductsWalker
     }
 
     if($end_timestamp = self::get_state('end_timestamp')){
-      $strings[] = sprintf('Последняя успешная синхронизация (отметка времени): %s', $end_timestamp);
+      $strings[] = sprintf('Последняя успешная синхронизация (отметка времени UTC): %s', $end_timestamp);
     }
 
     $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker_batch&orderby=schedule&order=desc'));
