@@ -25,7 +25,9 @@ class ProductsWalker
 
     add_action('init', function(){
       if(isset($_GET['dd'])){
-        self::add_schedule_hook();
+        delete_transient('wooms_end_timestamp');
+
+        // self::add_schedule_hook();
         var_dump(0); exit;
       }
     });
@@ -528,7 +530,7 @@ class ProductsWalker
       $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
     }
 
-    $strings[] = sprintf('Количество обработанных записей: %s', self::get_state('count'));
+    $strings[] = sprintf('Количество обработанных записей: %s', empty(self::get_state('count')) ? 0 : self::get_state('count') );
 
     if($session = get_option('wooms_session_id')){
       $strings[] = sprintf('Сессия (номер/дата): %s', $session);
