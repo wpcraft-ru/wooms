@@ -30,7 +30,7 @@ final class Logger {
   /**
    * add_log_error
    */
-  public static function add_log_error($type = '', $title = '', $description = ''){
+  public static function add_log_error($type = 'wooms', $title = '', $description = ''){
     if( ! get_option('wooms_logger_enable') ){
       return;
     }
@@ -45,11 +45,13 @@ final class Logger {
       $data .= ':' . PHP_EOL . $description;
     }
 
-    $source = 'wooms';
-    if( ! empty($type) ){
-      $type = str_replace('\\', '-', $type);
-      $source .= '-' . $type;
-    }
+    $source = $type;
+    $source = str_replace('\\', '-', $source);
+    // $source = 'wooms';
+    // if( ! empty($type) ){
+    //   $type = str_replace('\\', '-', $type);
+    //   $source .= '-' . $type;
+    // }
 
     $logger = wc_get_logger();
     $context = array( 'source' => $source );
@@ -60,7 +62,7 @@ final class Logger {
   /**
    * add log
    */
-  public static function add_log($type = '', $title = '', $description = ''){
+  public static function add_log($type = 'wooms', $title = '', $description = ''){
     if( ! get_option('wooms_logger_enable') ){
       return;
     }
@@ -75,11 +77,14 @@ final class Logger {
       $data .= ':' . PHP_EOL . $description;
     }
 
-    $source = 'wooms';
-    if( ! empty($type) ){
-      $type = str_replace('\\', '-', $type);
-      $source .= '-' . $type;
-    }
+    $source = $type;
+    $source = str_replace('\\', '-', $source);
+
+    // $source = 'wooms';
+    // if( ! empty($type) ){
+    //   $type = str_replace('\\', '-', $type);
+    //   $source .= '-' . $type;
+    // }
 
     $logger = wc_get_logger();
     $context = array( 'source' => $source );

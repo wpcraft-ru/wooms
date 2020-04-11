@@ -4,13 +4,13 @@
  */
 
 /**
- * Helper new function for responses data from moysklad.ru
+ * Helper for request and responses data to moysklad.ru
  *
  * @param string $url
  * @param array $data
  * @param string $type
  *
- * @return array|bool|mixed|object
+ * @return array
  */
 function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     if ( empty( $url ) ) {
@@ -44,7 +44,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     if ( is_wp_error( $request ) ) {
       do_action(
         'wooms_logger_error',
-        $type = 'Request',
+        $type = 'WooMS-Request',
         $title = 'Ошибка REST API',
         $desc = $request->get_error_message()
       );
@@ -55,7 +55,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
     if ( empty( $request['body'] ) ) {
       do_action(
         'wooms_logger_error',
-        $type = 'Request',
+        $type = 'WooMS-Request',
         $title = 'REST API вернулся без требуемых данных'
       );
   
@@ -68,7 +68,7 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
       foreach ($response["errors"] as $error) {
         do_action(
           'wooms_logger_error',
-          $type = 'Request',
+          $type = 'WooMS-Request',
           $title = $error['error']
         );
       }
