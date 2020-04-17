@@ -33,7 +33,6 @@ class SiteHealthDebugSection
 
         add_filter('add_wooms_plugin_debug', [__CLASS__, 'check_login_and_password']);
 
-        add_filter('add_wooms_plugin_debug', [__CLASS__, 'wooms_check_moy_sklad_user_tarrif']);
 
     }
 
@@ -138,27 +137,6 @@ class SiteHealthDebugSection
         return $debug_info;
     }
 
-    /**
-     * Check can we add webhooks
-     *
-     * @param [type] $debug_info
-     * @return void
-     */
-    public static function wooms_check_moy_sklad_user_tarrif($debug_info)
-    {
-
-        if (!get_transient('wooms_check_moysklad_tariff')) {
-            return $debug_info;
-        }
-
-        $debug_info['wooms-plugin-debug']['fields']['wooms-tariff-for-orders'] = [
-            'label'    => 'Подписка МойСклад',
-            'value'   => get_transient('wooms_check_moysklad_tariff'),
-        ];
-
-
-        return $debug_info;
-    }
 }
 
 SiteHealthDebugSection::init();
