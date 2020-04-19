@@ -141,7 +141,7 @@ class MenuSettings {
 		register_setting( 'mss-settings', 'wooms_replace_title' );
 		add_settings_field(
       $id = 'wooms_replace_title',
-      $title = 'Замена заголовока при обновлении',
+      $title = 'Замена заголовка при обновлении',
       $callback = array(__CLASS__, 'display_wooms_replace_title'),
       $page = 'mss-settings',
       $section = 'woomss_section_other'
