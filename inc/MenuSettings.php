@@ -241,6 +241,7 @@ class MenuSettings {
 		printf( '<p><a href="%s">Управление синхронизацией</a></p>', admin_url( 'admin.php?page=moysklad' ) );
 		printf( '<p><a href="%s" target="_blank">Расширенная версия с дополнительными возможностями</a></p>', "https://wpcraft.ru/product/wooms-extra/" );
 		printf( '<p><a href="%s" target="_blank">Предложения по улучшению и запросы на доработку</a></p>', "https://github.com/wpcraft-ru/wooms/issues" );
+		printf( '<p><a href="%s" target="_blank">Рекомендуемые хостинги</a></p>', "https://wpcraft.ru/wordpress/hosting/" );
 		printf( '<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru/contacts/" );
 	}
 

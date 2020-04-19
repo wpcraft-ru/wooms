@@ -52,6 +52,8 @@ class MenuTools {
       <span> | </span>
       <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
       <span> | </span>
+      <a href="https://wpcraft.ru/wordpress/hosting/" target="_blank">Рекомендуемые хостинги</a>
+      <span> | </span>
       <a href="<?php echo admin_url('site-health.php') ?>">Диагностика проблем</a>
 
     </p>
