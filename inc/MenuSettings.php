@@ -31,7 +31,7 @@ class MenuSettings {
 					'moysklad',
 					'Настройки',
 					'Настройки',
-					'manage_woocommerce',
+					'manage_options',
 					'mss-settings',
 					array( __CLASS__, 'display_settings' )
 				);

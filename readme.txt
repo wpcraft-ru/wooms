@@ -84,6 +84,7 @@ PHP 5.6
 
 = 7.1 =
 * Импорт услуг - первая версия https://github.com/wpcraft-ru/wooms/issues/60
+* Доступ к принудительной синхронизации для менеджеров https://github.com/wpcraft-ru/wooms/issues/280
 * Мелкие улучшения и исправления 
 
 = 7.0 =
