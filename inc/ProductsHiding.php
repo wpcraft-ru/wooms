@@ -29,7 +29,32 @@ class ProductsHiding
     add_action('wooms_main_walker_finish', array(__CLASS__, 'add_task_for_hide'));
     add_action('wooms_main_walker_started', array(__CLASS__, 'remove_task_for_hide'));
 
+    add_action('wooms_recount_terms', array( __CLASS__, 'recount_terms' ));
+
   }
+
+
+  /**
+   * recount_terms
+   */
+  public static function recount_terms(){
+    $product_cats = get_terms(
+      'product_cat', array(
+        'hide_empty' => false,
+        'fields'     => 'id=>parent',
+      )
+    );
+    _wc_term_recount( $product_cats, get_taxonomy( 'product_cat' ), true, false );
+
+    $product_tags = get_terms(
+      'product_tag', array(
+        'hide_empty' => false,
+        'fields'     => 'id=>parent',
+      )
+    );
+    _wc_term_recount( $product_tags, get_taxonomy( 'product_tag' ), true, false );
+  }
+
 
   public static function add_task_for_hide(){
     set_transient('wooms_product_need_hide', 1);
