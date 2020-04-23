@@ -57,7 +57,7 @@ class ProductsHiding
   }
 
   /**
-   * Cron task restart
+   * Hook restart
    */
   public static function add_schedule_hook($force = false)
   {
@@ -81,7 +81,7 @@ class ProductsHiding
 
 
   /**
-   * Starter walker by cron if option enabled
+   * Starter walker if option enabled
    */
   public static function walker_starter()
   {
