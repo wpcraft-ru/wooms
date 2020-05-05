@@ -1,5 +1,9 @@
 # WooMS - WooCommerce и МойСклад (интеграция, синхронизация, выгрузка, загрузка)
 
+## Вопросы и ответы
+
+https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa 
+
 ## Особенности
 
 *   Синхронизация товаров по протоколу JSON REST API
