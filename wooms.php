@@ -52,6 +52,7 @@ class WooMS_Core
      */
     require_once __DIR__ . '/inc/Logger.php';
     require_once __DIR__ . '/functions.php';
+    require_once __DIR__ . '/inc/MSImagesTrait.php';
 
     /**
      * Add hook for activate plugin
@@ -83,7 +84,6 @@ class WooMS_Core
       require_once __DIR__ . '/inc/ProductsPrices.php';
       require_once __DIR__ . '/inc/ProductsHiding.php';
 
-      require_once __DIR__ . '/inc/MSImagesTrait.php';
       require_once __DIR__ . '/inc/ProductGallery.php';
       require_once __DIR__ . '/inc/ProductImage.php';
       require_once __DIR__ . '/inc/SiteHealth.php';
