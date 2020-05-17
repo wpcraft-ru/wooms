@@ -82,6 +82,14 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.2 =
+* Изображения продукта для вариаций https://github.com/wpcraft-ru/wooms/issues/192
+* Кастомные статусы Заказов плохо передаются https://github.com/wpcraft-ru/wooms/issues/292
+* Добавлена механика проверки данных по заказам отправленных в МойСклад https://github.com/wpcraft-ru/wooms/issues/290
+* Разницы во времени создания заказа при синхронизации магазина и моего склада https://github.com/wpcraft-ru/wooms/issues/285
+* Опция "Отправлять выбранный склад в Заказе" - улучшить инструкцию https://github.com/wpcraft-ru/wooms/issues/284
+* Синхронизация заказов при каждом сохранении без опции https://github.com/wpcraft-ru/wooms/issues/289
+
 = 7.1 =
 * Импорт услуг - первая версия https://github.com/wpcraft-ru/wooms/issues/60
 * Доступ к принудительной синхронизации для менеджеров https://github.com/wpcraft-ru/wooms/issues/280
