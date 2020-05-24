@@ -65,6 +65,10 @@ class WooMS_Core
       do_action('wooms_deactivate');
     });
 
+
+    require_once __DIR__ . '/migrations/7-2.php';
+
+
     add_action('plugins_loaded', [__CLASS__, 'true_load_plugin_textdomain']);
 
     add_filter('woocommerce_status_log_items_per_page', function ($per_page) {
@@ -72,6 +76,12 @@ class WooMS_Core
     });
 
     add_action('plugins_loaded', function () {
+
+
+      //tmp solution for check https://github.com/wpcraft-ru/wooms/issues/296
+      if(get_option('wooms_db_version_check_7_2', 0)){
+        return;
+      }
 
       /**
        * Подключение компонентов
