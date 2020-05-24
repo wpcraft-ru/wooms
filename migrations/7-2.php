@@ -26,7 +26,12 @@ add_action('admin_init', function () {
 
     if($select_cat = get_option('woomss_include_categories_sync')){
         $data = wooms_request($select_cat);
-        $pathName = $data['pathName'] . '/' . $data['name'];
+        if($data['pathName']){
+            $pathName = $data['pathName'] . '/' . $data['name'];
+        } else {
+            $pathName = $data['name'];
+        }
+        
         update_option('wooms_set_folders', $pathName);
     }
 

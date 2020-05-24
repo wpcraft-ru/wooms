@@ -38,9 +38,9 @@ class ProductsPrices
 
         $price_value = 0;
 
-        foreach ($data["salePrices"] as $price) {
-            if ($price["priceType"]['name'] == $price_name) {
-                $price_value = $price["value"];
+        foreach ($data["salePrices"] as $price_item) {
+            if ($price_item["priceType"]['name'] == $price_name) {
+                $price_value = $price_item["value"];
             }
         }
 
@@ -49,8 +49,8 @@ class ProductsPrices
             __CLASS__,
             sprintf('Выбрана цена "%s" = %s. Для продукта ИД: %s', $price_name, $price_value, $product_id)
         );
-
-        if (empty($price_value)) {
+ 
+        if ($price_value == 0) {
             return $price;
         } 
         

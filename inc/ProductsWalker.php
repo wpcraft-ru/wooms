@@ -173,8 +173,11 @@ class ProductsWalker
 
     //Price Retail 'salePrices'
     if (isset($data_of_source['salePrices'][0]['value'])) {
+
+
       $price_source = floatval($data_of_source['salePrices'][0]['value']);
       $price        = apply_filters('wooms_product_price', $price_source, $data_api, $product_id);
+
 
       $price = floatval($price) / 100;
 
@@ -238,6 +241,7 @@ class ProductsWalker
     try {
 
       $data = wooms_request($url);
+      // dd($data);
 
       do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
 
@@ -462,6 +466,8 @@ class ProductsWalker
 
     do_action('wooms_recount_terms');
 
+    as_unschedule_all_actions(self::$walker_hook_name);
+
     do_action(
       'wooms_logger',
       __CLASS__,
@@ -559,7 +565,7 @@ class ProductsWalker
   {
     printf('<h2>%s</h2>', 'Продукты (Товары)');
 
-    if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS')) {
+    if (as_next_scheduled_action(self::$walker_hook_name)) {
       printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
     } else {
 
