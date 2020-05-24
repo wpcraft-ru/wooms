@@ -176,7 +176,7 @@ class ProductsWalker
       $price_source = floatval($data_of_source['salePrices'][0]['value']);
       $price        = apply_filters('wooms_product_price', $price_source, $data_api, $product_id);
 
-      $price = $price / 100;
+      $price = floatval($price) / 100;
 
       $product->set_price($price);
       $product->set_regular_price($price);
