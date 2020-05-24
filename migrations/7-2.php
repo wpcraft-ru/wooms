@@ -58,7 +58,7 @@ add_action( 'admin_notices', function(){
 
     $class = 'notice notice-error';
     $message = sprintf('<p><strong>%s</strong></p>', "Внимание! Плагин WooMS для синхронизации с МойСклад обновлен до версии 7.2");
-    $message .= sprintf('<p><strong>%s</strong></p>', "Требуется отключить плаги и включить его только после обновления обоих плагинов до версии 7.2");
+    $message .= sprintf('<p><strong>%s</strong></p>', "Требуется отключить плагин и включить его только после обновления обоих плагинов до версии 7.2");
     $message .= sprintf('<p>%s <a href="https://github.com/wpcraft-ru/wooms/issues/296" target="_blank">%s</a></strong></p>', "Подробнее", "тут");
  
     printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), $message ); 
