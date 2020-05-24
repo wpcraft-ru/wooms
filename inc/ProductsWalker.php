@@ -182,11 +182,12 @@ class ProductsWalker
       $product->set_regular_price($price);
     }
 
-    $product->set_catalog_visibility('visible');
-    $product->set_stock_status('instock');
-    $product->set_manage_stock('no');
-
-    $product->set_status('publish');
+    if($reset = apply_filters('wooms_reset_state_products', true)){
+      $product->set_catalog_visibility('visible');
+      $product->set_stock_status('instock');
+      $product->set_manage_stock('no');
+      $product->set_status('publish');
+    }
 
     return $product;
   }
