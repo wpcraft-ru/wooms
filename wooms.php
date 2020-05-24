@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: WooMS
  * Plugin URI: https://wpcraft.ru/product/wooms/
