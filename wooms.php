@@ -89,8 +89,6 @@ class WooMS_Core
       require_once __DIR__ . '/inc/SiteHealth.php';
       require_once __DIR__ . '/inc/SiteHealthDebugSection.php';
 
-
-      
       add_action('admin_notices', array(__CLASS__, 'show_notices_35'));
       add_action('admin_notices', array(__CLASS__, 'show_error_notice'));
 
@@ -101,6 +99,7 @@ class WooMS_Core
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
   }
+
 
   /**
    * Add Settings link in pligins list

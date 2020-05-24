@@ -8,22 +8,36 @@ if (!defined('ABSPATH')) {
 
 /**
  * Product Import Walker
- * do_action('wooms_product_import_row', $value, $key, $data);
  */
 class ProductsWalker
 {
 
-  
+
   public static $state_transient_key = 'wooms_products_walker_state';
 
   public static $walker_hook_name = 'wooms_products_walker_batch';
-  
+
 
   /**
    * The Init
    */
   public static function init()
   {
+
+    // add_action('init', function () {
+    //   if (!isset($_GET['dd'])) {
+    //     return;
+    //   }
+
+    //   // dd(get_transient('wooms_end_timestamp'));
+    //   self::set_state('timestamp', 0);
+
+    //   self::batch_handler();
+
+    //   dd(0);
+    // });
+
+
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
     //Main Walker
@@ -41,7 +55,6 @@ class ProductsWalker
 
     //Other
     add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes_post_type']);
-    
   }
 
 
@@ -103,7 +116,7 @@ class ProductsWalker
     $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
 
     //save data of source
-    $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT));
+    $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
     $product_id = $product->save();
 
@@ -184,31 +197,18 @@ class ProductsWalker
    */
   public static function batch_handler($state = [])
   {
-    if(self::walker_is_waiting()){
-      return;
-    }
 
-    //the lock stands if the handler is currently running
-    set_transient('wooms_walker_lock', 1, 60);
-
-    $count = apply_filters('wooms_iteration_size', 10);
     $state = self::get_state();
 
     //state reset for new session
-    if(empty($state['timestamp'])){
+    if (empty($state['timestamp'])) {
 
       self::walker_started();
 
-      self::set_state('timestamp', date("YmdHis"));
-      self::set_state('end_timestamp', 0);
-      self::set_state('count', 0);
-
-      delete_transient('wooms_end_timestamp');
-
       $query_arg_default = [
         'offset' => 0,
-        'limit'  => $count,
-        'scope'  => 'product',
+        'limit'  => apply_filters('wooms_iteration_size', 20),
+        // 'groupBy'  => 'product',
       ];
 
       self::set_state('query_arg', $query_arg_default);
@@ -216,32 +216,50 @@ class ProductsWalker
 
     $query_arg = self::get_state('query_arg');
 
-    $url = 'https://online.moysklad.ru/api/remap/1.1/entity/assortment';
+    /**
+     * issue https://github.com/wpcraft-ru/wooms/issues/296
+     */
+    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product';
 
     $url = add_query_arg($query_arg, $url);
 
     $url = apply_filters('wooms_url_get_products', $url);
 
+    $filters = [
+      // 'type=product',
+      // 'type=service',
+      // 'type=bundle',
+      // 'pathName~=Диваны',
+
+    ];
+
+    $filters = apply_filters('wooms_url_get_products_filters', $filters);
+
+    if (!empty($filters)) {
+      $filters = implode(';', $filters);
+      $url = add_query_arg('filter', $filters, $url);
+    }
+
     try {
 
-      
+      // $url0 = 'https://online.moysklad.ru/api/remap/1.2/entity/product?offset=0&limit=20&filter=pathName~=Мебель';
+      // $data0 = wooms_request($url2);
+
+      // $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product?offset=0&limit=20';
+
       $data = wooms_request($url);
+
+      // dd($url, $data);
 
       do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
 
       //If no rows, that send 'end' and stop walker
       if (isset($data['rows']) && empty($data['rows'])) {
         self::walker_finish();
-        delete_transient('wooms_walker_lock');
         return;
       }
 
       do_action('wooms_walker_start_iteration', $data);
-
-      /**
-       * @TODO: deprecated. remove after tests
-       */
-      do_action('wooms_walker_start');
 
       foreach ($data['rows'] as $key => $value) {
 
@@ -266,18 +284,19 @@ class ProductsWalker
       }
 
       //update count
-      self::set_state( 'count', self::get_state('count') + count($data['rows']) );
+      self::set_state('count', self::get_state('count') + count($data['rows']));
 
       //update offset 
       $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
       self::set_state('query_arg', $query_arg);
 
-      delete_transient('wooms_walker_lock');
+
 
       self::add_schedule_hook(true);
 
+      do_action('wooms_products_batch_end');
+
     } catch (\Exception $e) {
-      delete_transient('wooms_walker_lock');
 
       /**
        * need to protect the site
@@ -382,39 +401,35 @@ class ProductsWalker
    */
   public static function add_schedule_hook($force = false)
   {
-    if(self::walker_is_waiting()){
+    if (self::is_wait()) {
       return;
     }
 
-    if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') && ! $force) {
+    if (as_next_scheduled_action(self::$walker_hook_name) && !$force) {
       return;
     }
 
-    if($force){
+    if ($force) {
       self::set_state('force', 1);
     }
 
-    as_schedule_single_action( time() + 11, self::$walker_hook_name, self::get_state(), 'WooMS' );
+    as_schedule_single_action(time() + 11, self::$walker_hook_name, self::get_state(), 'WooMS');
   }
 
   /**
    * Проверяем стоит ли обработчик на паузе?
    */
-  public static function walker_is_waiting()
+  public static function is_wait()
   {
     //reset state if lock deleted and isset state
-    if( empty(get_transient('wooms_end_timestamp')) and ! empty(self::get_state('end_timestamp')) ){
+    if (empty(get_transient('wooms_end_timestamp')) and !empty(self::get_state('end_timestamp'))) {
       delete_transient(self::$state_transient_key);
     }
 
-    if(self::get_state('end_timestamp')){
+    if (self::get_state('end_timestamp')) {
       return true;
     }
 
-    //the lock stands if the handler is currently running
-    if(get_transient('wooms_walker_lock')){
-      return true;
-    }
 
     return false;
   }
@@ -427,6 +442,12 @@ class ProductsWalker
   {
     $timestamp = date("YmdHis");
     update_option('wooms_session_id', $timestamp, 'no'); //set id session sync
+
+    self::set_state('timestamp', date("YmdHis"));
+    self::set_state('end_timestamp', 0);
+    self::set_state('count', 0);
+
+    delete_transient('wooms_end_timestamp');
 
     do_action('wooms_main_walker_started');
 
@@ -453,11 +474,6 @@ class ProductsWalker
 
     do_action('wooms_recount_terms');
 
-    /**
-     * deprecated
-     */
-    do_action('wooms_walker_finish');
-
     do_action(
       'wooms_logger',
       __CLASS__,
@@ -472,14 +488,13 @@ class ProductsWalker
    */
   public static function start_manually()
   {
-
-    self::set_state('timestamp', 0);
     delete_transient(self::$state_transient_key);
-    self::batch_handler();
 
     delete_transient('wooms_end_timestamp');
 
     do_action('wooms_products_sync_manual_start');
+
+    self::batch_handler();
 
     wp_redirect(admin_url('admin.php?page=moysklad'));
   }
@@ -505,47 +520,47 @@ class ProductsWalker
   {
     $strings = [];
 
-    if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') ) {
+    if (as_next_scheduled_action(self::$walker_hook_name)) {
       $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
     }
 
-    if($end_timestamp = self::get_state('end_timestamp')){
+    if ($end_timestamp = self::get_state('end_timestamp')) {
       $strings[] = sprintf('Последняя успешная синхронизация (отметка времени UTC): %s', $end_timestamp);
     }
 
-    $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker_batch&orderby=schedule&order=desc'));
-    
-    if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
-      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductsWalker'));
-    } else {
-      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
-    }
+    $strings[] = sprintf('Количество обработанных записей: %s', empty(self::get_state('count')) ? 0 : self::get_state('count'));
 
-    $strings[] = sprintf('Количество обработанных записей: %s', empty(self::get_state('count')) ? 0 : self::get_state('count') );
-
-    if($session = get_option('wooms_session_id')){
+    if ($session = get_option('wooms_session_id')) {
       $strings[] = sprintf('Сессия (номер/дата): %s', $session);
     } else {
       $strings[] = sprintf('Сессия (номер/дата): %s', 'отсутствует');
     }
 
+    $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker_batch&orderby=schedule&order=desc'));
+
+    if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductsWalker'));
+    } else {
+      $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+    }
+
     $strings = apply_filters('wooms_main_walker_info_string', $strings);
 
-    ?>
+?>
     <div class="wrap">
       <div id="message" class="notice notice-warning">
-        <?php 
+        <?php
 
-        foreach($strings as $string){
+        foreach ($strings as $string) {
           printf('<p>%s</p>', $string);
-        } 
-        
-        do_action('wooms_products_state_before'); 
+        }
+
+        do_action('wooms_products_state_before');
 
         ?>
       </div>
     </div>
-    <?php
+<?php
   }
 
 
@@ -556,23 +571,22 @@ class ProductsWalker
   {
     printf('<h2>%s</h2>', 'Продукты (Товары)');
 
-    if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') ) {
+    if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS')) {
       printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
     } else {
-      
+
       printf(
-        "<p>%s</p>", 
+        "<p>%s</p>",
         'Нажмите на кнопку ниже, чтобы запустить синхронизацию данных о продуктах вручную'
       );
 
       printf(
-        '<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>', 
+        '<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>',
         add_query_arg('a', 'wooms_products_start_import', admin_url('admin.php?page=moysklad'))
       );
     }
 
     do_action('wooms_products_display_state');
-
   }
 
 
@@ -581,34 +595,34 @@ class ProductsWalker
    */
   public static function get_state($key = '')
   {
-    if( ! $state = get_transient(self::$state_transient_key)){
+    if (!$state = get_transient(self::$state_transient_key)) {
       $state = [];
       set_transient(self::$state_transient_key, $state);
     }
 
-    if(empty($key)){
+    if (empty($key)) {
       return $state;
     }
 
-    if(empty($state[$key])){
+    if (empty($state[$key])) {
       return null;
     }
 
     return $state[$key];
-    
   }
 
 
   /**
    * set state data
    */
-  public static function set_state($key, $value){
+  public static function set_state($key, $value)
+  {
 
-    if( ! $state = get_transient(self::$state_transient_key)){
+    if (!$state = get_transient(self::$state_transient_key)) {
       $state = [];
     }
 
-    if(is_array($state)){
+    if (is_array($state)) {
       $state[$key] = $value;
     } else {
       $state = [];

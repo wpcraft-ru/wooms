@@ -33,19 +33,19 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
       'timeout'     => 45,
       'redirection' => 5,
       'headers'     => array(
-        "Content-Type"  => 'application/json',
+        "Content-Type"  => 'application/json;charset=utf-8',
         'Authorization' => 'Basic ' .
                            base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
       ),
       'body'        => $data,
     );
-  
+
     $request = wp_remote_request( $url, $args);
     if ( is_wp_error( $request ) ) {
       do_action(
         'wooms_logger_error',
         $type = 'WooMS-Request',
-        $title = 'Ошибка REST API',
+        $title = 'Ошибка REST API WP Error',
         $desc = $request->get_error_message()
       );
   
@@ -69,7 +69,8 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
         do_action(
           'wooms_logger_error',
           $type = 'WooMS-Request',
-          $title = $error['error']
+          $title = $url,
+          $response
         );
       }
     }

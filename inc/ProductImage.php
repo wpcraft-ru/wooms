@@ -21,6 +21,26 @@ class ProductImage
      */
     public static function init()
     {
+
+
+        // add_action('init', function(){
+        //   if(!isset($_GET['dd'])){
+        //     return;
+        //   }
+
+        // //   dd(get_transient('wooms_end_timestamp'));
+        //   // self::set_state('timestamp', 0);
+        //   self::product_image_download(11774);
+        //   // self::batch_handler();
+
+        //   dd(0);
+        // });
+
+
+        add_action('wooms_product_image_sync', [__CLASS__, 'batch_handler']);
+        add_action('init', [__CLASS__, 'add_schedule_hook']);
+        add_action('wooms_main_walker_finish', [__CLASS__, 'restart']);
+
         /**
          * Обновление данных о продукте
          */
@@ -28,18 +48,16 @@ class ProductImage
 
         add_action('admin_init', [__CLASS__, 'settings_init'], 50);
 
-        add_action('init', [__CLASS__, 'add_schedule_hook']);
-
-        add_action('wooms_product_image_sync', [__CLASS__, 'download_images_from_metafield']);
 
         add_action('woomss_tool_actions_btns', [__CLASS__, 'ui_for_manual_start'], 15);
         add_action('woomss_tool_actions_wooms_products_images_manual_start', [__CLASS__, 'ui_action']);
-
-
-
     }
 
 
+    public static function restart()
+    {
+        delete_transient('wooms_product_image_sync_finish');
+    }
 
 
     /**
@@ -47,17 +65,17 @@ class ProductImage
      */
     public static function update_product($product, $value, $data)
     {
-        if ( ! self::is_enable() ) {
+        if (!self::is_enable()) {
             return $product;
         }
 
         $product_id = $product->get_id();
 
         //Check image
-        if (empty($value['image']['meta']['href'])) {
+        if (empty($value['images']['meta']['size'])) {
             return $product;
         } else {
-            $url = $value['image']['meta']['href'];
+            $url = $value['images']['meta']['href'];
         }
 
         //check current thumbnail. if isset - break, or add url for next downloading
@@ -65,7 +83,6 @@ class ProductImage
             return $product;
         } else {
             $product->update_meta_data('wooms_url_for_get_thumbnail', $url);
-            $product->update_meta_data('wooms_image_data', $value['image']);
         }
 
         return $product;
@@ -76,20 +93,19 @@ class ProductImage
      */
     public static function add_schedule_hook($force = false)
     {
-        if ( ! self::is_enable() ) {
+        if (!self::is_enable()) {
             return;
         }
 
-        if( self::is_wait()){
+        if (self::is_wait()) {
             return;
         }
 
-        if (as_next_scheduled_action(self::$walker_hook_name) && ! $force) {
+        if (as_next_scheduled_action(self::$walker_hook_name) && !$force) {
             return;
         }
 
-        as_schedule_single_action( time() + 11, self::$walker_hook_name, [], 'WooMS' );
-
+        as_schedule_single_action(time() + 11, self::$walker_hook_name, [], 'WooMS');
     }
 
     /**
@@ -97,7 +113,7 @@ class ProductImage
      */
     public static function ui_action()
     {
-        $data = self::download_images_from_metafield();
+        $data = self::batch_handler();
 
         echo '<hr>';
 
@@ -117,7 +133,8 @@ class ProductImage
     /**
      * checking the option activation
      */
-    public static function is_enable(){
+    public static function is_enable()
+    {
         if (empty(get_option('woomss_images_sync_enabled'))) {
             return false;
         }
@@ -125,44 +142,26 @@ class ProductImage
         return true;
     }
 
-    
+
     /**
      * checking the pause state
      */
-    public static function is_wait(){
-
-
-        $args = array(
-            'post_type'              => 'product',
-            'meta_query'             => array(
-                array(
-                    'key'     => 'wooms_url_for_get_thumbnail',
-                    'compare' => 'EXISTS',
-                ),
-            ),
-            'no_found_rows'          => true,
-            'update_post_term_cache' => false,
-            'update_post_meta_cache' => false,
-            'cache_results'          => false,
-        );
-
-        $list = get_posts($args);
-
-        if (empty($list)) {
+    public static function is_wait()
+    {
+        if (get_transient('wooms_product_image_sync_finish')) {
             return true;
         }
 
         return false;
-
     }
 
 
     /**
      * Download images from meta
      */
-    public static function download_images_from_metafield()
+    public static function batch_handler()
     {
-        if ( ! self::is_enable() ) {
+        if (!self::is_enable()) {
             return;
         }
 
@@ -184,12 +183,13 @@ class ProductImage
 
         if (empty($list)) {
 
+            set_transient('wooms_product_image_sync_finish', time());
+
             do_action(
                 'wooms_logger',
                 __CLASS__,
                 sprintf('Главные изображения продуктов загружены')
             );
-
 
             return false;
         }
@@ -197,33 +197,11 @@ class ProductImage
         $result = [];
 
         foreach ($list as $key => $value) {
-            $url        = get_post_meta($value->ID, 'wooms_url_for_get_thumbnail', true);
-            $image_data = get_post_meta($value->ID, 'wooms_image_data', true);
-
-            $image_name = $image_data['filename'];
-
-            //$check_id = self::download_img($url, $image_name, $value->ID);
-            $check_id = self::uploadRemoteImageAndAttach($url, $value->ID, $image_name);
-
-            if (!empty($check_id)) {
-
-                set_post_thumbnail($value->ID, $check_id);
-                delete_post_meta($value->ID, 'wooms_url_for_get_thumbnail');
-                delete_post_meta($value->ID, 'wooms_image_data');
+            if (self::product_image_download($value->ID)) {
                 $result[] = $value->ID;
-
-                do_action(
-                    'wooms_logger',
-                    __CLASS__,
-                    sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $value->ID, $check_id, $image_name)
-                );
-            } else {
-                do_action(
-                    'wooms_logger_error',
-                    __CLASS__,
-                    sprintf('Ошибка назначения картинки для продукта %s (url %s, filename: %s)', $value->ID, $url, $image_name)
-                );
             }
+
+            delete_post_meta($value->ID, 'wooms_url_for_get_thumbnail');
         }
 
         self::add_schedule_hook(true);
@@ -234,6 +212,52 @@ class ProductImage
             return $result;
         }
     }
+
+    public static function product_image_download($product_id)
+    {
+        if (!$url = get_post_meta($product_id, 'wooms_url_for_get_thumbnail', true)) {
+            return false;
+        }
+
+        $images_data = wooms_request($url);
+
+        if (empty($images_data['rows'][0]['filename'])) {
+            do_action(
+                'wooms_logger_error',
+                __CLASS__,
+                sprintf('Ошибка получения картинки для продукта %s (url %s)', $product_id, $url ),
+                $images_data
+            );
+            return false;
+        }
+
+        $image_name = $images_data['rows'][0]['filename'];
+        $url = $images_data['rows'][0]['meta']['downloadHref'];
+
+        $check_id = self::uploadRemoteImageAndAttach($url, $product_id, $image_name);
+
+        if (!empty($check_id)) {
+
+            set_post_thumbnail($product_id, $check_id);
+            delete_post_meta($product_id, 'wooms_url_for_get_thumbnail');
+            delete_post_meta($product_id, 'wooms_image_data');
+
+            do_action(
+                'wooms_logger',
+                __CLASS__,
+                sprintf('Загружена картинка для продукта %s (ИД %s, filename: %s)', $product_id, $check_id, $image_name)
+            );
+            return true;
+        } else {
+            do_action(
+                'wooms_logger_error',
+                __CLASS__,
+                sprintf('Ошибка назначения картинки для продукта %s (url %s, filename: %s)', $product_id, $url, $image_name)
+            );
+            return false;
+        }
+    }
+
 
     /**
      * Check exist image by URL
@@ -254,27 +278,27 @@ class ProductImage
      */
     public static function ui_for_manual_start()
     {
-        if ( ! self::is_enable()) {
+        if (!self::is_enable()) {
             return;
-        } 
-        
+        }
+
         $strings = [];
 
-        if (as_next_scheduled_action(self::$walker_hook_name, null, 'WooMS') ) {
+        if (as_next_scheduled_action(self::$walker_hook_name)) {
             $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
-        } else{
+        } else {
             $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
         }
 
         $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_product_image_sync&orderby=schedule&order=desc'));
-    
-        if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
-          $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductImage'));
+
+        if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
+            $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductImage'));
         } else {
-          $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+            $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
         }
-        
-        ?>
+
+?>
 
         <h2>Изображения</h2>
         <p>Ручная загрузка изображений по 5 штук за раз.</p>
@@ -284,19 +308,19 @@ class ProductImage
 
         ?>
         <div class="wrap">
-        <div id="message" class="notice notice-warning">
-            <?php 
+            <div id="message" class="notice notice-warning">
+                <?php
 
-            foreach($strings as $string){
-                printf('<p>%s</p>', $string);
-            } 
+                foreach ($strings as $string) {
+                    printf('<p>%s</p>', $string);
+                }
 
-            do_action('wooms_product_images_info');
-            
-            ?>
+                do_action('wooms_product_images_info');
+
+                ?>
+            </div>
         </div>
-        </div>
-        <?php
+<?php
     }
 
     /**

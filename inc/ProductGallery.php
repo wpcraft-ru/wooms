@@ -16,10 +16,22 @@ class ProductGallery
   public static $walker_hook_name = 'gallery_images_download_schedule';
 
   /**
-   * WooMS_Import_Product_Images constructor.
+   * the init
    */
   public static function init()
   {
+
+
+    // add_action('init', function(){
+    //   if(!isset($_GET['dd'])){
+    //     return;
+    //   }
+
+    //   self::download_images_by_id(12237);
+
+
+    //   dd(0);
+    // });
 
     add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
 
@@ -29,16 +41,26 @@ class ProductGallery
 
     add_action('init', [__CLASS__, 'add_schedule_hook']);
 
+    add_action('wooms_main_walker_finish', [__CLASS__, 'restart']);
 
     add_action('wooms_product_images_info', [__CLASS__, 'render_state_info']);
+  }
 
+
+  /**
+   * restart walker after finish main product walker
+   */
+  public static function restart()
+  {
+    delete_transient('gallery_images_downloaded');
   }
 
 
   /**
    * check disable option
    */
-  public static function is_disable(){
+  public static function is_disable()
+  {
     if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return true;
     }
@@ -46,97 +68,76 @@ class ProductGallery
     return false;
   }
 
+
   /**
    * render_state_info
    */
-  public static function render_state_info(){
-
-    if(self::is_disable()){
+  public static function render_state_info()
+  {
+    if (self::is_disable()) {
       return;
     }
 
     $strings = [];
 
-    if (as_next_scheduled_action(self::$walker_hook_name) ) {
-        $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
-    } else{
-        $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
+    if (as_next_scheduled_action(self::$walker_hook_name)) {
+      $strings[] = sprintf('<strong>Статус:</strong> %s', 'галлереи продуктов загружаются очередями в фоне');
+    } else {
+      $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
     }
 
     $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=gallery_images_download_schedule&orderby=schedule&order=desc'));
 
-    if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
+    if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
       $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductGallery'));
     } else {
       $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
     }
 
-    ?>
+?>
     <hr>
     <div>
       <br>
       <strong>Галлереи:</strong>
       <ul>
         <li>
-        <?php 
-        echo implode('</li><li>', $strings);
-        ?>
+          <?php
+          echo implode('</li><li>', $strings);
+          ?>
         </li>
       </ul>
     </div>
-  <?php 
-
-
+<?php
   }
+
 
   /**
    * update_product
    */
-  public static function update_product($product, $value, $data)
+  public static function update_product($product, $data_api, $data)
   {
 
     if (empty(get_option('woomss_gallery_sync_enabled'))) {
       return $product;
     }
-    $product_id = $product->get_id();
 
-    self::get_gallery_from_api($product_id);
+    if (empty($data_api['images']['meta']['size'])) {
+      return $product;
+    }
+
+    $img_count = $data_api['images']['meta']['size'];
+    $href = $data_api['images']['meta']['href'];
+
+    if ($img_count < 2) {
+      return $product;
+    }
+
+    $product->update_meta_data('wooms_data_for_get_gallery', $href);
+
 
     return $product;
   }
 
-  public static function get_gallery_from_api($product_id)
-  {
-    // Getting data from mysklad product directly using id of product
-    $pm_id = get_post_meta($product_id, 'wooms_id', true);
-    $url = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/product/%s/images', $pm_id);
-    $data_api = wooms_request($url);
-
-    //Check image
-    if (empty($data_api['rows']) || count($data_api['rows']) == 1) {
-      return false;
-    }
-
-    // Making array with image data
-    $product_gallery_data = [];
-
-    foreach ($data_api['rows'] as $key => $image) {
-      // First key is the first image that already downloading with another class https://github.com/uptimizt/dev-wms-local/issues/4
-      if ($key !== 0) {
-        $product_gallery_data[$image['filename']] = $image['meta']['downloadHref'];
-      }
-    }
-
-    // encoding array to json
-    $product_gallery_data = json_encode($product_gallery_data);
-
-    // check current meta is set already or not
-    if (!empty(get_post_meta($product_id, 'wooms_data_for_get_gallery'))) {
-      return false;
-    } else {
-      update_post_meta($product_id, 'wooms_data_for_get_gallery', $product_gallery_data);
-    }
-  }
 
   /**
    * Setup schedule
@@ -151,7 +152,7 @@ class ProductGallery
       return;
     }
 
-    if(self::is_wait()){
+    if (self::is_wait()) {
       as_unschedule_all_actions(self::$walker_hook_name);
       return;
     }
@@ -161,74 +162,22 @@ class ProductGallery
     }
 
     // Adding schedule hook
-    as_schedule_recurring_action(time(), 60, self::$walker_hook_name, [], 'WooMS' );
-
-  }
-
-  /**
-   * Checking if schedule can be created or not
-   *
-   * @return void
-   */
-  public static function check_schedule_needed()
-  {
-
-    // If next schedule is not this one and the sync is active and the all gallery images is downloaded
-    if (as_next_scheduled_action('gallery_images_download_schedule', [], 'ProductGallery')) {
-      return false;
-    }
-
-    // Checking if there is any of this type pending schedules
-    $future_schedules = as_get_scheduled_actions(
-      [
-        'hook' => 'gallery_images_download_schedule',
-        'status' => \ActionScheduler_Store::STATUS_PENDING,
-        'group' => 'ProductGallery'
-      ]
-    );
-
-    if (!empty($future_schedules)) {
-      return false;
-    }
-
-    if (empty(get_transient('wooms_start_timestamp'))) {
-      return false;
-    }
-
-    if (get_transient('gallery_images_downloaded')) {
-      return false;
-    }
-
-    return true;
+    as_schedule_recurring_action(time(), 60, self::$walker_hook_name, [], 'WooMS');
   }
 
 
   /**
    * check new task for walker
    */
-  public static function is_wait(){
-    $args = array(
-      'post_type'              => 'product',
-      'numberposts'            => 1,
-      'meta_query'             => array(
-        array(
-          'key'     => 'wooms_data_for_get_gallery',
-          'compare' => 'EXISTS',
-        ),
-      ),
-      'no_found_rows'          => true,
-      'cache_results'          => false,
-    );
-
-    $list = get_posts($args);
-
-    // If no images left to download
-    if (empty($list)) {
+  public static function is_wait()
+  {
+    if (get_transient('gallery_images_downloaded')) {
       return true;
     }
 
     return false;
   }
+
 
   /**
    * Download images from meta
@@ -265,7 +214,7 @@ class ProductGallery
       // If sync product already finished
 
       // Adding the option that all images downloaded and the sync is over
-      set_transient('gallery_images_downloaded', true);
+      set_transient('gallery_images_downloaded', time());
 
       do_action(
         'wooms_logger',
@@ -276,18 +225,12 @@ class ProductGallery
       return false;
     }
 
-    $result = [];
-
     foreach ($list as $key => $value) {
-      $result[] = self::download_images_by_id($value->ID);
-    }
-
-    if (empty($result)) {
-      return false;
-    } else {
-      return $result;
+      self::download_images_by_id($value->ID);
+      delete_post_meta($value->ID, 'wooms_data_for_get_gallery');
     }
   }
+
 
   /**
    * Downloading gallery images from meta product
@@ -297,24 +240,26 @@ class ProductGallery
    */
   public static function download_images_by_id($product_id, $all = false)
   {
-    $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
+    $imgages_url = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
 
-    if (empty($img_data_list)) {
-      self::get_gallery_from_api($product_id);
-      $img_data_list = get_post_meta($product_id, 'wooms_data_for_get_gallery', true);
+    $img_data_list = $imgages_url;
+
+    $images_data = wooms_request($imgages_url);
+
+    if (empty($images_data['rows'])) {
+      return false;
     }
-
-    $img_data_list = json_decode($img_data_list, true);
 
     $media_data_list = [];
 
-    foreach ($img_data_list as $image_name => $url) {
+    foreach ($images_data['rows'] as $key => $row) {
 
-      if ($check_id = self::check_exist_image_by_url($image_name)) {
-        return $check_id;
+      $url_download = $row['meta']['downloadHref'];
+      $media_id = self::uploadRemoteImageAndAttach($url_download, $product_id, $row['filename']);
+
+      if ($media_id == get_post_thumbnail_id($product_id)) {
+        continue;
       }
-
-      $media_id = self::uploadRemoteImageAndAttach($url, $product_id, $image_name);
 
       if (!empty($media_id)) {
         $media_data_list[] = $media_id;
@@ -326,13 +271,10 @@ class ProductGallery
       // Set the gallery images
       update_post_meta($product_id, '_product_image_gallery', implode(',', $media_data_list));
 
-      // Delete meta for correct query work
-      delete_post_meta($product_id, 'wooms_data_for_get_gallery');
-
       do_action(
         'wooms_logger',
         __CLASS__,
-        sprintf('Image is attach to the product %s (Image id list [%s], filename: %s)', $product_id, implode(',', $media_data_list), $image_name)
+        sprintf('Image is attach to the product %s (Image id list [%s], filename: %s)', $product_id, implode(',', $media_data_list), $row['filename'])
       );
     } else {
       do_action(

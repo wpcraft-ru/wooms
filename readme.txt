@@ -83,7 +83,9 @@ PHP 5.6
 == Changelog ==
 
 = 7.2 =
+* Внимание! Большая часть обработчиков переведена на версию 1.2 REST API MoySklad и обновляться нужно осторожно и только обе версии сразу иначе могут быть проблемы 
 * Изображения продукта для вариаций https://github.com/wpcraft-ru/wooms/issues/192
+* Выбор нескольких групп для синхронизации https://github.com/wpcraft-ru/wooms/issues/297
 * Кастомные статусы Заказов плохо передаются https://github.com/wpcraft-ru/wooms/issues/292
 * Добавлена механика проверки данных по заказам отправленных в МойСклад https://github.com/wpcraft-ru/wooms/issues/290
 * Разницы во времени создания заказа при синхронизации магазина и моего склада https://github.com/wpcraft-ru/wooms/issues/285
