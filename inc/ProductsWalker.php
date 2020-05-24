@@ -198,7 +198,6 @@ class ProductsWalker
    */
   public static function batch_handler($state = [])
   {
-
     $state = self::get_state();
 
     //state reset for new session
@@ -209,7 +208,6 @@ class ProductsWalker
       $query_arg_default = [
         'offset' => 0,
         'limit'  => apply_filters('wooms_iteration_size', 20),
-        // 'groupBy'  => 'product',
       ];
 
       self::set_state('query_arg', $query_arg_default);
@@ -227,11 +225,7 @@ class ProductsWalker
     $url = apply_filters('wooms_url_get_products', $url);
 
     $filters = [
-      // 'type=product',
-      // 'type=service',
-      // 'type=bundle',
       // 'pathName~=Диваны',
-
     ];
 
     $filters = apply_filters('wooms_url_get_products_filters', $filters);
@@ -243,14 +237,7 @@ class ProductsWalker
 
     try {
 
-      // $url0 = 'https://online.moysklad.ru/api/remap/1.2/entity/product?offset=0&limit=20&filter=pathName~=Мебель';
-      // $data0 = wooms_request($url2);
-
-      // $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product?offset=0&limit=20';
-
       $data = wooms_request($url);
-
-      // dd($url, $data);
 
       do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
 
