@@ -10,6 +10,10 @@ defined('ABSPATH') || exit;
 
 add_action('admin_init', function () {
 
+    if ( ! is_plugin_active( 'wooms-extra/wooms-extra.php' ) ) {
+        return;
+    }
+    
     // delete_option('wooms_db_version');
     $version = get_option('wooms_db_version', 0);
 
@@ -44,9 +48,14 @@ add_action('admin_init', function () {
 
 add_action( 'admin_notices', function(){
 
+    if ( ! is_plugin_active( 'wooms-extra/wooms-extra.php' ) ) {
+        return;
+    }
+    
     if( ! get_option('wooms_db_version_check_7_2')){
         return;
     }
+    
     $wooms_file = ABSPATH . PLUGINDIR . '/wooms-extra/wooms-extra.php';
     $data = get_plugin_data($wooms_file);
 
