@@ -502,6 +502,11 @@ class ProductsWalker
     self::set_state('stop_manual', 1);
     self::walker_finish();
 
+    /**
+     * issue https://github.com/wpcraft-ru/wooms/issues/305
+     */
+    delete_option('wooms_session_id');
+
     wp_redirect(admin_url('admin.php?page=moysklad'));
     exit;
   }
