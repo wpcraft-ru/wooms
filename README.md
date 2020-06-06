@@ -18,13 +18,16 @@ https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa
 
 ## Ссылки
 
-Исходники https://github.com/wpcraft-ru/wooms
+- Исходники https://github.com/wpcraft-ru/wooms
+- Адрес в каталоге WordPress https://wordpress.org/plugins/wooms/
+- Расширенная версия https://wpcraft.ru/product/wooms-xt/
+- По вопросам и доработкам https://github.com/wpcraft-ru/wooms/issues
 
-Адрес в каталоге WordPress https://wordpress.org/plugins/wooms/
 
-Расширенная версия https://wpcraft.ru/product/wooms-xt/
+## Изменения и улучшения - changelog
 
-По вопросам доработки и автоматизации магазина можно писать сюда https://wpcraft.ru/contacts/
+https://github.com/wpcraft-ru/wooms/releases
+
 
 ## План разработки - дорожная карта
 
