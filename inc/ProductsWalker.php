@@ -146,7 +146,7 @@ class ProductsWalker
 
     $product->update_meta_data('wooms_id', $data_api['id']);
 
-    $product->update_meta_data('wooms_updated', $data_api['updated']);
+    $product->update_meta_data('wooms_updated_from_api', $data_api['updated']);
 
     //update title
     if (isset($data_api['name']) and $data_api['name'] != $product->get_title()) {
