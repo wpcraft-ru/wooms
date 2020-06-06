@@ -9,13 +9,13 @@
  * Developer URI: https://wpcraft.ru/
  * Text Domain: wooms
  * Domain Path: /languages
+ * License: GPLv2 or later
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * WC requires at least: 3.6
- * WC tested up to: 4.0
+ * WC tested up to: 4.2
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.6
- * License: GPLv2 or later
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * WooMS XT Latest: 7.2
  * Version: 7.4
  */
