@@ -85,6 +85,8 @@ class WooMS_Core
       /**
        * Подключение компонентов
        */
+      require_once __DIR__ . '/inc/LoaderIcon.php';
+
       require_once __DIR__ . '/inc/MenuSettings.php';
       require_once __DIR__ . '/inc/MenuTools.php';
       require_once __DIR__ . '/inc/ProductsWalker.php';

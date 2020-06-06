@@ -520,6 +520,7 @@ class ProductsWalker
     $strings = [];
 
     if (as_next_scheduled_action(self::$walker_hook_name)) {
+      $strings[] = do_shortcode('[wooms_loader_icon]');
       $strings[] = sprintf('<strong>Статус:</strong> %s', 'Выполняется очередями в фоне');
     }
 
