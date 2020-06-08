@@ -78,9 +78,17 @@ PHP 5.6
 == Screenshots ==
 
 1. Страница настроек.
-2. Страница управления
+2. Страница продуктов
+3. Журнал обработки
 
 == Changelog ==
+
+= 7.5 =
+* Анимация синхронизации https://github.com/wpcraft-ru/wooms/issues/306
+* Мелкие улучшения и исправления 
+* XT Улучшен лог данных. Товары в наличии пропадают в каталоге https://github.com/wpcraft-ru/wooms/issues/302
+* XT Исправлено - Заказы передаются с отключенной опцией https://github.com/wpcraft-ru/wooms/issues/309
+* XT Рефакторинг опции выбора склада https://github.com/wpcraft-ru/wooms/issues/308
 
 = 7.4 =
 * XT: Исправили проблему с сохранением цен распродажи
