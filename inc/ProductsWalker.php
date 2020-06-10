@@ -116,7 +116,11 @@ class ProductsWalker
     $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
 
     //save data of source
-    $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    if(apply_filters('wooms_logger_enable', false)){
+      $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    } else {
+      $product->delete_meta_data( 'wooms_data_api');
+    }
 
     $product_id = $product->save();
 

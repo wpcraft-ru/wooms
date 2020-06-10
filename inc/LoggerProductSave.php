@@ -5,7 +5,9 @@ namespace WooMS;
 defined('ABSPATH') || exit;
 
 /**
- * Core
+ * LoggerProductSave
+ * 
+ * issue https://github.com/wpcraft-ru/wooms/issues/310
  */
 class LoggerProductSave
 {
@@ -17,22 +19,8 @@ class LoggerProductSave
         add_action('woocommerce_update_product', array(__CLASS__, 'product_save'), 20, 2);
     }
 
-    public static function is_enable()
-    {
-        if (get_option('wooms_logger_enable')) {
-            return true;
-        }
-
-        return false;
-    }
-
-
     public static function product_save($product_id, $product)
     {
-        if( ! self::is_enable() ){
-            return;
-        }
-
         $product = wc_get_product($product);
 
         $data = [
