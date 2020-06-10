@@ -44,13 +44,17 @@ class WooMS_Core
    */
   public static function init()
   {
+    require_once __DIR__ . '/functions.php';
+
+    if( ! is_woocommerce_activated() ){
+      return;
+    }
 
     /**
      * Этот класс должен работать до хука plugins_loaded
      * Птм что иначе хук wooms_activate не срабатывает
      */
     require_once __DIR__ . '/inc/Logger.php';
-    require_once __DIR__ . '/functions.php';
     require_once __DIR__ . '/inc/MSImagesTrait.php';
 
     /**
@@ -99,6 +103,7 @@ class WooMS_Core
       require_once __DIR__ . '/inc/ProductImage.php';
       require_once __DIR__ . '/inc/SiteHealth.php';
       require_once __DIR__ . '/inc/SiteHealthDebugSection.php';
+      require_once __DIR__ . '/inc/LoggerProductSave.php';
 
       add_action('admin_notices', array(__CLASS__, 'show_notices_35'));
       add_action('admin_notices', array(__CLASS__, 'show_error_notice'));

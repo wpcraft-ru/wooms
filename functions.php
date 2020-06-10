@@ -107,3 +107,12 @@ function wooms_request( $url = '', $data = array(), $type = 'GET' ) {
       $url = str_replace('productFolder_id', 'productFolder.id', $url);
       return $url;
   }
+
+  /**
+ * Check if WooCommerce is activated
+ */
+if ( ! function_exists( 'is_woocommerce_activated' ) ) {
+	function is_woocommerce_activated() {
+		if ( class_exists( 'woocommerce' ) ) { return true; } else { return false; }
+	}
+}
