@@ -154,9 +154,7 @@ class ProductsHiding
       <strong>Скрытие продуктов:</strong>
       <ul>
         <li>
-        <?php 
-        echo implode('</li><li>', $strings);
-        ?>
+        <?= implode('</li><li>', $strings); ?>
         </li>
       </ul>
     </div>
