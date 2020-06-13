@@ -83,6 +83,14 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.7 =
+* Добавить поддержку услуг с учетом REST API 1.2 https://github.com/wpcraft-ru/wooms/issues/314
+* Выбор всего дерева категорий у продукта https://github.com/wpcraft-ru/wooms/issues/282
+* XT Fix в версии 7.5 не работает синхранизация сетов https://github.com/wpcraft-ru/wooms/issues/313
+* XT Скрытие товаров в черновики если нет остатков - добавлен хук https://github.com/wpcraft-ru/wooms/issues/287
+* XT Заказы - опция передачи вручную, если автомат отключен https://github.com/wpcraft-ru/wooms/issues/316
+* Рефакторинг, мелкие улучшения и исправления 
+
 = 7.6 =
 * Добавлена опция указания всего деревая категорий по продукту https://github.com/wpcraft-ru/wooms/issues/282
 * Исправлена проблема при которой товары иногда могли скрываться без причины https://github.com/wpcraft-ru/wooms/issues/305
