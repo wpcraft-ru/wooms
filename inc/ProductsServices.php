@@ -33,32 +33,27 @@ class ProductsServices extends AbstractWalker
     public static function init()
     {
 
+        // add_action('init', function () {
+        //     if (!isset($_GET['dd'])) {
+        //         return;
+        //     }
+
+        //     // self::set_state('timestamp', 0);
+        //     self::batch_handler();
+
+        //     dd(0);
+        // });
 
         add_action('wooms_bundle_walker_batch', [__CLASS__, 'batch_handler']);
 
         add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 2);
 
-        add_action('wooms_main_walker_started', array(__CLASS__, 'reset_after_main_walker_finish'));
+        add_action('wooms_main_walker_started', array(__CLASS__, 'reset_walker'));
 
         add_action('init', array(__CLASS__, 'add_schedule_hook'));
         add_action('wooms_tools_sections', array(__CLASS__, 'display_state'));
         add_action('admin_init', array(__CLASS__, 'add_settings'), 150);
     }
-
-
-    /**
-     * Resetting state after completing the main walker
-     * And restart schedules for sync variations
-     */
-    public static function reset_after_main_walker_finish()
-    {
-        self::set_state('count', 0);
-        self::set_state('lock', 0);
-        self::set_state('end_timestamp', 0);
-        self::set_state('timestamp_start', 0);
-        self::add_schedule_hook();
-    }
-
 
     /**
      * Walker for data variant product from MoySklad
@@ -89,21 +84,21 @@ class ProductsServices extends AbstractWalker
             self::set_state('query_arg', $query_arg_default);
         }
 
-        $query_arg = self::get_state('query_arg');
-
-        $url = 'https://online.moysklad.ru/api/remap/1.2/entity/service';
-
-        $url = add_query_arg($query_arg, $url);
-
-        $filters = [];
-
-        $filters = apply_filters('wooms_url_get_service_filter', $filters);
-
-        $url = add_query_arg('filter', implode(';', $filters), $url);
-
-        $url = apply_filters('wooms_url_get_service', $url);
-
         try {
+
+            $query_arg = self::get_state('query_arg');
+
+            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/service';
+
+            $url = add_query_arg($query_arg, $url);
+
+            $filters = [];
+
+            $filters = apply_filters('wooms_url_get_service_filter', $filters);
+
+            $url = add_query_arg('filter', implode(';', $filters), $url);
+
+            $url = apply_filters('wooms_url_get_service', $url);
 
             do_action(
                 'wooms_logger',
@@ -114,16 +109,15 @@ class ProductsServices extends AbstractWalker
 
             $data = wooms_request($url);
 
+            // dd($data);
+
             //Check for errors and send message to UI
             if (isset($data['errors'][0]["error"])) {
                 throw new \Exception($data['errors'][0]["error"]);
             }
-            // dd($state, $data);
 
             //If no rows, that send 'end' and stop walker
             if (isset($data['rows']) && empty($data['rows'])) {
-
-
                 self::set_state('lock', 0);
                 self::walker_finish();
                 return true;
@@ -149,9 +143,8 @@ class ProductsServices extends AbstractWalker
 
             self::add_schedule_hook(true);
 
-            do_action('wooms_variations_batch_end');
-
             return true;
+
         } catch (\Exception $e) {
             self::set_state('lock', 0);
             do_action(
@@ -258,6 +251,9 @@ class ProductsServices extends AbstractWalker
         return true;
     }
 
+    /**
+     * update_product
+     */
     public static function update_product($product, $api_data)
     {
         if (!self::is_enable()) {
@@ -281,6 +277,18 @@ class ProductsServices extends AbstractWalker
         return $product;
     }
 
+    /**
+     * Resetting state after start the main walker
+     * And restart schedules for sync variations
+     */
+    public static function reset_walker()
+    {
+        self::set_state('count', 0);
+        self::set_state('lock', 0);
+        self::set_state('end_timestamp', 0);
+        self::set_state('timestamp_start', 0);
+        self::add_schedule_hook();
+    }
 
     /**
      * display_state
