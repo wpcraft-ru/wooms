@@ -44,7 +44,7 @@ class ProductsServices extends AbstractWalker
         //     dd(0);
         // });
 
-        add_action('wooms_bundle_walker_batch', [__CLASS__, 'batch_handler']);
+        add_action('wooms_services_walker_batch', [__CLASS__, 'batch_handler']);
 
         add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 2);
 
@@ -84,6 +84,8 @@ class ProductsServices extends AbstractWalker
             self::set_state('query_arg', $query_arg_default);
         }
 
+        // if(get_option(''))
+
         try {
 
             $query_arg = self::get_state('query_arg');
@@ -109,8 +111,6 @@ class ProductsServices extends AbstractWalker
 
             $data = wooms_request($url);
 
-            // dd($data);
-
             //Check for errors and send message to UI
             if (isset($data['errors'][0]["error"])) {
                 throw new \Exception($data['errors'][0]["error"]);
@@ -127,6 +127,10 @@ class ProductsServices extends AbstractWalker
             foreach ($data['rows'] as $key => $item) {
 
                 $i++;
+
+                if(apply_filters('wooms_skip_service', false, $item)){
+                    continue;
+                }
 
                 do_action('wooms_product_data_item', $item);
             }
