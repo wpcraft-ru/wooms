@@ -106,6 +106,7 @@ class WooMS_Core
       require_once __DIR__ . '/inc/SiteHealth.php';
       require_once __DIR__ . '/inc/SiteHealthDebugSection.php';
       require_once __DIR__ . '/inc/LoggerProductSave.php';
+      require_once __DIR__ . '/inc/UseCodeAsArticle.php';
       
 
       add_action('admin_notices', array(__CLASS__, 'show_notices_35'));

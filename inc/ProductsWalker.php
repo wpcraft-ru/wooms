@@ -68,21 +68,24 @@ class ProductsWalker
     }
 
     /**
-     * Если отключена опция связи по UUID и пустой артикул, то пропуск записи
+     * Определение способов связи
      */
-    if (empty(get_option('wooms_use_uuid')) and empty($value['article'])) {
-      return;
+    $product_id = 0;
+    if (empty($value['article'])) {
+      if (!$product_id = apply_filters('wooms_get_product_id', $product_id, $value)) {
+        if (empty(get_option('wooms_use_uuid'))) {
+          return;
+        }
+      }
     }
 
     //попытка получить id по артикулу
     if (!empty($value['article'])) {
       $product_id = wc_get_product_id_by_sku($value['article']);
-    } else {
-      $product_id = null;
     }
 
     //попытка получить id по uuid
-    if (empty(intval($product_id))) {
+    if (empty($product_id)) {
       $product_id = self::get_product_id_by_uuid($value['id']);
     }
 
@@ -116,10 +119,10 @@ class ProductsWalker
     $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
 
     //save data of source
-    if(apply_filters('wooms_logger_enable', false)){
+    if (apply_filters('wooms_logger_enable', false)) {
       $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     } else {
-      $product->delete_meta_data( 'wooms_data_api');
+      $product->delete_meta_data('wooms_data_api');
     }
 
     $product_id = $product->save();
@@ -192,7 +195,7 @@ class ProductsWalker
     // issue https://github.com/wpcraft-ru/wooms/issues/302
     $product->set_catalog_visibility('visible');
 
-    if($reset = apply_filters('wooms_reset_state_products', true)){
+    if ($reset = apply_filters('wooms_reset_state_products', true)) {
       $product->set_stock_status('instock');
       $product->set_manage_stock('no');
       $product->set_status('publish');
@@ -293,7 +296,6 @@ class ProductsWalker
       self::add_schedule_hook(true);
 
       do_action('wooms_products_batch_end');
-
     } catch (\Exception $e) {
 
       /**
