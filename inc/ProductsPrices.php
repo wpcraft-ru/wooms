@@ -51,6 +51,7 @@ class ProductsPrices
         $price = apply_filters('wooms_product_price', $price, $data_api, $product_id, $price_meta);
 
         $price = floatval($price) / 100;
+        $price = round($price, 2);
         // $product->set_price($price);
         $product->set_regular_price($price);
 

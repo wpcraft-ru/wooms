@@ -505,6 +505,7 @@ class ProductsWalker
   {
     as_unschedule_all_actions(self::$walker_hook_name);
     self::set_state('stop_manual', 1);
+    self::set_state('timestamp', 0);
     self::walker_finish();
 
     /**
