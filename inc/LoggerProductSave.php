@@ -16,12 +16,12 @@ class LoggerProductSave
      */
     public static function init()
     {
-        add_action('woocommerce_update_product', array(__CLASS__, 'product_save'), 20, 2);
+        add_action('woocommerce_update_product', array(__CLASS__, 'product_save'));
     }
 
-    public static function product_save($product_id, $product)
+    public static function product_save($product_id)
     {
-        $product = wc_get_product($product);
+        $product = wc_get_product($product_id);
 
         $data = [
             'status' => $product->get_status(),
