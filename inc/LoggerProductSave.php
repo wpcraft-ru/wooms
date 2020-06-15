@@ -27,13 +27,16 @@ class LoggerProductSave
             'status' => $product->get_status(),
             'type' => $product->get_type(),
             'catalog_visibility' => $product->get_catalog_visibility(),
+            'price' => $product->get_price(),
+            'regular_price' => $product->get_regular_price(),
+            'sale_price' => $product->get_sale_price(),
         ];
 
         do_action(
             'wooms_logger',
             __CLASS__,
-            sprintf('Продукт сохранен: %s (продукт ID %s)', $product->get_name(), $product_id),
-            $data
+            sprintf('Продукт сохранен: %s (ID %s)', $product->get_name(), $product_id),
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
     }
 }

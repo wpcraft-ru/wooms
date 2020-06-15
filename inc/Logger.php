@@ -20,7 +20,7 @@ final class Logger
     add_action('wooms_logger_error', array(__CLASS__, 'add_log_error'), 10, 3);
 
     // issue https://github.com/wpcraft-ru/wooms/issues/300
-    add_filter('wooms_logger_enable', function($is_enable){
+    add_filter('wooms_logger_enable', function ($is_enable) {
       return self::is_enable();
     });
 
@@ -57,18 +57,19 @@ final class Logger
     $data .= strval($title);
 
     if (!empty($description)) {
-      $description = wc_print_r($description, true);
+
+      if (is_array($description)) {
+        $description = json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+      } else {
+        $description = wc_print_r($description, true);
+      }
+
       $description = wp_trim_words($description, $num_words = 300, $more = null);
       $data .= ':' . PHP_EOL . $description;
     }
 
     $source = $type;
     $source = str_replace('\\', '-', $source);
-    // $source = 'wooms';
-    // if( ! empty($type) ){
-    //   $type = str_replace('\\', '-', $type);
-    //   $source .= '-' . $type;
-    // }
 
     $logger = wc_get_logger();
     $context = array('source' => $source);
@@ -89,7 +90,12 @@ final class Logger
     $data .= strval($title);
 
     if (!empty($description)) {
-      $description = wc_print_r($description, true);
+      if (is_array($description)) {
+        $description = json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+      } else {
+        $description = wc_print_r($description, true);
+      }
+
       $description = wp_trim_words($description, $num_words = 300, $more = null);
       $data .= ':' . PHP_EOL . $description;
     }

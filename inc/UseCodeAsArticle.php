@@ -70,6 +70,12 @@ class UseCodeAsArticle
 
         if ($product_id_by_code != $product_id) {
             wp_delete_post($product_id, true);
+
+            do_action(
+                'wooms_logger',
+                __CLASS__,
+                sprintf('Удаление дубликата по uuid (name: %s, id product %s, uuid: %s)', get_the_title( $product_id_by_code ), $product_id_by_code, $uuid)
+            );
         }
     }
 

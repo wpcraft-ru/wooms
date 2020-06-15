@@ -4,8 +4,8 @@ namespace WooMS;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
-  }
-  
+}
+
 trait MSImages
 {
     /**
@@ -81,7 +81,7 @@ trait MSImages
             'wooms_logger',
             __CLASS__,
             sprintf('Image is downloaded %s (ИД %s, filename: %s)', $product_id, $attach_id, $filename)
-          );
+        );
 
         return $attach_id;
     }
@@ -101,7 +101,7 @@ trait MSImages
                 'wooms_logger',
                 __CLASS__,
                 sprintf('We have such image (%s) already', $posts[0]->ID)
-              );
+            );
 
             return $posts[0]->ID;
         }
