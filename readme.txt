@@ -83,6 +83,14 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.8 =
+* Логгер - доп данные в JSON формате https://github.com/wpcraft-ru/wooms/issues/317
+* Использование кода в МойСклад как артикула в WooCommerce (код, code) https://github.com/wpcraft-ru/wooms/issues/98
+* XT: Учет НДС в Заказе https://github.com/wpcraft-ru/wooms/issues/173
+* XT: Работа с валютой в WooCommerce и МойСклад (USD, EUR) https://github.com/wpcraft-ru/wooms/issues/189
+* XT: Конвертер валют если цена указана в евро, долларах и рублях https://github.com/wpcraft-ru/wooms/issues/277
+* Рефакторинг, мелкие улучшения и исправления 
+
 = 7.7 =
 * Добавить поддержку услуг с учетом REST API 1.2 https://github.com/wpcraft-ru/wooms/issues/314
 * Выбор всего дерева категорий у продукта https://github.com/wpcraft-ru/wooms/issues/282
