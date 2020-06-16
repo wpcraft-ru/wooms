@@ -55,6 +55,45 @@ class ProductsWalker
 
     //Other
     add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes_post_type']);
+
+    add_action('admin_init', array(__CLASS__, 'add_settings'));
+  }
+
+
+  /**
+   * Settings
+   */
+  public static function add_settings()
+  {
+
+    $option_name = 'wooms_batch_size';
+    register_setting('mss-settings', $option_name);
+    add_settings_field(
+      $id = $option_name,
+      $title = 'Количество элементов в пачке',
+      $callback = function ($args) {
+
+        printf(
+          '<input type="number" name="%s" value="%s"  />',
+          $args['key'],
+          $args['value']
+        );
+        printf(
+          '<p>%s</p>',
+          'Опция позволяет ускорять обмен данными, но может приводить к перегрузке сервера и связанным с этим ошибкам'
+        );
+        printf(
+          '<p>%s</p>',
+          'Подробнее: <a href="https://github.com/wpcraft-ru/wooms/issues/295">https://github.com/wpcraft-ru/wooms/issues/295</a>'
+        );
+      },
+      $page = 'mss-settings',
+      $section = 'woomss_section_other',
+      $args = [
+        'key' => $option_name,
+        'value' => get_option($option_name, 20),
+      ]
+    );
   }
 
 
@@ -214,9 +253,11 @@ class ProductsWalker
 
       self::walker_started();
 
+      $batch_size = get_option('wooms_batch_size', 20);
+
       $query_arg_default = [
         'offset' => 0,
-        'limit'  => apply_filters('wooms_iteration_size', 20),
+        'limit'  => apply_filters('wooms_iteration_size', $batch_size),
       ];
 
       self::set_state('query_arg', $query_arg_default);
