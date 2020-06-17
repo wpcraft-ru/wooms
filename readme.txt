@@ -83,6 +83,13 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.9 =
+* Добавить опцию для ускорения синхронизации https://github.com/wpcraft-ru/wooms/issues/295
+* XT: Исправление: Заказы. Нумерация с сайта перебивает нумерацию на складе https://github.com/wpcraft-ru/wooms/issues/319
+* XT: Поиск дубля контрагента по телефону или user_id https://github.com/wpcraft-ru/wooms/issues/146
+* ЛК: Скида 50% автоматически назначается Клиентам которе покупают проделение подписки по плагину https://github.com/wpcraft-ru/wooms/issues/318
+* ЛК: Исправлена ошибка которая выдавала Клиентам доступ к новым версиям более чем на 1 год https://github.com/wpcraft-ru/wooms/issues/274
+
 = 7.8 =
 * Логгер - доп данные в JSON формате https://github.com/wpcraft-ru/wooms/issues/317
 * Использование кода в МойСклад как артикула в WooCommerce (код, code) https://github.com/wpcraft-ru/wooms/issues/98
