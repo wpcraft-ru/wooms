@@ -95,7 +95,7 @@ class ProductsCategories
         do_action(
           'wooms_logger',
           __CLASS__,
-          printf('Выбор категории продукта %s (id %s)', $product->get_name(), $product->get_id()),
+          sprintf('Выбор категории продукта %s (id %s)', $product->get_name(), $product->get_id()),
           [
             '$url' => $url,
             '$term_id' => $term_id,
