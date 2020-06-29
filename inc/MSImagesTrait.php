@@ -37,6 +37,15 @@ trait MSImages
 
         $get = wp_remote_get($image_url, $args);
 
+        if( is_wp_error( $get ) ) {
+            do_action(
+                'wooms_logger_error',
+                __CLASS__,
+                sprintf('Ошибка загрузки картинки: %s', $get->get_error_message()),
+                $get->get_error_code()
+            );
+        }
+
         if (empty($get['response']['code'])) {
             return false;
         }
