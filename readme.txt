@@ -83,6 +83,10 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.10 =
+* XT: связь позиций заказа и wooms_id https://github.com/wpcraft-ru/wooms/issues/335
+
+
 = 7.9 =
 * Добавить опцию для ускорения синхронизации https://github.com/wpcraft-ru/wooms/issues/295
 * XT: Исправление: Заказы. Нумерация с сайта перебивает нумерацию на складе https://github.com/wpcraft-ru/wooms/issues/319
