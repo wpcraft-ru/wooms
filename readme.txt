@@ -84,8 +84,13 @@ PHP 5.6
 == Changelog ==
 
 = 7.10 =
-* XT: связь позиций заказа и wooms_id https://github.com/wpcraft-ru/wooms/issues/335
-
+* Проработка решения для множества складов https://github.com/wpcraft-ru/wooms/issues/327
+* [XT] Синхронное присвоение номера заказа в магазине https://github.com/wpcraft-ru/wooms/issues/330
+* [XT] Исправлено. Сбрасывается заказ в "Мой склад" https://github.com/wpcraft-ru/wooms/issues/333
+* [XT] Ошибка обновления кастомных статусов https://github.com/wpcraft-ru/wooms/issues/332
+* [XT] Улучшили поиск контрагента по телефону https://github.com/wpcraft-ru/wooms/issues/326
+* [XT] Связь позиций заказа и wooms_id https://github.com/wpcraft-ru/wooms/issues/335
+* [XT] Исправление диагностики по веб хукам https://github.com/wpcraft-ru/wooms/issues/321
 
 = 7.9 =
 * Добавить опцию для ускорения синхронизации https://github.com/wpcraft-ru/wooms/issues/295

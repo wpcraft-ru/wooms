@@ -16,8 +16,8 @@
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.6
- * WooMS XT Latest: 7.9
- * Version: 7.9
+ * WooMS XT Latest: 7.10
+ * Version: 7.10
  */
 
 // Exit if accessed directly
