@@ -84,7 +84,7 @@ PHP 5.6
 == Changelog ==
 
 = 7.10 =
-* Проработка решения для множества складов https://github.com/wpcraft-ru/wooms/issues/327
+* [XT] Проработка решения для множества складов https://github.com/wpcraft-ru/wooms/issues/327
 * [XT] Синхронное присвоение номера заказа в магазине https://github.com/wpcraft-ru/wooms/issues/330
 * [XT] Исправлено. Сбрасывается заказ в "Мой склад" https://github.com/wpcraft-ru/wooms/issues/333
 * [XT] Ошибка обновления кастомных статусов https://github.com/wpcraft-ru/wooms/issues/332
