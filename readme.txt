@@ -83,6 +83,10 @@ PHP 5.6
 
 == Changelog ==
 
+= unrelease =
+* 
+
+
 = 7.10 =
 * [XT] Проработка решения для множества складов https://github.com/wpcraft-ru/wooms/issues/327
 * [XT] Синхронное присвоение номера заказа в магазине https://github.com/wpcraft-ru/wooms/issues/330
