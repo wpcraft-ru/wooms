@@ -83,9 +83,9 @@ PHP 5.6
 
 == Changelog ==
 
-= unrelease =
-* 
-
+= 7.11 =
+* [XT] Фикс проблемы поиска по номерам заказа https://github.com/wpcraft-ru/wooms/issues/331
+* [XT] Исправление проблемы с новым механизмом обновления заказов в 2 стороны https://github.com/wpcraft-ru/wooms/issues/344
 
 = 7.10 =
 * [XT] Проработка решения для множества складов https://github.com/wpcraft-ru/wooms/issues/327
