@@ -83,6 +83,10 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.12 =
+* [XT] Рефакторинг кода по отправке заказов https://github.com/wpcraft-ru/wooms/issues/342
+* [XT] Исправление проблемы с новым механизмом обновления заказов в 2 стороны https://github.com/wpcraft-ru/wooms/issues/344
+
 = 7.11 =
 * [XT] Фикс проблемы поиска по номерам заказа https://github.com/wpcraft-ru/wooms/issues/331
 * [XT] Исправление проблемы с новым механизмом обновления заказов в 2 стороны https://github.com/wpcraft-ru/wooms/issues/344
