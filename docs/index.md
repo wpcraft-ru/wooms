@@ -1,6 +1,10 @@
 ![main image](https://raw.githubusercontent.com/wpcraft-ru/wooms/master/screenshots/screenshot-1.gif)
 
-- изменения и changelog https://github.com/wpcraft-ru/wooms/releases
-- код https://github.com/wpcraft-ru/wooms
-- базовая поддержка и разработка https://github.com/wpcraft-ru/wooms/issues
-- расширенная поддержка 
+# Ссылки
+- изменения (changelog) [https://github.com/wpcraft-ru/wooms/releases](https://github.com/wpcraft-ru/wooms/releases)
+- код [https://github.com/wpcraft-ru/wooms](https://github.com/wpcraft-ru/wooms)
+- базовая поддержка и разработка [https://github.com/wpcraft-ru/wooms/issues](https://github.com/wpcraft-ru/wooms/issues)
+- расширенная поддержка [https://wpcraft.ru/contacts/](https://wpcraft.ru/contacts/)
+
+# Документация
+- [Диагностика проблем - общие рекомендации по сборку информации для первичной диагностики](https://github.com/wpcraft-ru/wooms/wiki/Diagnostics)
