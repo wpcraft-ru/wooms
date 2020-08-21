@@ -8,3 +8,4 @@
 
 # Документация
 - [Диагностика проблем - общие рекомендации по сборку информации для первичной диагностики](https://github.com/wpcraft-ru/wooms/wiki/Diagnostics)
+- [Мультисклад](https://github.com/wpcraft-ru/wooms/wiki/MultiWarehouse)
