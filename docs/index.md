@@ -7,6 +7,7 @@
 - расширенная поддержка [https://wpcraft.ru/contacts/](https://wpcraft.ru/contacts/)
 
 # Документация
+- [Первые шаги](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
 - [Диагностика проблем - общие рекомендации по сборку информации для первичной диагностики](https://github.com/wpcraft-ru/wooms/wiki/Diagnostics)
 - [Не загружаются изображения (картинки) для продуктов (товаров)](https://github.com/wpcraft-ru/wooms/wiki/ImagesNotLoaded)
 - [Мультисклад](https://github.com/wpcraft-ru/wooms/wiki/MultiWarehouse)
