@@ -12,6 +12,14 @@ WooMS - синхронизация, выгрузка, загрузка
 * Импорт изображений и фото по продуктам
 * Простые настройки
 
+## Инструкции и документация
+
+- [Список инструкци](https://github.com/wpcraft-ru/wooms/wiki)
+
+- [Первые шаги](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
+
+- [Диагностика проблем - общие рекомендации по сборку информации для первичной диагностики](https://github.com/wpcraft-ru/wooms/wiki/Diagnostics)
+
 
 ## Вопросы и ответы
 
