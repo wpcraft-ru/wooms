@@ -44,6 +44,9 @@ trait MSImages
                 sprintf('Ошибка загрузки картинки: %s', $get->get_error_message()),
                 $get->get_error_code()
             );
+            
+            return false;
+
         }
 
         if (empty($get['response']['code'])) {
