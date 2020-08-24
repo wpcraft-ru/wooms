@@ -45,20 +45,24 @@ class MenuTools {
    */
   public static function display_ui()
   { ?>
-    <h1>Управление МойСклад</h1>
+<h1>Управление МойСклад</h1>
 
-    <p>
-      <a href="<?php echo admin_url('admin.php?page=mss-settings') ?>">Настройки</a>
-      <span> | </span>
-      <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
-      <span> | </span>
-      <a href="https://wpcraft.ru/wordpress/hosting/" target="_blank">Рекомендуемые хостинги</a>
-      <span> | </span>
-      <a href="<?php echo admin_url('site-health.php') ?>">Диагностика проблем</a>
+<p>
+    <a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted"
+        target="_blank"><strong>Начало
+            работы</strong></a>
+    <span> | </span>
+    <a href="<?php echo admin_url('admin.php?page=mss-settings') ?>">Настройки</a>
+    <span> | </span>
+    <a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>
+    <span> | </span>
+    <a href="https://wpcraft.ru/wordpress/hosting/" target="_blank">Рекомендуемые хостинги</a>
+    <span> | </span>
+    <a href="<?php echo admin_url('site-health.php') ?>">Диагностика проблем</a>
 
-    </p>
+</p>
 
-    <?php
+<?php
     if(empty($_GET['a'])){
 
       do_action('woomss_tool_actions_btns');

@@ -115,6 +115,8 @@ class WooMS_Core
       add_action('after_plugin_row_wooms-extra/wooms-extra.php', array(__CLASS__, 'xt_plugin_update_message'), 10, 2);
 
       add_filter("plugin_action_links_" . plugin_basename(__FILE__), array(__CLASS__, 'plugin_add_settings_link'));
+
+      add_filter('plugin_row_meta', array(__CLASS__,  'add_wooms_plugin_row_meta'), 10, 2);
     });
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
@@ -130,6 +132,22 @@ class WooMS_Core
     $xt_link = '<a href="//wpcraft.ru/product/wooms-xt/" target="_blank">Расширенная версия</a>';
     array_unshift($links, $xt_link);
     array_unshift($links, $settings_link);
+    return $links;
+  }
+  
+  /**
+   * Add GettingStarted link in row meta at pligins list
+   */
+  public static function add_wooms_plugin_row_meta($links, $file)
+  {
+    if ( strpos( $file, 'wooms.php' ) !== false ) {
+      $new_links = array(
+        '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>'
+        );
+      
+      $links = array_merge( $links, $new_links );
+    }
+    
     return $links;
   }
 
@@ -232,12 +250,12 @@ class WooMS_Core
         return;
       }
 ?>
-      <div class="notice notice-error">
-        <p>
-          <strong>Плагин WooMS XT нужно срочно обновить до версии 3.5! </strong>
-          <a href="https://wpcraft.ru/my">https://wpcraft.ru/my</a>
-        </p>
-      </div>
+<div class="notice notice-error">
+    <p>
+        <strong>Плагин WooMS XT нужно срочно обновить до версии 3.5! </strong>
+        <a href="https://wpcraft.ru/my">https://wpcraft.ru/my</a>
+    </p>
+</div>
 <?php
     }
 
