@@ -24,6 +24,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 *   Загрузка картинок
 *   Простые настройки
 
+[Руководство по быстрому началу работы](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
 
 [Инструкция по правильному запуску Интернет магазина на базе WordPress & WooCommerce](https://wpcraft.ru/blog/internet-magazin-na-wordpress-woocommerce-storefront-mojsklad/)
 
