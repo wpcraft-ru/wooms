@@ -1,2 +1,2 @@
 vendor
-!tests/unit/.phpunit.result.cache
+tests/unit/.phpunit.result.cache
