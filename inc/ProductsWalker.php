@@ -12,7 +12,6 @@ if (!defined('ABSPATH')) {
 class ProductsWalker
 {
 
-
   public static $state_transient_key = 'wooms_products_walker_state';
 
   public static $walker_hook_name = 'wooms_products_walker_batch';
@@ -24,18 +23,20 @@ class ProductsWalker
   public static function init()
   {
 
-    // add_action('init', function () {
-    //   if (!isset($_GET['dd'])) {
-    //     return;
-    //   }
+    add_action('init', function () {
+      if (!isset($_GET['dd'])) {
+        return;
+      }
 
-    //   // dd(get_transient('wooms_end_timestamp'));
-    //   self::set_state('timestamp', 0);
+      // dd(get_transient('wooms_end_timestamp'));
+      // self::set_state('timestamp', 0);
 
-    //   self::batch_handler();
+      // self::batch_handler();
 
-    //   dd(0);
-    // });
+      // do_action('wooms_product_data_item', $dddd);
+
+      dd(0);
+    });
 
 
     add_action('init', [__CLASS__, 'add_schedule_hook']);
@@ -679,5 +680,3 @@ class ProductsWalker
     set_transient(self::$state_transient_key, $state);
   }
 }
-
-ProductsWalker::init();

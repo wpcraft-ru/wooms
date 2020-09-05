@@ -1,0 +1,26 @@
+<phpunit
+        bootstrap="./bootstrap.php"
+        backupGlobals="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        stopOnFailure="true"
+        beStrictAboutTestsThatDoNotTestAnything="false"
+>
+    <testsuites>
+        <testsuite name="wooms-tests">
+            <directory suffix=".php">./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../../inc/</directory>
+            <exclude>
+                <directory>../../docs</directory>
+                <directory>../../screenshots</directory>
+                <directory>../../vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>

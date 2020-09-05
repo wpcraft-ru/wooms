@@ -123,4 +123,3 @@ class ProductsPrices
     }
 }
 
-ProductsPrices::init();

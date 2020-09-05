@@ -95,10 +95,19 @@ class WooMS_Core
 
       require_once __DIR__ . '/inc/MenuSettings.php';
       require_once __DIR__ . '/inc/MenuTools.php';
+
+      
       require_once __DIR__ . '/inc/ProductsWalker.php';
+      \WooMS\ProductsWalker::init();
+
+
+      require_once __DIR__ . '/inc/ProductsPrices.php';
+      \WooMS\ProductsPrices::init();
+
+
       require_once __DIR__ . '/inc/ProductsServices.php';
       require_once __DIR__ . '/inc/ProductsCategories.php';
-      require_once __DIR__ . '/inc/ProductsPrices.php';
+
       require_once __DIR__ . '/inc/ProductsHiding.php';
 
       require_once __DIR__ . '/inc/ProductGallery.php';

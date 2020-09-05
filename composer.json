@@ -1,0 +1,17 @@
+{
+    "name": "uptimizt/wooms",
+    "authors": [
+        {
+            "name": "r2 d2",
+            "email": "uptimizt@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "brain/monkey": "^2.4",
+        "phpunit/phpunit": "^9.3"
+    },
+    "scripts": {
+        "unit": "phpunit -c tests/unit/phpunit.xml"
+    }
+}
