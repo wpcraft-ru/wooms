@@ -1,17 +1,5 @@
-# GitHub Action: whenever creating a new release of the source code,
-# also create a release of the installable plugin.
-# Steps to execute:
-# - Checkout the source code
-# - Run "composer install" to download all dependencies under vendor/
-# - Create a .zip file, excluding:
-#   - All hidden files (.git, .gitignore, etc)
-#   - All development files, ending in .dist
-#   - All composer files <= after installing dependencies, no need for them anymore
-#   - Markdown files concerning development
-#   - Folder build/ <= created only to store the .zip file
-#   - Folder dev-helpers/ <= not needed for the plugin
-# - Upload the .zip file as an artifact to the action (this step is possibly optional)
-# - Upload the .zip file as a release, for download
+# GitHub Action: https://dev.to/leoloso/using-github-actions-to-release-a-wordpress-plugin-42a5
+
 name: Generate Installable Plugin, and Upload as Release Asset
 on:
   release:
