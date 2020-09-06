@@ -84,6 +84,12 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.13 =
+* Исправлено. Ошибка при загрузке картинок https://github.com/wpcraft-ru/wooms/issues/348
+* Улучшение. Документация и инструкции по плагину https://github.com/wpcraft-ru/wooms/issues/325
+* Тест плагинов с новой версией WooCommerce https://github.com/wpcraft-ru/wooms/issues/351
+* [XT] Пропал метод доставки в комментах к заказу https://github.com/wpcraft-ru/wooms/issues/357 
+
 = 7.12 =
 * [XT] Рефакторинг кода по отправке заказов https://github.com/wpcraft-ru/wooms/issues/342
 * [XT] Исправление проблемы с новым механизмом обновления заказов в 2 стороны https://github.com/wpcraft-ru/wooms/issues/344
