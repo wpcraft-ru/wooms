@@ -44,6 +44,24 @@ class MenuSettings
 		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
 		add_action('admin_init', array(__CLASS__, 'settings_shedules'), $priority = 20, $accepted_args = 1);
 		add_action('admin_init', array(__CLASS__, 'settings_other'), $priority = 100, $accepted_args = 1);
+
+		add_action('wooms_settings_after_header', [__CLASS__, 'render_nav_menu']);
+	}
+
+
+	public static function render_nav_menu(){
+
+		$nav_items = [
+			'getting-started' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki/GettingStarted', 'С чего начать?'),
+			'diagnostic' => sprintf('<a href="%s">%s</a>', admin_url('site-health.php'), 'Диагностика проблем'),
+			'hostings' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://wpcraft.ru/wordpress/hosting/', 'Рекомендуемые хостинги'),
+			'ms' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://online.moysklad.ru/', 'Вход в МойСклад'),
+		];
+
+		$nav_items = apply_filters('wooms_settings_nav_items', $nav_items);
+
+		echo implode(' | ', $nav_items);
+
 	}
 
 
@@ -222,19 +240,11 @@ class MenuSettings
 
 	?>
 		<form method="POST" action="options.php">
-			<style media="screen" scoped="true">
-				.lead {
-					background-color: blanchedalmond;
-					padding: 10px;
-				}
-			</style>
+		
 			<h1>Настройки интеграции МойСклад</h1>
-			<p>
-				<strong class="lead">
-					<span>Внимание! Настройки рекомендуется сначала выполнять на тестовой копии сайта.</span>
-					<span>Только после тестов, переносить конфигурацию на рабочий сайт с клиентами.</span>
-				</strong>
-			</p>
+
+			<?php do_action('wooms_settings_after_header') ?>
+		
 			<?php
 
 			settings_fields('mss-settings');

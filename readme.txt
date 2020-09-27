@@ -84,6 +84,10 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.14 =
+- Навигация в настройках https://github.com/wpcraft-ru/wooms/issues/360
+- XT: Добавлена опция обновления клиента в МойСклад по Заказам https://github.com/wpcraft-ru/wooms/issues/361
+
 = 7.13 =
 * Исправлено. Ошибка при загрузке картинок https://github.com/wpcraft-ru/wooms/issues/348
 * Улучшение. Документация и инструкции по плагину https://github.com/wpcraft-ru/wooms/issues/325
