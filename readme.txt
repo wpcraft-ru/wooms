@@ -84,6 +84,12 @@ PHP 5.6
 
 == Changelog ==
 
+= 7.15 rc =
+
+- Обновление позиций заказа из МойСклад https://github.com/wpcraft-ru/wooms/issues/338
+
+
+
 = 7.14 =
 - Навигация в настройках https://github.com/wpcraft-ru/wooms/issues/360
 - XT: Добавлена опция обновления клиента в МойСклад по Заказам https://github.com/wpcraft-ru/wooms/issues/361
