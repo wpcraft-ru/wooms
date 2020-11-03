@@ -100,8 +100,12 @@ function wooms_get_wooms_id_from_href($href = '')
  */
 function wooms_get_product_id_by_uuid($uuid)
 {
+  $posts = get_posts([
+    'post_type' => ['product', 'product_variation'],
+    'meta_key' => 'wooms_id',
+    'meta_value' => $uuid
+  ]);
 
-  $posts = get_posts('post_type=product&meta_key=wooms_id&meta_value=' . $uuid);
   if (empty($posts[0]->ID)) {
     return false;
   } else {
