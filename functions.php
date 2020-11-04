@@ -1,7 +1,7 @@
 <?php
 
 /**
- * General function
+ * General functions
  */
 
 /**
@@ -95,8 +95,6 @@ function wooms_get_wooms_id_from_href($href = '')
 /**
  * Get product id by UUID from metafield
  * or false
- *
- * XXX move to \WooMS\Products\Bundle::get_product_id_by_uuid
  */
 function wooms_get_product_id_by_uuid($uuid)
 {
