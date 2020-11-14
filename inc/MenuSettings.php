@@ -54,7 +54,6 @@ class MenuSettings
 		$nav_items = [
 			'getting-started' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki/GettingStarted', 'С чего начать?'),
 			'diagnostic' => sprintf('<a href="%s">%s</a>', admin_url('site-health.php'), 'Диагностика проблем'),
-			'hostings' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://wpcraft.ru/wordpress/hosting/', 'Рекомендуемые хостинги'),
 			'ms' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://online.moysklad.ru/', 'Вход в МойСклад'),
 		];
 
@@ -260,6 +259,7 @@ class MenuSettings
 		printf('<p><a href="%s" target="_blank">Расширенная версия с дополнительными возможностями</a></p>', "https://wpcraft.ru/product/wooms-extra/");
 		printf('<p><a href="%s" target="_blank">Предложения по улучшению и запросы на доработку</a></p>', "https://github.com/wpcraft-ru/wooms/issues");
 		printf('<p><a href="%s" target="_blank">Рекомендуемые хостинги</a></p>', "https://wpcraft.ru/wordpress/hosting/");
+		printf('<p><a href="%s" target="_blank">Сопровождение магазинов и консалтинг</a></p>', "https://wpcraft.ru/wordpress-woocommerce-mentoring/");
 		printf('<p><a href="%s" target="_blank">Помощь и техическая поддержка</a></p>', "https://wpcraft.ru/contacts/");
 	}
 }
