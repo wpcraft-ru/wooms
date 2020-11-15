@@ -64,9 +64,17 @@ class ProductsWalker
   /**
    * Settings
    */
+
   public static function add_settings()
   {
 
+    self::add_setting_wooms_batch_size();
+    self::add_setting_short_description();
+  }
+
+
+  public static function add_setting_wooms_batch_size()
+  {
     $option_name = 'wooms_batch_size';
     register_setting('mss-settings', $option_name);
     add_settings_field(
@@ -86,6 +94,35 @@ class ProductsWalker
         printf(
           '<p>%s</p>',
           'Подробнее: <a href="https://github.com/wpcraft-ru/wooms/issues/295">https://github.com/wpcraft-ru/wooms/issues/295</a>'
+        );
+      },
+      $page = 'mss-settings',
+      $section = 'woomss_section_other',
+      $args = [
+        'key' => $option_name,
+        'value' => get_option($option_name, 20),
+      ]
+    );
+  }
+
+  public static function add_setting_short_description()
+  {
+    $option_name = 'wooms_short_description';
+    register_setting('mss-settings', $option_name);
+    add_settings_field(
+      $id = $option_name,
+      $title = 'Использовать краткое описание продуктов вместо полного',
+      $callback = function ($args) {
+
+        printf(
+          '<input type="checkbox" name="%s" value="1" %s />',
+          $args['key'],
+          checked(1, $args['value'], false)
+        );
+
+        printf(
+          '<p>%s</p>',
+          'Подробнее: <a href="https://github.com/wpcraft-ru/wooms/issues/347">https://github.com/wpcraft-ru/wooms/issues/347</a>'
         );
       },
       $page = 'mss-settings',
@@ -208,12 +245,20 @@ class ProductsWalker
 
       if ($product_description && !empty(get_option('wooms_replace_description'))) {
 
-        $product->set_description($product_description);
+        if (get_option('wooms_short_description')) {
+          $product->set_short_description($product_description);
+        } else {
+          $product->set_description($product_description);
+        }
       } else {
 
         if (empty($product->get_description())) {
 
-          $product->set_description($product_description);
+          if (get_option('wooms_short_description')) {
+            $product->set_short_description($product_description);
+          } else {
+            $product->set_description($product_description);
+          }
         }
       }
     }
