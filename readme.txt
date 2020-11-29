@@ -84,6 +84,10 @@ PHP 5.6
 
 == Changelog ==
 
+= 8.1 =
+- Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
+- XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
+
 = 8.0 =
 - Добавлена ссылка на услугу сопровождения магазинов
 - XT: 2х сторонняя синхронизация Заказов - Обновление позиций заказа из МойСклад https://github.com/wpcraft-ru/wooms/issues/338
