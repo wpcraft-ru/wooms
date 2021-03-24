@@ -87,6 +87,9 @@ PHP 5.6
 = 8.1 =
 - Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
 - XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
+* Тест плагинов с новыми версиями WordPress и WooCommerce https://github.com/wpcraft-ru/wooms/issues/396
+* [XT] Публикация решения для отображения остатков со множества складов через ACF https://github.com/wpcraft-ru/wooms/issues/327
+* [XT] Публикация решения для передачи склада в заказе через методы доставки https://github.com/wpcraft-ru/wooms/issues/327
 
 = 8.0 =
 - Добавлена ссылка на услугу сопровождения магазинов
