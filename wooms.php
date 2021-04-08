@@ -129,6 +129,10 @@ class WooMS_Core
     });
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
+
+    add_action( 'woocommerce_order_item_meta_start', function () {
+      add_filter( 'woocommerce_order_item_get_formatted_meta_data', 'remove_wooms_id_from_order_data', 10, 2);
+    });
   }
 
 
@@ -294,6 +298,22 @@ class WooMS_Core
       as_unschedule_all_actions('wooms_cron_variation_walker', [], 'ProductWalker');
       as_unschedule_all_actions('wooms_product_single_update', [], 'ProductWalker');
     }
+  }
+
+  /** 
+   * Removal of wooms_id from order data in customer email and order-received page
+   * 
+  */
+  public static function remove_wooms_id_from_order_data( $attr, $data )
+  {
+    foreach( $attr as $key => $att ) {
+
+      if ( $att->key == 'wooms_id' ) {
+          unset( $attr[$key] );
+      }
+    }
+
+    return $attr;
   }
 
 }
