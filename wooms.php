@@ -131,7 +131,8 @@ class WooMS_Core
     add_action('init', [__CLASS__, 'delete_old_schedules']);
 
     add_action( 'woocommerce_order_item_meta_start', function () {
-      add_filter( 'woocommerce_order_item_get_formatted_meta_data', 'remove_wooms_id_from_order_data', 10, 2);
+
+      add_filter( 'woocommerce_order_item_get_formatted_meta_data',  array( __CLASS__, 'remove_wooms_id_from_order_data' ), 10, 2 );
     });
   }
 
