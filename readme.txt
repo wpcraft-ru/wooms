@@ -84,6 +84,10 @@ PHP 5.6
 
 == Changelog ==
 
+= 8.2 =
+- Сокрытие wooms_id из деталей Заказа видимых клиенту https://github.com/wpcraft-ru/wooms/issues/398
+
+
 = 8.1 =
 - Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
 - XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
