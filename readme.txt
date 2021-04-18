@@ -87,6 +87,7 @@ PHP 5.6
 = 8.2 =
 - Сокрытие wooms_id из деталей Заказа видимых клиенту https://github.com/wpcraft-ru/wooms/issues/398
 - Проверка совместимости с WooCommerce 5.0 https://github.com/wpcraft-ru/wooms/issues/396
+- Загрузка изображения у модификаций Товара повторное https://github.com/wpcraft-ru/wooms/issues/359
 
 = 8.1 =
 - Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
