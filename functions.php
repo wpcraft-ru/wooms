@@ -228,6 +228,6 @@ function wooms_id_check_if_unique($post_ID, $post = '', $update = '') {
     do_action(
         'wooms_logger',
         $type = 'WooMS-Request',
-        $title =  sprintf('Дубли meta-полей wooms для товаров и вариаций (%s) не удалены', implode(', ', $ids)),
+        $title =  sprintf('Дубли meta-полей wooms для товаров и вариаций (%s) удалены', implode(', ', $ids))
     );
 }
