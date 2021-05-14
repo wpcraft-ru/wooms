@@ -95,6 +95,8 @@ class WooMS_Core
 
       require_once __DIR__ . '/inc/MenuSettings.php';
       require_once __DIR__ . '/inc/MenuTools.php';
+            
+      require_once __DIR__ . '/inc/MetaColumn.php';
 
       
       require_once __DIR__ . '/inc/ProductsWalker.php';
@@ -129,6 +131,7 @@ class WooMS_Core
     });
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
+    add_action('admin_enqueue_scripts', array(__CLASS__,  'admin_styles'));
   }
 
 
@@ -296,6 +299,18 @@ class WooMS_Core
     }
   }
 
+  /**
+   * Styles for Dashboard
+   *
+   * @return void
+   */
+  public static function admin_styles() {
+
+    $admin_style = plugin_dir_url( __FILE__ ) . 'css/admin.css';
+
+    wp_enqueue_style( 'wooms_styles', $admin_style, array() );
+
+  }
 }
 
 WooMS_Core::init();
