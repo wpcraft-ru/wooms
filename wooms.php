@@ -131,8 +131,6 @@ class WooMS_Core
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
 
-    add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
-
     add_action('admin_enqueue_scripts', array(__CLASS__,  'admin_styles'));
   }
 
