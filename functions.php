@@ -153,83 +153,81 @@ if (!function_exists('is_woocommerce_activated')) {
  */
 function wooms_id_check_if_unique($post_ID, $post = '', $update = '') {
 
-	$wooms_id = get_post_meta($post_ID, 'wooms_id', true);
+    if (!$post_ID || !is_numeric($post_ID)) {
+        return;
+    }
 
-	if ($wooms_id) {
+    $uuid = get_post_meta($post_ID, 'wooms_id', true);
 
-		$basic_args = array(
-			'post_type'              => ['product', 'product_variation'],
-			'numberposts'            => -1,
-			'post_status'            => 'any',
-			'orderby'                => 'ID',
-			'order'                  => 'ASC',
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
-			'cache_results'          => false,
-		);
+    if (!$uuid) {
+        return;
+    }
 
-		$products_args = array(
-			'post__not_in' => [$post_ID],
-			'meta_query'   => array(
-				array(
-					'key'     => 'wooms_id',
-					'value'   => $wooms_id,
-				),
-			),
-		);
+    $basic_args = array(
+        'post_type'              => array('product', 'product_variation'),
+        'numberposts'            => -1,
+        'post_status'            => 'any',
+        'orderby'                => 'ID',
+        'order'                  => 'ASC',
+        'update_post_term_cache' => false,
+        'update_post_meta_cache' => false,
+        'cache_results'          => false,
+    );
 
-		$args = array_merge($basic_args, $products_args);
+    $products_args = array(
+        'meta_key'   => 'wooms_id',
+        'meta_value' => $uuid
+    );
 
-		$products = get_posts($args);
+    $args = array_merge($basic_args, $products_args);
 
-		$ids = [];
+    $products = get_posts($args);
 
-		if (count($products)) {
+    $ids = [];
 
-			$ids[] = $post_ID;
-		}
+    if (count($products) > 1) {
 
-		if (count($products) > 1) {
+        foreach ($products as $key => $product) {
 
-			foreach ($products as $key => $product) {
+            if ($key > 0) {
 
-				if ($key > 0) {
+                $ids[] = $product->ID;
+            }
+        }
+    }
 
-					$ids[] = $product->ID;
-				}
-			}
-		}
-		/* Selecting all child variations */
-		$variations_args = array(
-			'post_parent__in' => $ids,
-		);
+    if (empty($ids)) {
+        return;
+    }
+    
+    /* Selecting all child variations */
+    $variations_args = array(
+        'post_parent__in' => $ids,
+    );
 
-		$args = array_merge($basic_args, $variations_args);
+    $args = array_merge($basic_args, $variations_args);
 
-		$variations = get_posts($args);
+    $variations = get_posts($args);
 
-		foreach ($variations as $variation) {
+    foreach ($variations as $variation) {
 
-			$ids[] = $variation->ID;
-		}
+        $ids[] = $variation->ID;
+    }
 
-		foreach ($ids as $id) {
+    foreach ($ids as $id) {
 
-			$meta_values = get_post_meta( $id );
+        $meta_values = get_post_meta( $id );
 
-			foreach ($meta_values as $key => $values) {
-				if (preg_match('/^wooms_/',  $key)) {
-					delete_post_meta($id, $key);
-				}
-			}
-		}
+        foreach ($meta_values as $key => $values) {
+            if (preg_match('/^wooms_/',  $key)) {
+                delete_post_meta($id, $key);
+            }
+        }
+    }
 
-		if (!empty($ids)) {
-			do_action(
-				'wooms_logger',
-				$type = 'WooMS-Request',
-				$title =  sprintf('Дубли meta-полей wooms для товаров и вариаций (%s) удалены', implode(', ', $ids)),
-			);
-		}
-	}
+    do_action(
+        'wooms_logger',
+        $type = 'WooMS-Request',
+        $title =  sprintf('Дубли meta-полей wooms для товаров и вариаций (%s) не удалены', implode(', ', $ids)),
+    );
 }
