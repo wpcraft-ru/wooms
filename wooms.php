@@ -95,6 +95,8 @@ class WooMS_Core
 
       require_once __DIR__ . '/inc/MenuSettings.php';
       require_once __DIR__ . '/inc/MenuTools.php';
+            
+      require_once __DIR__ . '/inc/MetaColumn.php';
 
       
       require_once __DIR__ . '/inc/ProductsWalker.php';
@@ -116,7 +118,6 @@ class WooMS_Core
       require_once __DIR__ . '/inc/SiteHealthDebugSection.php';
       require_once __DIR__ . '/inc/LoggerProductSave.php';
       require_once __DIR__ . '/inc/UseCodeAsArticle.php';
-      
 
       add_action('admin_notices', array(__CLASS__, 'show_notices_35'));
       add_action('admin_notices', array(__CLASS__, 'show_error_notice'));
@@ -130,7 +131,9 @@ class WooMS_Core
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
 
-	add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
+    add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
+
+    add_action('admin_enqueue_scripts', array(__CLASS__,  'admin_styles'));
   }
 
 
@@ -296,6 +299,19 @@ class WooMS_Core
       as_unschedule_all_actions('wooms_cron_variation_walker', [], 'ProductWalker');
       as_unschedule_all_actions('wooms_product_single_update', [], 'ProductWalker');
     }
+  }
+
+  /**
+   * Styles for Dashboard
+   *
+   * @return void
+   */
+  public static function admin_styles() {
+
+    $admin_style = plugin_dir_url( __FILE__ ) . 'css/admin.css';
+
+    wp_enqueue_style( 'wooms_styles', $admin_style, array() );
+
   }
 }
 
