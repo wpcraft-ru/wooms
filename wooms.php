@@ -11,13 +11,13 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * WC requires at least: 3.6
- * WC tested up to: 5.1.0
+ * WC requires at least: 4.0
+ * WC tested up to: 5.2.0
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.7
- * WooMS XT Latest: 8.1
- * Version: 8.1
+ * WooMS XT Latest: 8.2
+ * Version: 8.2
  */
 
 // Exit if accessed directly
@@ -95,6 +95,8 @@ class WooMS_Core
 
       require_once __DIR__ . '/inc/MenuSettings.php';
       require_once __DIR__ . '/inc/MenuTools.php';
+            
+      require_once __DIR__ . '/inc/MetaColumn.php';
 
       
       require_once __DIR__ . '/inc/ProductsWalker.php';
@@ -129,6 +131,7 @@ class WooMS_Core
     });
 
     add_action('init', [__CLASS__, 'delete_old_schedules']);
+    add_action('admin_enqueue_scripts', array(__CLASS__,  'admin_styles'));
   }
 
 
@@ -296,6 +299,18 @@ class WooMS_Core
     }
   }
 
+  /**
+   * Styles for Dashboard
+   *
+   * @return void
+   */
+  public static function admin_styles() {
+
+    $admin_style = plugin_dir_url( __FILE__ ) . 'css/admin.css';
+
+    wp_enqueue_style( 'wooms_styles', $admin_style, array() );
+
+  }
 }
 
 WooMS_Core::init();

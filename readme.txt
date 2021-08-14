@@ -84,6 +84,13 @@ PHP 5.6
 
 == Changelog ==
 
+= 8.2 =
+- Проверка совместимости с WooCommerce 5.0 https://github.com/wpcraft-ru/wooms/issues/396
+- Полное и краткое описание товара https://github.com/wpcraft-ru/wooms/issues/347
+- XT: Сокрытие wooms_id из деталей Заказа видимых клиенту https://github.com/wpcraft-ru/wooms/issues/398
+- XT: Загрузка изображения у модификаций Продукта https://github.com/wpcraft-ru/wooms/issues/359
+- XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
+
 = 8.1 =
 - Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
 - XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
