@@ -84,6 +84,11 @@ PHP 5.6
 
 == Changelog ==
 
+= 8.3 =
+- Проверка совместимости с WooCommerce 5.6
+- Исправление ряда ошибок
+
+
 = 8.2 =
 - Проверка совместимости с WooCommerce 5.0 https://github.com/wpcraft-ru/wooms/issues/396
 - Полное и краткое описание товара https://github.com/wpcraft-ru/wooms/issues/347
