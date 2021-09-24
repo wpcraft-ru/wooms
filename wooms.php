@@ -15,7 +15,7 @@
  * WC tested up to: 5.7.0
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
- * Tested up to: 5.8
+ * Tested up to: 5.8.1
  * WooMS XT Latest: 8.2
  * Version: 8.2
  */
