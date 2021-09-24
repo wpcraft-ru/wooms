@@ -12,7 +12,7 @@
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * WC requires at least: 4.0
- * WC tested up to: 5.2.0
+ * WC tested up to: 5.7.0
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.8
