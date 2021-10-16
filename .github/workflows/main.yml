@@ -14,4 +14,4 @@ jobs:
       with:
         type: 'zip'
         filename: 'wooms.zip'
-        exclusions: '*.git* /*node_modules/* .editorconfig ".github" "tests"'
+        exclusions: '*.git* /*node_modules/* .editorconfig .github tests'
