@@ -11,12 +11,14 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * 
  * PHP requires at least: 5.6
  * WC requires at least: 5.0
  * WC tested up to: 5.8
  * WP requires at least: 5.0
  * Tested up to: 5.8.1
  * WooMS XT Latest: 8.4
+ * 
  * Version: 8.4
  */
 
