@@ -14,12 +14,12 @@
  * 
  * PHP requires at least: 5.6
  * WC requires at least: 5.0
- * WC tested up to: 5.8
+ * WC tested up to: 5.9
  * WP requires at least: 5.0
  * Tested up to: 5.8.1
- * WooMS XT Latest: 8.4
+ * WooMS XT Latest: 8.5
  * 
- * Version: 8.4
+ * Version: 8.5
  */
 
 // Exit if accessed directly
