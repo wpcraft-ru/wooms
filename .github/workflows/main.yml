@@ -11,10 +11,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: wooms
-      - run: rm -r wooms/tests wooms/composer*
-      - run: rm -r wooms/docs
-      - run: rm -rf wooms/.git
-      - run: rm -rf wooms/.github
+      - run: rm -rf wooms/tests wooms/docs wooms/composer* wooms/.git*
       - run: cd wooms && ls -la
       - name: action-zip
         uses: montudor/action-zip@v0.1.0
