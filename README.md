@@ -3,6 +3,8 @@
 # XT версия теперь доступна бесплатно
 - новые версии тут https://github.com/wpcraft-ru/wooms-extra/releases
 - со временем код расширенной версии перейдет в базовую
+- стратегия тут https://github.com/wpcraft-ru/wooms/wiki/2022
+- дорожная карта и план работ тут https://github.com/wpcraft-ru/wooms/issues/444
 
 # WooMS - синхронизация, выгрузка, загрузка
 
