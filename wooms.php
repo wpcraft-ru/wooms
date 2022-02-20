@@ -95,28 +95,26 @@ if( wooms_can_start() ){
 
   // require_once __DIR__ . '/migrations/7-2.php';
 
-
   add_action('plugins_loaded', function () {
     
     load_plugin_textdomain('wooms', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-
-    add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\' . 'xt_plugin_update_message', 10, 2);
-
-    add_filter("plugin_action_links_" . plugin_basename(__FILE__), __NAMESPACE__ . '\\' . 'plugin_add_settings_link');
-
-    add_filter('plugin_row_meta', __NAMESPACE__ . '\\' . 'add_wooms_plugin_row_meta', 10, 2);
-
-    add_filter('wooms_xt_load', '__return_false');
-
   	add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
     add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\' . 'admin_styles');
 
   });
+
+
 }
+
+add_filter('wooms_xt_load', '__return_false');
+add_filter("plugin_action_links_" . plugin_basename(__FILE__), __NAMESPACE__ . '\\' . 'plugin_add_settings_link');
+add_filter('plugin_row_meta', __NAMESPACE__ . '\\' . 'add_wooms_plugin_row_meta', 10, 2);
+add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\' . 'xt_plugin_update_message', 10, 2);
 
 function xt_plugin_update_message($data, $response)
   {
 
+    echo 1;
     $wp_list_table = _get_list_table('WP_Plugins_List_Table');
 
     printf(
