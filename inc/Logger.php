@@ -31,6 +31,12 @@ final class Logger
         $submenu['moysklad'][] = array('Журнал', 'manage_options', $permalink);
       }
     }, 111);
+
+
+    add_filter('woocommerce_status_log_items_per_page', function ($per_page) {
+      return 100;
+    });
+
   }
 
   public static function is_enable()
