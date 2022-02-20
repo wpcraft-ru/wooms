@@ -14,12 +14,11 @@
  * 
  * PHP requires at least: 5.6
  * WC requires at least: 5.0
- * WC tested up to: 6.1.0
  * WP requires at least: 5.0
- * Tested up to: 5.8.3
- * WooMS XT Latest: 8.6
+ * Tested up to: 5.9
+ * WC tested up to: 6.2.0
  * 
- * Version: 8.6
+ * Version: 9.0
  */
 
 // Exit if accessed directly
@@ -46,6 +45,7 @@ class WooMS_Core
    */
   public static function init()
   {
+    
     require_once __DIR__ . '/functions.php';
 
     if( ! is_woocommerce_activated() ){
@@ -70,10 +70,14 @@ class WooMS_Core
       do_action('wooms_deactivate');
     });
 
+    //disable XT version
+    add_filter('wooms_xt_load', '__return_false');
 
     require_once __DIR__ . '/migrations/7-2.php';
 
     require_once __DIR__ . '/inc/AbstractWalker.php';
+
+    require_once __DIR__ . '/inc/OrderSender.php';
 
 
     add_action('plugins_loaded', [__CLASS__, 'true_load_plugin_textdomain']);
@@ -120,6 +124,30 @@ class WooMS_Core
       require_once __DIR__ . '/inc/SiteHealthDebugSection.php';
       require_once __DIR__ . '/inc/LoggerProductSave.php';
       require_once __DIR__ . '/inc/UseCodeAsArticle.php';
+      require_once __DIR__ . '/inc/ProductAttributes.php';
+      require_once __DIR__ . '/inc/ProductSingleSync.php';
+      require_once __DIR__ . '/inc/ProductStocks.php';
+      require_once __DIR__ . '/inc/ProductGrouped.php';
+
+      require_once __DIR__ . '/inc/ProductVariable.php';
+      require_once __DIR__ . '/inc/ProductVariableImage.php';
+      require_once __DIR__ . '/inc/VariationsHider.php';
+
+      require_once __DIR__ . '/inc/OrderUpdateFromMoySklad.php';
+      
+      require_once __DIR__ . '/inc/OrderShipment.php';
+      require_once __DIR__ . '/inc/OrderNotes.php';
+      require_once __DIR__ . '/inc/OrderStatusesFromSite.php';
+
+      require_once __DIR__ . '/inc/TaxSupport.php';
+      require_once __DIR__ . '/inc/CategoriesFilter.php';
+      require_once __DIR__ . '/inc/SalePrices.php';
+      require_once __DIR__ . '/inc/SendWarehouse.php';
+      require_once __DIR__ . '/inc/SiteHealthXT.php';
+      require_once __DIR__ . '/inc/SiteHealthWebHooks.php';
+      require_once __DIR__ . '/inc/CurrencyConverter.php';
+      require_once __DIR__ . '/inc/OrderNumber.php';
+      require_once __DIR__ . '/inc/ProductsExclusion.php';
       
 
       add_action('admin_notices', array(__CLASS__, 'show_notices_35'));
