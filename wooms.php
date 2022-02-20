@@ -40,7 +40,7 @@ register_deactivation_hook(__FILE__, function () {
 
 require_once __DIR__ . '/functions.php';
 
-if( is_woocommerce_activated() ){
+if( wooms_can_start() ){
     
   /**
    * Этот класс должен работать до хука plugins_loaded
@@ -62,7 +62,7 @@ if( is_woocommerce_activated() ){
 
 
   require_once __DIR__ . '/inc/AbstractWalker.php';
-  require_once __DIR__ . '/inc/OrderSender.php';
+  require_once __DIR__ . '/inc/Orders.php';
   require_once __DIR__ . '/inc/ProductsServices.php';
   require_once __DIR__ . '/inc/ProductsCategories.php';
   require_once __DIR__ . '/inc/ProductsHiding.php';

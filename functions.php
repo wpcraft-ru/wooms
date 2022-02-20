@@ -140,6 +140,17 @@ if (!function_exists('is_woocommerce_activated')) {
   }
 }
 
+function wooms_can_start(){
+  if ( ! class_exists('woocommerce')) {
+    return false;
+  }
+  if( class_exists('\WooMS\OrderSender')){
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Checking if wooms meta is unique and deleting if it is duplicated in save_post action
  * 

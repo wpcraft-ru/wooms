@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
 /**
  * Send orders to MoySklad
  */
-class OrderSender
+class Orders
 {
 
     /**
@@ -1352,4 +1352,4 @@ class OrderSender
     }
 }
 
-OrderSender::init();
+Orders::init();
