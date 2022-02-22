@@ -53,19 +53,10 @@ class ProductsExclusion {
             $id       = $option,
             $title    = 'Не загружать товары с отметкой',
             $callback = function ($args) {
-
-                // $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/product/metadata/attributes';
-                // $data = wooms_request( $url );
-
-                // if ( empty( $data['rows'] ) ) {
-                //     echo '<span class="notice notice-error inline">Система не смогла получить список атрибутов из МойСклад</span>';
-                //     return;
-                // }
-
-                // $selected_flag = $args['value']; ?>
+?>
 
                 <input type="text", name="<?= self::$exclude_flag ?>" size="50">
-                <p>Тип поля в МойСклад должен быть - Флажок</p>
+                <p>Укажите название поля по которому поймем что этот продукт загружать на сайт не нужно. Тип поля в МойСклад должен быть - Флажок</p>
                 <?php
             },
             $page    = 'mss-settings',
@@ -92,4 +83,4 @@ class ProductsExclusion {
 
 }
 
-// ProductsExclusion::init();
+ProductsExclusion::init();
