@@ -98,7 +98,7 @@ if( wooms_can_start() ){
   add_action('plugins_loaded', function () {
     
     load_plugin_textdomain('wooms', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-  	add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
+  	// add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
     add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\' . 'admin_styles');
 
   });
