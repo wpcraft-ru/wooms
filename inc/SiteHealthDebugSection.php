@@ -13,10 +13,8 @@ if (!defined('ABSPATH')) {
 class SiteHealthDebugSection
 {
 
-
     public static $plugin_dir = ABSPATH . "wp-content/plugins/";
     public static $base_plugin_url = "wooms/wooms.php";
-    public static $xt_plugin_url = "wooms-extra/wooms-extra.php";
     public static $settings_page_url = 'admin.php?page=mss-settings';
     public static $wooms_check_login_password;
     public static $wooms_check_woocommerce_version_for_wooms;
@@ -29,7 +27,6 @@ class SiteHealthDebugSection
 
         add_filter('add_wooms_plugin_debug', [__CLASS__, 'wooms_debug_check_version_for_wooms']);
 
-        add_filter('add_wooms_plugin_debug', [__CLASS__, 'wooms_check_different_versions_of_plugins']);
 
         add_filter('add_wooms_plugin_debug', [__CLASS__, 'check_login_and_password']);
 
@@ -54,35 +51,6 @@ class SiteHealthDebugSection
         return $debug_info;
     }
 
-    /**
-     * check differences of versions
-     *
-     * @return void
-     */
-    public static function wooms_check_different_versions_of_plugins($debug_info)
-    {
-
-        $base_plugin_data = get_plugin_data(self::$plugin_dir . self::$base_plugin_url);
-        $xt_plugin_data = get_plugin_data(self::$plugin_dir . self::$xt_plugin_url);
-        $base_version = $base_plugin_data['Version'];
-        $xt_version = $xt_plugin_data['Version'];
-
-        $result = [
-            'label'    => 'Версии плагинов',
-            'value'   => sprintf('WooMS(%s) %s WooMS XT(%s) %s', $base_version, '=', $xt_version, '✔️'),
-        ];
-
-        if ($base_version !== $xt_version) {
-            $result = [
-                'label'    => 'Версии плагинов',
-                'value'   => sprintf('WooMS(%s) Wooms XT(%s) %s', $base_version, $xt_version, '❌'),
-            ];
-        }
-
-        $debug_info['wooms-plugin-debug']['fields']['wooms-plugins-versions'] = $result;
-
-        return $debug_info;
-    }
 
     /**
      * debuging and adding to debug sections of health page
@@ -94,9 +62,7 @@ class SiteHealthDebugSection
     {
 
         $base_plugin_data = get_plugin_data(self::$plugin_dir . self::$base_plugin_url);
-        $xt_plugin_data = get_plugin_data(self::$plugin_dir . self::$xt_plugin_url);
         $base_version = $base_plugin_data['Version'];
-        $xt_version = $xt_plugin_data['Version'];
 
         $debug_info['wooms-plugin-debug'] = [
             'label'    => 'Wooms',
@@ -104,11 +70,7 @@ class SiteHealthDebugSection
                 'Wooms Version' => [
                     'label'    => 'Версия WooMS',
                     'value'   => sprintf('%s %s', $base_version, '✔️'),
-                ],
-                'WoomsXT Version' => [
-                    'label'    => 'Версия WooMS XT',
-                    'value'   => sprintf('%s %s', $xt_version, '✔️'),
-                ],
+                ]
             ],
         ];
 
