@@ -39,25 +39,24 @@ register_deactivation_hook(__FILE__, function () {
 
 
 require_once __DIR__ . '/functions.php';
-require_once __DIR__ . '/inc/MSImagesTrait.php'; //do above - for dependent classes
 
 if( wooms_can_start() ){
-    
 
+  require_once __DIR__ . '/inc/MSImagesTrait.php'; //do above - for dependent classes
   require_once __DIR__ . '/inc/LoaderIcon.php';
   require_once __DIR__ . '/inc/MenuSettings.php';
   require_once __DIR__ . '/inc/MenuTools.php';
   require_once __DIR__ . '/inc/MetaColumn.php';
 
-  require_once __DIR__ . '/inc/ProductsWalker.php';
-  ProductsWalker::init();
+  require_once __DIR__ . '/inc/Products.php';
+  Products::init();
 
   require_once __DIR__ . '/inc/ProductsPrices.php';
   ProductsPrices::init();
 
+  require_once __DIR__ . '/inc/Orders.php';
 
   require_once __DIR__ . '/inc/AbstractWalker.php';
-  require_once __DIR__ . '/inc/Orders.php';
   require_once __DIR__ . '/inc/ProductsServices.php';
   require_once __DIR__ . '/inc/ProductsCategories.php';
   require_once __DIR__ . '/inc/ProductsHiding.php';
@@ -92,7 +91,6 @@ if( wooms_can_start() ){
 
   add_action('plugins_loaded', function () {
     
-    load_plugin_textdomain('wooms', false, dirname(plugin_basename(__FILE__)) . '/languages/');
   	add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
     add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\' . 'admin_styles');
 

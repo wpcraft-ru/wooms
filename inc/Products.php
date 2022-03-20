@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 /**
  * Product Import Walker
  */
-class ProductsWalker
+class Products
 {
 
   public static $state_transient_key = 'wooms_products_walker_state';
@@ -336,8 +336,7 @@ class ProductsWalker
     try {
 
       $data = wooms_request($url);
-      // dd($data);
-
+      
       do_action('wooms_logger', __CLASS__, sprintf('Отправлен запрос %s', $url));
 
       //If no rows, that send 'end' and stop walker
