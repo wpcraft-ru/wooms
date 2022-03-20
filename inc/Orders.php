@@ -1045,12 +1045,12 @@ class Orders
             return $data_order;
         }
 
-        $timezone = new \DateTimeZone("Europe/Moscow");
-        $date = $order->get_date_created();
-        $date = $date->setTimeZone($timezone);
-        $date = $date->date('Y-m-d H:i:s');
-
-        $data_order['moment'] = $date;
+        if($date = $order->get_date_created()){
+            $timezone = new \DateTimeZone("Europe/Moscow");
+            $date = $date->setTimeZone($timezone);
+            $date = $date->date('Y-m-d H:i:s');
+            $data_order['moment'] = $date;
+        }
 
         return $data_order;
     }
