@@ -42,12 +42,6 @@ require_once __DIR__ . '/functions.php';
 
 if( wooms_can_start() ){
     
-  /**
-   * Этот класс должен работать до хука plugins_loaded
-   * Птм что иначе хук wooms_activate не срабатывает
-   */
-  require_once __DIR__ . '/inc/Logger.php';
-  require_once __DIR__ . '/inc/MSImagesTrait.php';
 
   require_once __DIR__ . '/inc/LoaderIcon.php';
   require_once __DIR__ . '/inc/MenuSettings.php';
@@ -87,11 +81,12 @@ if( wooms_can_start() ){
   require_once __DIR__ . '/inc/CategoriesFilter.php';
   require_once __DIR__ . '/inc/SalePrices.php';
   require_once __DIR__ . '/inc/SendWarehouse.php';
-  require_once __DIR__ . '/inc/SiteHealthXT.php';
   require_once __DIR__ . '/inc/SiteHealthWebHooks.php';
   require_once __DIR__ . '/inc/CurrencyConverter.php';
   require_once __DIR__ . '/inc/OrderNumber.php';
   require_once __DIR__ . '/inc/ProductsExclusion.php';
+  require_once __DIR__ . '/inc/Logger.php';
+  require_once __DIR__ . '/inc/MSImagesTrait.php';
 
   // require_once __DIR__ . '/migrations/7-2.php';
 
