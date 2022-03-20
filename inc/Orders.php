@@ -1026,6 +1026,10 @@ class Orders
     public static function add_moment($data_order, $order_id, $order = [])
     {
         if (empty($order)) {
+            $order = wc_get_order($order_id);
+        }
+
+        if (empty($order)) {
 
             do_action(
                 'wooms_logger_error',
@@ -1033,15 +1037,6 @@ class Orders
                 sprintf('Заказ %s - ордер пустой при попытке добавить время', $order_id)
             );
 
-            return $data_order;
-        }
-
-        if(!$order = wc_get_order($order_id)){
-            do_action(
-                'wooms_logger_error',
-                __CLASS__,
-                sprintf('Заказ %s - при попытке добавить время - id объект заказа не удалось получить', $order_id)
-            );
             return $data_order;
         }
 
