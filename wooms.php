@@ -39,6 +39,7 @@ register_deactivation_hook(__FILE__, function () {
 
 
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/inc/MSImagesTrait.php'; //do above - for dependent classes
 
 if( wooms_can_start() ){
     
@@ -86,7 +87,6 @@ if( wooms_can_start() ){
   require_once __DIR__ . '/inc/OrderNumber.php';
   require_once __DIR__ . '/inc/ProductsExclusion.php';
   require_once __DIR__ . '/inc/Logger.php';
-  require_once __DIR__ . '/inc/MSImagesTrait.php';
 
   // require_once __DIR__ . '/migrations/7-2.php';
 
