@@ -677,7 +677,7 @@ class Products
    */
   public static function render_ui()
   {
-    printf('<h2>%s</h2>', 'Продукты (Товары)');
+    printf('<h2>%s</h2>', 'Каталог');
 
     if (as_next_scheduled_action(self::$walker_hook_name)) {
       printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
