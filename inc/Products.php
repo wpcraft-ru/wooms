@@ -5,9 +5,6 @@ namespace WooMS\Products;
 const HOOK_NAME = 'wooms_products_walker';
 
 add_action('plugins_loaded', function () {
-  add_action('dd', function () {
-    $st = walker();
-  });
 
 
   add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
@@ -30,8 +27,7 @@ add_action('plugins_loaded', function () {
 function walker()
 {
   $state = get_state();
-  dd($state);
-
+  
   //state reset for new session
   if (empty($state['timestamp'])) {
 
