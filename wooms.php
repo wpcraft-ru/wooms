@@ -55,7 +55,7 @@ if( wooms_can_start() ){
   // require_once __DIR__ . '/inc/MetaColumn.php';
 
   // require_once __DIR__ . '/inc/Products.php';
-  Products::init();
+  // Products::init();
 
   // require_once __DIR__ . '/inc/ProductsPrices.php';
   ProductsPrices::init();

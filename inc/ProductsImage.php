@@ -335,7 +335,7 @@ function render_ui()
     if (as_next_scheduled_action(HOOK_NAME)) {
         $strings[] = sprintf('Статус: <strong>%s</strong>', 'Выполняется очередями в фоне');
     } else {
-        $strings[] = sprintf('<strong>Статус:</strong> %s', 'в ожидании новых задач');
+        $strings[] = sprintf('Статус: %s', 'в ожидании новых задач');
     }
 
     $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_product_image_sync&orderby=schedule&order=desc'));
@@ -347,7 +347,7 @@ function render_ui()
     // }
 
     echo '<h2>Изображения</h2>';
-    echo '<p>Ручная загрузка изображений по 5 штук за раз.</p>';
+    echo '<p>Загрузка изображений по 5 штук за раз.</p>';
     foreach ($strings as $string) {
         printf('<p>%s</p>', $string);
     }
