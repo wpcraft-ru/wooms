@@ -1,5 +1,20 @@
 <?php
 
+namespace WooMS\Products;
+
+add_action('plugins_loaded', function(){
+
+});
+
+function get_config(){
+  $config = [
+    'state_key' => 'wooms_products_walker_state',
+    'walker_hook_name' => 'wooms_products_walker_batch',
+  ];
+
+  return $config;
+}
+
 namespace WooMS;
 
 if (!defined('ABSPATH')) {
@@ -35,7 +50,6 @@ class Products
 
       // do_action('wooms_product_data_item', $dddd);
 
-      dd(0);
     });
 
 
@@ -663,7 +677,7 @@ class Products
    */
   public static function render_ui()
   {
-    printf('<h2>%s</h2>', 'Продукты (Товары)');
+    printf('<h2>%s</h2>', 'Каталог');
 
     if (as_next_scheduled_action(self::$walker_hook_name)) {
       printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
