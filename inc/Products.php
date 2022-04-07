@@ -1,5 +1,20 @@
 <?php
 
+namespace WooMS\Products;
+
+add_action('plugins_loaded', function(){
+
+});
+
+function get_config(){
+  $config = [
+    'state_key' => 'wooms_products_walker_state',
+    'walker_hook_name' => 'wooms_products_walker_batch',
+  ];
+
+  return $config;
+}
+
 namespace WooMS;
 
 if (!defined('ABSPATH')) {
@@ -35,7 +50,6 @@ class Products
 
       // do_action('wooms_product_data_item', $dddd);
 
-      dd(0);
     });
 
 
