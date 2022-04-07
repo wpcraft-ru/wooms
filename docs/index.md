@@ -13,3 +13,9 @@
 - [Диагностика проблем - общие рекомендации по сборку информации для первичной диагностики](https://github.com/wpcraft-ru/wooms/wiki/Diagnostics)
 - [Не загружаются изображения (картинки) для продуктов (товаров)](https://github.com/wpcraft-ru/wooms/wiki/ImagesNotLoaded)
 - [Мультисклад](https://github.com/wpcraft-ru/wooms/wiki/MultiWarehouse)
+
+
+# Для разработчиков
+
+- код для тест окружения тут https://github.com/uptimizt/wooms.local
+- доступ запрашивать тут https://wpcraft.ru/contacts/
