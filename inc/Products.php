@@ -15,8 +15,6 @@ add_action('plugins_loaded', function () {
 
   add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
   add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
-  // add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\restart');
-  // add_action('wooms_product_image_sync', __NAMESPACE__ . '\\walker');
 
   add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
   add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
@@ -26,7 +24,7 @@ add_action('plugins_loaded', function () {
 
   add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
   add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
-  // add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
+  add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 });
 
 function walker()
@@ -518,9 +516,9 @@ function render_ui()
 
   printf('<h2>%s</h2>', 'Каталог');
 
-
   $strings = [];
   if (as_next_scheduled_action(HOOK_NAME)) {
+    printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
     $strings[] = sprintf('Статус: <strong>%s</strong>', 'синхронизация в процессе');
     $strings[] = do_shortcode('[wooms_loader_icon]');
   } else {
