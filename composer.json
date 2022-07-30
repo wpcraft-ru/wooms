@@ -9,9 +9,10 @@
     "require": {},
     "require-dev": {
         "brain/monkey": "^2.4",
-        "phpunit/phpunit": "^9.3"
+        "phpunit/phpunit": "^7.5",
+        "yoast/phpunit-polyfills": "^1.0"
     },
     "scripts": {
-        "unit": "phpunit -c tests/unit/phpunit.xml"
+        "test": "@php ./vendor/phpunit/phpunit/phpunit --testsuite default"
     }
 }

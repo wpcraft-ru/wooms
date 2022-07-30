@@ -1,5 +1,266 @@
 <?php
 
+namespace WooMS\ProductsHider;
+
+defined('ABSPATH') || exit;
+
+
+const HOOK_NAME = 'wooms_schedule_clear_old_products_walker';
+
+add_action('dd', function () {
+  // walker();
+  add_schedule_hook();
+});
+
+add_action('plugins_loaded', function () {
+
+  add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
+  add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\add_task_for_hide');
+  add_action('wooms_main_walker_started', __NAMESPACE__ . '\\remove_task_for_hide');
+
+  add_action('admin_init', __NAMESPACE__ . '\\add_settings');
+
+  add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\display_state', 22);
+});
+
+function walker()
+{
+  if (is_disable()) {
+    return;
+  }
+
+
+  do_action(
+    'wooms_logger',
+    __NAMESPACE__,
+    sprintf('Проверка очереди скрытия продуктов: %s', date("Y-m-d H:i:s"))
+  );
+
+  $products = get_products_old_session();
+
+  dd($products);
+
+  if (empty($products)) {
+
+    set_state('need_hide', null);
+    delete_transient('wooms_product_need_hide'); // need delete
+
+    do_action('wooms_recount_terms');
+    do_action(
+      'wooms_logger',
+      __CLASS__,
+      sprintf('Финишь скрытия продуктов: %s', date("Y-m-d H:i:s"))
+    );
+    return;
+  }
+
+  foreach ($products as $product_id) {
+    $product = wc_get_product($product_id);
+
+    if ($product->get_type() == 'variable') {
+      $product->set_manage_stock('yes');
+    }
+
+    // $product->set_status( 'draft' );
+    $product->set_catalog_visibility('hidden');
+    // $product->set_stock_status( 'outofstock' );
+    $product->save();
+
+    do_action(
+      'wooms_logger',
+      __CLASS__,
+      sprintf('Скрытие продукта: %s', $product_id)
+    );
+  }
+
+  add_schedule_hook(true);
+
+  do_action('wooms_hide_old_product', $products);
+}
+
+function get_session()
+{
+  \WooMS\Products\get_session_id();
+}
+
+function add_task_for_hide()
+{
+  set_state('need_hide', 1);
+  add_schedule_hook();
+}
+
+function remove_task_for_hide()
+{
+  delete_transient('wooms_product_need_hide');
+  set_state('need_hide', null);
+}
+
+
+/**
+ * Obtaining products with specific attributes
+ *
+ * @param int $offset
+ *
+ * @return array
+ */
+function get_products_old_session()
+{
+  $session = get_session();
+  if (empty($session)) {
+    return false;
+  }
+
+  $args = array(
+    'post_type'   => 'product',
+    'numberposts' => 30,
+    'fields'      => 'ids',
+    'tax_query'   => array(
+      array(
+        'taxonomy'  => 'product_visibility',
+        'terms'     => array('exclude-from-catalog', 'exclude-from-search'),
+        'field'     => 'name',
+        'operator'  => 'NOT IN',
+      ),
+    ),
+    'meta_query'  => array(
+      array(
+        'key'     => 'wooms_session_id',
+        'value'   => $session,
+        'compare' => '!=',
+      ),
+      array(
+        'key'     => 'wooms_id',
+        'compare' => 'EXISTS',
+      ),
+    ),
+
+  );
+
+  return get_posts($args);
+}
+
+function add_schedule_hook($force = false)
+{
+
+  if (is_disable()) {
+    return;
+  }
+
+  if (is_wait()) {
+    return;
+  }
+
+  if (as_next_scheduled_action(HOOK_NAME) && !$force) {
+    return;
+  }
+
+  // Adding schedule hook
+  as_schedule_single_action(time() + 5, HOOK_NAME, [], 'WooMS');
+}
+
+function is_wait()
+{
+
+  if (as_next_scheduled_action(\WooMS\Products\HOOK_NAME)) {
+    return true;
+  }
+
+  if (empty(get_state('need_hide'))) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * проверяем надо ли скрывать продукты
+ */
+function is_disable()
+{
+  if (get_option('wooms_product_hiding_disable')) {
+    return true;
+  }
+
+  return false;
+}
+
+function get_state($key = '')
+{
+  $option_key = HOOK_NAME . '_state';
+  $value = get_option($option_key, []);
+  if (!is_array($value)) {
+    $value = [];
+  }
+  if (empty($key)) {
+    return $value ?? [];
+  }
+
+  return $value[$key] ?? null;
+}
+
+function set_state($key, $value)
+{
+  $option_key = HOOK_NAME . '_state';
+  $state = get_option($option_key, []);
+  if (!is_array($state)) {
+    $state = [];
+  }
+  $state[$key] = $value;
+  return update_option($option_key, $state);
+}
+
+function display_state()
+{
+  if (is_disable()) {
+    return;
+  }
+
+  $strings = [];
+
+  if (as_next_scheduled_action(HOOK_NAME)) {
+    $strings[] = 'Продукты скрываются в фоне очередями';
+  }
+
+  if (is_wait()) {
+    $strings[] = 'Обработчик ожидает задач';
+  }
+
+  $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_schedule_clear_old_products_walker&orderby=schedule&order=desc'));
+
+
+  // if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
+  //   $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductsHiding'));
+  // } else {
+  //   $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
+  // }
+
+
+  echo '<h2>Скрытие продуктов</h2>';
+  foreach ($strings as $string) {
+    printf('<p>%s</p>', $string);
+  }
+}
+
+function add_settings()
+{
+  $option_name = 'wooms_product_hiding_disable';
+  register_setting('mss-settings', $option_name);
+  add_settings_field(
+    $id = $option_name,
+    $title = 'Отключить скрытие продуктов',
+    $callback = function ($args) {
+      printf('<input type="checkbox" name="%s" value="1" %s />', $args['name'], checked(1, $args['value'], false));
+      printf('<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.');
+    },
+    $page = 'mss-settings',
+    $section = 'woomss_section_other',
+    $args = [
+      'name' => $option_name,
+      'value' => get_option($option_name),
+    ]
+  );
+}
+
 namespace WooMS;
 
 if (!defined('ABSPATH')) {
@@ -29,56 +290,60 @@ class ProductsHiding
     add_action('wooms_main_walker_finish', array(__CLASS__, 'add_task_for_hide'));
     add_action('wooms_main_walker_started', array(__CLASS__, 'remove_task_for_hide'));
 
-    add_action('wooms_recount_terms', array( __CLASS__, 'recount_terms' ));
-
+    add_action('wooms_recount_terms', array(__CLASS__, 'recount_terms'));
   }
 
 
   /**
    * recount_terms
    */
-  public static function recount_terms(){
+  public static function recount_terms()
+  {
     $product_cats = get_terms(
-      'product_cat', array(
+      'product_cat',
+      array(
         'hide_empty' => false,
         'fields'     => 'id=>parent',
       )
     );
-    _wc_term_recount( $product_cats, get_taxonomy( 'product_cat' ), true, false );
+    _wc_term_recount($product_cats, get_taxonomy('product_cat'), true, false);
 
     $product_tags = get_terms(
-      'product_tag', array(
+      'product_tag',
+      array(
         'hide_empty' => false,
         'fields'     => 'id=>parent',
       )
     );
-    _wc_term_recount( $product_tags, get_taxonomy( 'product_tag' ), true, false );
+    _wc_term_recount($product_tags, get_taxonomy('product_tag'), true, false);
   }
 
 
-  public static function add_task_for_hide(){
+  public static function add_task_for_hide()
+  {
     set_transient('wooms_product_need_hide', 1);
     self::add_schedule_hook();
   }
 
-  public static function remove_task_for_hide(){
+  public static function remove_task_for_hide()
+  {
     delete_transient('wooms_product_need_hide');
   }
 
 
-  public static function is_wait(){
+  public static function is_wait()
+  {
 
-    if(as_next_scheduled_action('wooms_products_walker_batch') ){
+    if (as_next_scheduled_action('wooms_products_walker_batch')) {
       return true;
     }
 
 
-    if(empty(get_transient('wooms_product_need_hide'))){
+    if (empty(get_transient('wooms_product_need_hide'))) {
       return true;
     }
 
     return false;
-  
   }
 
   /**
@@ -87,21 +352,20 @@ class ProductsHiding
   public static function add_schedule_hook($force = false)
   {
 
-    if( self::is_disable()){
+    if (self::is_disable()) {
       return;
     }
 
-    if(self::is_wait()){
+    if (self::is_wait()) {
       return;
     }
 
-    if(as_next_scheduled_action(self::$walker_hook) && ! $force){
+    if (as_next_scheduled_action(self::$walker_hook) && !$force) {
       return;
     }
-  
+
     // Adding schedule hook
-    as_schedule_single_action( time() + 5, self::$walker_hook, [], 'WooMS' );
-
+    as_schedule_single_action(time() + 5, self::$walker_hook, [], 'WooMS');
   }
 
 
@@ -110,7 +374,7 @@ class ProductsHiding
    */
   public static function walker_starter()
   {
-    if( self::is_disable()){
+    if (self::is_disable()) {
       return;
     }
 
@@ -123,42 +387,42 @@ class ProductsHiding
    */
   public static function display_state()
   {
-    if( self::is_disable()){
+    if (self::is_disable()) {
       return;
     }
 
     $strings = [];
 
     // self::$walker_hook
-    if(as_next_scheduled_action(self::$walker_hook)){
+    if (as_next_scheduled_action(self::$walker_hook)) {
       $strings[] = 'Продукты скрываются в фоне очередями';
-    } 
-    
-    if(self::is_wait()){
+    }
+
+    if (self::is_wait()) {
       $strings[] = 'Обработчик ожидает задач';
     }
 
     $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_schedule_clear_old_products_walker&orderby=schedule&order=desc'));
-        
-        
-    if(defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER){
+
+
+    if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
       $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductsHiding'));
     } else {
       $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
     }
 
-    ?>
+?>
     <hr>
     <div>
       <br>
       <strong>Скрытие продуктов:</strong>
       <ul>
         <li>
-        <?= implode('</li><li>', $strings); ?>
+          <?= implode('</li><li>', $strings); ?>
         </li>
       </ul>
     </div>
-<?php 
+<?php
   }
 
   /**
@@ -175,7 +439,7 @@ class ProductsHiding
     $products = self::get_products_old_session();
 
     if (empty($products)) {
-      
+
 
       delete_transient('wooms_product_need_hide');
 
@@ -273,8 +537,9 @@ class ProductsHiding
   /**
    * проверяем надо ли скрывать продукты
    */
-  public static function is_disable(){
-    if(get_option('wooms_product_hiding_disable')){
+  public static function is_disable()
+  {
+    if (get_option('wooms_product_hiding_disable')) {
       return true;
     }
 
@@ -291,10 +556,9 @@ class ProductsHiding
     add_settings_field(
       $id = $option_name,
       $title = 'Отключить скрытие продуктов',
-      $callback = function($args)
-      {
+      $callback = function ($args) {
         printf('<input type="checkbox" name="%s" value="1" %s />', $args['name'], checked(1, $args['value'], false));
-        printf( '<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.' );
+        printf('<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.');
       },
       $page = 'mss-settings',
       $section = 'woomss_section_other',
@@ -304,7 +568,6 @@ class ProductsHiding
       ]
     );
   }
-
 }
 
-ProductsHiding::init();
+// ProductsHiding::init();

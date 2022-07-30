@@ -132,7 +132,9 @@ function walker()
   }
 }
 
-
+function get_session_id(){
+  return get_state('session_id');
+}
 
 /**
  * Start manually actions

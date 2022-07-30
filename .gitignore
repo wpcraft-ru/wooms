@@ -1,3 +1,4 @@
-vendor
-tests/unit/.phpunit.result.cache
 .vscode
+vendor
+phpunit/data
+phpunit/includes
