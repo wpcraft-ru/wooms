@@ -43,7 +43,7 @@ require_once __DIR__ . '/functions.php';
 
 if (wooms_can_start()) {
 
-  $files = glob(__DIR__ . '/inc/*.php');
+  $files = glob(__DIR__ . '/includes/*.php');
   foreach ($files as $file) {
     require_once $file;
   }
