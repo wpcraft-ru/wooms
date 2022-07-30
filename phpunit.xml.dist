@@ -12,8 +12,9 @@
 			<file>./phpunit/tests/smoke.php</file>
 			<exclude>./phpunit/tests/old.php</exclude>
 		</testsuite>
-		<testsuite name="regress">
-			<directory suffix=".php">/phpunit/tests/regress/</directory>
+		<testsuite name="tdd">
+			<directory suffix=".php">./phpunit/tests/TDD/</directory>
+
 		</testsuite>
 	</testsuites>
 	<php>
