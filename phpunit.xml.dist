@@ -13,7 +13,7 @@
 			<exclude>./phpunit/tests/old.php</exclude>
 		</testsuite>
 		<testsuite name="tdd">
-			<directory suffix=".php">./phpunit/tests/TDD/</directory>
+			<directory suffix=".php">./phpunit/tests/tdd/</directory>
 
 		</testsuite>
 	</testsuites>
