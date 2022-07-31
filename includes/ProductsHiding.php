@@ -7,12 +7,7 @@ defined('ABSPATH') || exit;
 
 const HOOK_NAME = 'wooms_schedule_clear_old_products_walker';
 
-add_action('dd', function () {
-  // walker();
-  add_schedule_hook();
-});
-
-add_action('plugins_loaded', function () {
+add_action('init', function () {
 
   add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
   add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\add_task_for_hide');

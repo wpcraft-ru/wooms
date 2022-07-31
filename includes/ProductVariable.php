@@ -12,7 +12,7 @@ class ProductVariable
 {
     /**
      * Save state in DB
-     * 
+     *
      * @var string
      */
     public static $state_transient_key = 'wooms_variables_walker_state';
@@ -30,17 +30,6 @@ class ProductVariable
      */
     public static function init()
     {
-
-        // add_action('init', function(){
-        //   if(!isset($_GET['dd'])){
-        //     return;
-        //   }
-
-        //   self::set_state('timestamp', 0);
-        //   self::batch_handler();
-
-        //   dd(0);
-        // });
 
         //walker
         add_action('wooms_variables_walker_batch', array(__CLASS__, 'batch_handler'));
@@ -61,7 +50,7 @@ class ProductVariable
 
         add_action('woomss_tool_actions_btns', array(__CLASS__, 'display_state'), 15);
 
-		add_action('woocommerce_variation_header', array(__CLASS__, 'variation_sync_id'), 10);
+  		add_action('woocommerce_variation_header', array(__CLASS__, 'variation_sync_id'), 10);
     }
 
 
@@ -161,7 +150,7 @@ class ProductVariable
             //update count
             self::set_state('count', self::get_state('count') + $i);
 
-            //update offset 
+            //update offset
             $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
 
             self::set_state('query_arg', $query_arg);
@@ -644,7 +633,7 @@ class ProductVariable
             return true;
         }
 
-        //check end pause 
+        //check end pause
         if (!empty(self::get_state('end_timestamp'))) {
             return true;
         }

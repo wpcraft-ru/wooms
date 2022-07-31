@@ -6,20 +6,15 @@ defined('ABSPATH') || exit;
 
 const HOOK_NAME = 'wooms_products_walker';
 
-add_action('plugins_loaded', function () {
-
+add_action('init', function () {
 
   add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
-  // add_filter('wooms_product_save', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
 
   add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
   add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
 
   add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
   add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
-
-  // add_action('wooms_products_display_state', __NAMESPACE__ . '\\display_state');
-
 
   add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
   add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
@@ -29,7 +24,7 @@ add_action('plugins_loaded', function () {
 function walker()
 {
   $state = get_state();
-  
+
   //state reset for new session
   if (empty($state['timestamp'])) {
 
@@ -106,7 +101,7 @@ function walker()
     //update count
     set_state('count', get_state('count') + count($data['rows']));
 
-    //update offset 
+    //update offset
     $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
     set_state('query_arg', $query_arg);
 
@@ -357,6 +352,8 @@ function load_product($value)
     __NAMESPACE__,
     sprintf('Продукт: %s (%s) сохранен', $product->get_title(), $product_id)
   );
+
+  return $product_id;
 }
 
 
@@ -372,7 +369,7 @@ function walker_finish()
   }
 
   set_state('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
-  set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer); //need delete after all tests 
+  set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer); //need delete after all tests
 
   do_action('wooms_main_walker_finish');
 
@@ -472,12 +469,13 @@ function walker_started()
   $now = date("YmdHis");
   set_state('session_id', $now, 'no'); //set id session sync
 
-  // backward compatibility - need delete after all updates 
+  // backward compatibility - need delete after all updates
   update_option('wooms_session_id', $now, 'no'); //set id session sync
 
   set_state('timestamp', $now);
   set_state('end_timestamp', 0);
   set_state('count', 0);
+  set_state('stop_manual', 0);
 
   do_action('wooms_main_walker_started');
 
@@ -497,7 +495,6 @@ function add_schedule_hook($force = false)
   as_schedule_single_action(time() + 11, HOOK_NAME, get_state(), 'WooMS');
 }
 
-
 /**
  * Проверяем стоит ли обработчик на паузе?
  */
@@ -507,13 +504,11 @@ function is_wait()
     return true;
   }
 
-
   return false;
 }
 
 function render_ui()
 {
-
   printf('<h2>%s</h2>', 'Каталог');
 
   $strings = [];

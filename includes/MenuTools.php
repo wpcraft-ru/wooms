@@ -66,9 +66,8 @@ class MenuTools {
 
 <?php
     if(empty($_GET['a'])){
-
       do_action('woomss_tool_actions_btns');
-      
+
       do_action('wooms_tools_sections');
 
     } else {

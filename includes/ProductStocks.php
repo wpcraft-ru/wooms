@@ -17,7 +17,7 @@ class ProductStocks
 
   /**
    * Save state in DB
-   * 
+   *
    * @var string
    */
   public static $state_transient_key = 'wooms_assortmen_state';
@@ -27,19 +27,6 @@ class ProductStocks
    */
   public static function init()
   {
-
-    // add_action('init', function () {
-    //   if (!isset($_GET['dd'])) {
-    //     return;
-    //   }
-
-    //   // $p = wc_get_product();
-    //   // self::add_schedule_hook();
-    //   // self::batch_handler();
-    //   // self::add_warehouse_name_to_log_data();
-
-    //   dd(0);
-    // });
 
     add_action('wooms_assortment_sync', [__CLASS__, 'batch_handler']);
 
@@ -146,7 +133,7 @@ class ProductStocks
 
       /**
        * manage stock save
-       * 
+       *
        * issue https://github.com/wpcraft-ru/wooms/issues/287
        */
       $product = apply_filters('wooms_stock_product_save', $product, $row);
@@ -351,7 +338,7 @@ class ProductStocks
 
   /**
    * Get product variant ID
-   * 
+   *
    * XXX move to trait
    *
    * @param $uuid

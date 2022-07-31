@@ -4,7 +4,7 @@ namespace WooMS\ProductsImage;
 
 const HOOK_NAME = 'wooms_product_image_sync';
 
-add_action('plugins_loaded', function () {
+add_action('init', function () {
     add_action('wooms_product_image_sync', __NAMESPACE__ . '\\walker');
     add_filter('wooms_product_save', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
     add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 15);
