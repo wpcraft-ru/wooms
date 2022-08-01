@@ -2,9 +2,6 @@
 
 namespace WooMS\ProductsHider;
 
-defined('ABSPATH') || exit;
-
-
 const HOOK_NAME = 'wooms_schedule_clear_old_products_walker';
 
 add_action('init', function () {
@@ -24,7 +21,6 @@ function walker()
     return;
   }
 
-
   do_action(
     'wooms_logger',
     __NAMESPACE__,
@@ -32,8 +28,6 @@ function walker()
   );
 
   $products = get_products_old_session();
-
-  dd($products);
 
   if (empty($products)) {
 
@@ -71,11 +65,13 @@ function walker()
   add_schedule_hook(true);
 
   do_action('wooms_hide_old_product', $products);
+
+  return true;
 }
 
 function get_session()
 {
-  \WooMS\Products\get_session_id();
+  return \WooMS\Products\get_state('session_id');
 }
 
 function add_task_for_hide()
@@ -221,13 +217,6 @@ function display_state()
   }
 
   $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_schedule_clear_old_products_walker&orderby=schedule&order=desc'));
-
-
-  // if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
-  //   $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs&source=WooMS-ProductsHiding'));
-  // } else {
-  //   $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
-  // }
 
 
   echo '<h2>Скрытие продуктов</h2>';

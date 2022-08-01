@@ -6,20 +6,22 @@ defined('ABSPATH') || exit;
 
 const HOOK_NAME = 'wooms_products_walker';
 
-add_action('init', function () {
+add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
 
-  add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
+add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
+add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
 
-  add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
-  add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
+add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
+add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 
-  add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
-  add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
+add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
+add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
+add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 
-  add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
-  add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
-  add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
-});
+
+if(isset($_GET['ddd'])){
+  walker();
+}
 
 function walker()
 {
@@ -66,6 +68,7 @@ function walker()
 
     $data = wooms_request($url);
 
+
     do_action('wooms_logger', __NAMESPACE__, sprintf('Отправлен запрос %s', $url));
 
     //If no rows, that send 'end' and stop walker
@@ -76,27 +79,7 @@ function walker()
 
     do_action('wooms_walker_start_iteration', $data);
 
-    foreach ($data['rows'] as $key => $value) {
-
-      if (apply_filters('wooms_skip_product_import', false, $value)) {
-        continue;
-      }
-
-      /**
-       * в выдаче могут быть не только товары, но и вариации и мб что-то еще
-       * птм нужна проверка что это точно продукт
-       */
-      if ('variant' == $value["meta"]["type"]) {
-        continue;
-      }
-
-      do_action('wooms_product_data_item', $value);
-
-      /**
-       * deprecated - for remove
-       */
-      do_action('wooms_product_import_row', $value, $key, $data);
-    }
+    process_rows($data['rows']);
 
     //update count
     set_state('count', get_state('count') + count($data['rows']));
@@ -104,8 +87,6 @@ function walker()
     //update offset
     $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
     set_state('query_arg', $query_arg);
-
-
 
     add_schedule_hook(true);
 
@@ -118,16 +99,51 @@ function walker()
      */
     set_state('session_id', null);
 
-
     //backwards compatible - to delete
     delete_option('wooms_session_id');
-
 
     do_action('wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой' . $e->getMessage());
   }
 }
 
-function get_session_id(){
+function process_rows($rows = [])
+{
+  if(empty($rows)){
+    return false;
+  }
+
+  // var_dump($rows); exit;
+
+  $rr = json_encode($rows);
+  echo $rr;
+  exit;
+
+  foreach ($rows as $key => $value) {
+
+    if (apply_filters('wooms_skip_product_import', false, $value)) {
+      continue;
+    }
+
+    /**
+     * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+     * птм нужна проверка что это точно продукт
+     */
+    if ('variant' == $value["meta"]["type"]) {
+      continue;
+    }
+
+
+    do_action('wooms_product_data_item', $value);
+
+  }
+
+  return true;
+
+}
+
+
+function get_session_id()
+{
   return get_state('session_id');
 }
 
@@ -136,14 +152,12 @@ function get_session_id(){
  */
 function start_manually()
 {
-
   set_state('finish', null);
   set_state('timestamp', null);
 
   do_action('wooms_products_sync_manual_start');
 
   walker();
-
 
   wp_redirect(admin_url('admin.php?page=moysklad'));
 }
@@ -168,14 +182,11 @@ function stop_manually()
   exit;
 }
 
-
-
 /**
  * Update product from source data
  */
 function update_product($product, $data_api, $data = 'deprecated')
 {
-
   $data_of_source = $data_api;
   $product_id = $product->get_id();
 
@@ -235,7 +246,7 @@ function update_product($product, $data_api, $data = 'deprecated')
   // issue https://github.com/wpcraft-ru/wooms/issues/302
   $product->set_catalog_visibility('visible');
 
-  if ($reset = apply_filters('wooms_reset_state_products', true)) {
+  if ( apply_filters('wooms_reset_state_products', true) ) {
     $product->set_stock_status('instock');
     $product->set_manage_stock('no');
     $product->set_status('publish');
@@ -294,7 +305,7 @@ function load_product($value)
   if (empty($value['article'])) {
     if (!$product_id = apply_filters('wooms_get_product_id', $product_id, $value)) {
       if (empty(get_option('wooms_use_uuid'))) {
-        return;
+        return false;
       }
     }
   }
@@ -321,7 +332,7 @@ function load_product($value)
       'Ошибка определения и добавления ИД продукта',
       $value
     );
-    return;
+    return false;
   }
 
   $product = wc_get_product($product_id);
@@ -467,7 +478,7 @@ function get_product_id_by_uuid($uuid)
 function walker_started()
 {
   $now = date("YmdHis");
-  set_state('session_id', $now, 'no'); //set id session sync
+  set_state('session_id', $now); //set id session sync
 
   // backward compatibility - need delete after all updates
   update_option('wooms_session_id', $now, 'no'); //set id session sync
