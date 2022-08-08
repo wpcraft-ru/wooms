@@ -84,7 +84,7 @@ function add_settings()
         $args = [
             'key' => 'woomss_images_sync_enabled',
             'value' => checked(1, get_option('woomss_images_sync_enabled'), false),
-        ],
+        ]
     );
 
     register_setting('mss-settings', 'woomss_images_replace_to_sync');
@@ -101,7 +101,7 @@ function add_settings()
         $args = [
             'key' => 'woomss_images_replace_to_sync',
             'value' => checked(1, get_option('woomss_images_replace_to_sync'), false),
-        ],
+        ]
     );
 }
 
