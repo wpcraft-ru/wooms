@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-	bootstrap="phpunit/bootstrap.php"
+	bootstrap="tests/bootstrap.php"
 	backupGlobals="false"
 	colors="true"
 	convertErrorsToExceptions="true"
@@ -9,11 +9,11 @@
 	>
 	<testsuites>
 		<testsuite name="default">
-			<file>./phpunit/tests/smoke.php</file>
-			<exclude>./phpunit/tests/old.php</exclude>
+			<file>./tests/tests/smoke.php</file>
+			<exclude>./tests/tests/old.php</exclude>
 		</testsuite>
 		<testsuite name="tdd">
-			<directory suffix=".php">./phpunit/tests/tdd/</directory>
+			<directory suffix=".php">./tests/tests/tdd/</directory>
 
 		</testsuite>
 	</testsuites>
