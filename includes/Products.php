@@ -19,9 +19,6 @@ add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 
 
-if(isset($_GET['ddd'])){
-  walker();
-}
 
 function walker()
 {

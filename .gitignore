@@ -1,3 +1,4 @@
 .vscode
 vendor
 phpunit/data
+.phpunit.result.cache

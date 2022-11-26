@@ -36,8 +36,8 @@ class ProductsCategories
   }
 
   /**
-   * add ancestors 
-   * 
+   * add ancestors
+   *
    * issue https://github.com/wpcraft-ru/wooms/issues/282
    */
   public static function add_ancestors($product, $data_api)
@@ -159,6 +159,10 @@ class ProductsCategories
     }
 
     $data = wooms_request($url);
+
+    if(empty($data['id'])){
+      return false;
+    }
 
     if ($term_id = self::check_term_by_ms_uuid($data['id'])) {
 
@@ -336,7 +340,7 @@ class ProductsCategories
 
   /**
    * add_setting_include_children
-   * 
+   *
    * issue https://github.com/wpcraft-ru/wooms/issues/282
    */
   public static function add_setting_include_children()

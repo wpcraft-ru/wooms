@@ -9,12 +9,11 @@
 	>
 	<testsuites>
 		<testsuite name="default">
-			<file>./tests/tests/smoke.php</file>
-			<exclude>./tests/tests/old.php</exclude>
+			<file>./tests/examples/smoke.php</file>
+			<exclude>./tests/examples/old.php</exclude>
 		</testsuite>
 		<testsuite name="tdd">
-			<directory suffix=".php">./tests/tests/tdd/</directory>
-
+			<directory suffix=".php">./tests/tdd/</directory>
 		</testsuite>
 	</testsuites>
 	<php>

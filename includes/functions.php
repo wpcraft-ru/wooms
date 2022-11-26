@@ -10,8 +10,6 @@
  * @param string $url
  * @param array $data
  * @param string $type
- *
- * @return array
  */
 function wooms_request($url = '', $data = array(), $type = 'GET')
 {
@@ -114,7 +112,7 @@ function wooms_get_product_id_by_uuid($uuid)
 /**
  * fix bug with url
  *
- * @link https://github.com/wpcraft-ru/wooms/issues/177 
+ * @link https://github.com/wpcraft-ru/wooms/issues/177
  */
 function wooms_fix_url($url = '')
 {
@@ -144,22 +142,19 @@ function wooms_can_start(){
   if ( ! class_exists('woocommerce')) {
     return false;
   }
-  if( class_exists('\WooMS\OrderSender')){
-    return false;
-  }
 
   return true;
 }
 
 /**
  * Checking if wooms meta is unique and deleting if it is duplicated in save_post action
- * 
+ *
  * @param int     $post_ID Post ID.
  * @param WP_Post $post    Post object.
  * @param bool    $update  Whether this is an existing post being updated.
- * 
+ *
  * @return void
- * 
+ *
  * @link https://github.com/wpcraft-ru/wooms/issues/409
  */
 function wooms_id_check_if_unique($post_ID, $post = '', $update = '') {
@@ -210,7 +205,7 @@ function wooms_id_check_if_unique($post_ID, $post = '', $update = '') {
     if (empty($ids)) {
         return;
     }
-    
+
     /* Selecting all child variations */
     $variations_args = array(
         'post_parent__in' => $ids,

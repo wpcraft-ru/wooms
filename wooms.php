@@ -39,9 +39,11 @@ register_deactivation_hook(__FILE__, function () {
 });
 
 
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 
-
+add_action('tdd', function(){
+  tdd(wooms_can_start());
+});
 
 add_action('plugins_loaded', function () {
   if (!wooms_can_start()) {

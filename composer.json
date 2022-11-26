@@ -9,11 +9,12 @@
     "require": {},
     "require-dev": {
         "brain/monkey": "^2.4",
-        "phpunit/phpunit": "^7.5",
+        "phpunit/phpunit": "^9.0",
         "yoast/phpunit-polyfills": "^1.0"
     },
     "scripts": {
-        "at": "@php ./vendor/phpunit/phpunit/phpunit --testsuite default",
-        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --testsuite tdd"
+        "main": "@php ./vendor/phpunit/phpunit/phpunit tests/checks/Main.php",
+        "test": "@php ./vendor/phpunit/phpunit/phpunit tests/tdd/BaseCase.php",
+        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --debug --testsuite tdd"
     }
 }
