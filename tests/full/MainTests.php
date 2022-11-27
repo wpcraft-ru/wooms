@@ -9,13 +9,10 @@ use WooMS\Products;
 use function WooMS\Products\get_product_id_by_uuid;
 use function WooMS\Products\process_rows;
 
-/**
- * Sample test case.
- */
-class ProductsTests extends WP_UnitTestCase {
+
+class Main extends WP_UnitTestCase {
 
   private $product_id = null;
-
 
   /**
    * check product by UUID
@@ -42,6 +39,38 @@ class ProductsTests extends WP_UnitTestCase {
     $this->assertEquals('Яндекс.Станция', $name);
 	}
 
+  /**
+   * test all rows for products
+   */
+  public function test_process_rows(){
+    $rows = $this->getProductsRows();
+
+    $result = process_rows($rows);
+    $this->assertTrue($result);
+
+  }
+
+  public function test_AddPost() {
+
+    $new_post = array(
+      'post_title'    => 'test post title',
+      'post_content'  => 'test post content',
+      'post_status'   => 'publish',
+    );
+
+    // Insert the post into the database
+    $post_id = wp_insert_post( $new_post );
+
+
+		$this->assertIsInt( $post_id );
+	}
+
+  public function test_CanStart() {
+    $can_start = wooms_can_start();
+
+		$this->assertTrue( $can_start );
+	}
+
 
   function getJsonForSimpleProduct_code00045(){
     $rows = $this->getProductsRows();
@@ -53,6 +82,7 @@ class ProductsTests extends WP_UnitTestCase {
     return false;
   }
 
+
   function getProductsRows(){
     $strJsonFileContents = file_get_contents(__DIR__ . "/../json/products.json");
     $data = json_decode($strJsonFileContents, true);
@@ -62,10 +92,7 @@ class ProductsTests extends WP_UnitTestCase {
   protected function setUp(): void
   {
     parent::setUp();
-    $json = $this->getJsonForSimpleProduct_code00045();
-    $product_id = \WooMS\Products\load_product($json);
-
-    $this->product_id = $product_id;
+    //TBD
   }
 
   protected function tearDown(): void

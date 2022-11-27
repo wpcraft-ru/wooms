@@ -18,12 +18,20 @@ add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 
+// add_action('init', function(){
 
+//  if(!isset($_GET['dddd'])){
+//   return;
+//  }
+
+//  $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product';
+//  $data = wooms_request($url);
+//  var_dump($data);
+//  exit;
+// });
 
 function walker($args = [])
 {
-
-  // error_log(print_r($args, true));
 
   $state = get_state();
 
@@ -106,7 +114,7 @@ function walker($args = [])
     //backwards compatible - to delete
     delete_option('wooms_session_id');
 
-    do_action('wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой' . $e->getMessage());
+    do_action('wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой... ' . $e->getMessage());
     return ['result' => 'error'];
   }
 }
@@ -116,10 +124,6 @@ function process_rows($rows = [])
   if(empty($rows)){
     return false;
   }
-
-  $rr = json_encode($rows);
-  echo $rr;
-  exit;
 
   foreach ($rows as $key => $value) {
 
@@ -170,6 +174,7 @@ function start_manually()
  */
 function stop_manually()
 {
+
   as_unschedule_all_actions(HOOK_NAME);
   set_state('stop_manual', 1);
   set_state('timestamp', 0);
@@ -468,16 +473,13 @@ function add_settings()
  */
 function get_product_id_by_uuid($uuid)
 {
-  $types = wc_get_product_types();
-  $types = array_keys($types);
-
   $args = [
-    'post_type' => $types,
+    'post_type' => ['product'],
     'post_status' => 'any',
     'meta_key' => 'wooms_id',
     'meta_value' => $uuid,
   ];
-  $posts = get_posts($types);
+  $posts = get_posts($args);
 
   if (empty($posts[0]->ID)) {
     return false;
@@ -545,8 +547,6 @@ function render_ui()
     $strings[] = do_shortcode('[wooms_loader_icon]');
   } else {
     $strings[] = sprintf('Статус: %s', 'Завершено');
-
-
     printf(
       '<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>',
       add_query_arg('a', 'wooms_products_start_import', admin_url('admin.php?page=moysklad'))
