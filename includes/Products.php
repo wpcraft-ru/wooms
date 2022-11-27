@@ -18,21 +18,12 @@ add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 
-// add_action('init', function(){
-
-//  if(!isset($_GET['dddd'])){
-//   return;
-//  }
-
-//  $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product';
-//  $data = wooms_request($url);
-//  var_dump($data);
-//  exit;
-// });
-
+/**
+ * main walker for start sync
+ */
 function walker($args = [])
 {
-
+  error_log(print_r($args, true));
   $state = get_state();
 
   //state reset for new session
@@ -303,35 +294,30 @@ function add_product($data_source)
 function load_product($value)
 {
   if (!empty($value['archived'])) {
-    return;
+    return false;
   }
 
   /**
    * Определение способов связи
    */
   $product_id = 0;
-  if (empty($value['article'])) {
-    if (!$product_id = apply_filters('wooms_get_product_id', $product_id, $value)) {
-      if (empty(get_option('wooms_use_uuid'))) {
-        return false;
-      }
-    }
-  }
 
-  //попытка получить id по артикулу
-  if (!empty($value['article'])) {
+  $product_id = get_product_id_by_uuid($value['id']);
+
+  if(empty($product_id) && !empty($value['article'])){
     $product_id = wc_get_product_id_by_sku($value['article']);
   }
 
-  //попытка получить id по uuid
+  //попытка получить id по другим параметрам
   if (empty($product_id)) {
-    $product_id = get_product_id_by_uuid($value['id']);
+    $product_id = apply_filters('wooms_get_product_id', $product_id, $value);
   }
 
   //создаем продукт, если не нашли
   if (empty(intval($product_id))) {
     $product_id = add_product($value);
   }
+
 
   if (empty(intval($product_id))) {
     do_action(
@@ -349,6 +335,8 @@ function load_product($value)
    * rename vars
    */
   $data_api = $value;
+
+  $product->update_meta_data('wooms_id_' . $data_api['id'], 1);
 
   /**
    * Хук позволяет работать с методами WC_Product
@@ -516,7 +504,7 @@ function add_schedule_hook($force = false)
     return;
   }
 
-  as_schedule_single_action(time() + 11, HOOK_NAME, get_state(), 'WooMS');
+  as_schedule_single_action(time() + 11, HOOK_NAME, [get_state()], 'WooMS');
 }
 
 /**

@@ -2,106 +2,58 @@
 
 namespace WooMS;
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
-}
+defined('ABSPATH') || exit;
 
 /**
  * UseCodeAsArticle
- * 
+ *
+ * @todo may be it have to delete
+ *
  * issue https://github.com/wpcraft-ru/wooms/issues/98
  */
 class UseCodeAsArticle
 {
-
-    /**
-     * The Init
-     */
     public static function init()
     {
-        // add_action('init', function () {
-        //     if (!isset($_GET['dd'])) {
-        //         return;
-        //     }
-
-        //     $dd = wc_get_product_id_by_sku("00053");
-
-        //     dd($dd);
-
-        //     // dd(get_transient('wooms_end_timestamp'));
-        //     //   self::set_state('timestamp', 0);
-
-        //     //   self::batch_handler();
-
-        //     dd(0);
-        // });
-
-        add_filter('wooms_get_product_id', array(__CLASS__, 'get_product_id_by_code'), 40, 2);
-        add_action('admin_init', array(__CLASS__, 'add_settings'), 40);
+        add_filter('wooms_get_product_id', [__CLASS__, 'get_product_id_by_code'], 40, 2);
+        add_filter('wooms_product_save', [__CLASS__, 'product_save'], 40, 2);
+        add_action('admin_init', [__CLASS__, 'add_settings'], 40);
     }
 
+    /**
+     * @param \WC_Product $product
+     * @param array $data_api
+     */
+    public static function product_save($product, $data_api){
 
+      if( self::is_disable() ){
+        return $product;
+      }
+
+      $product->set_sku($data_api['code']);
+      return $product;
+    }
 
     public static function get_product_id_by_code($product_id, $data_api)
     {
-        if (!self::is_enable()) {
+        if ( self::is_disable() ) {
             return $product_id;
         }
 
-        if ($product_id_by_code = wc_get_product_id_by_sku((string)$data_api['code'])) {
-
-            self::delete_other_product_with_uuid($product_id_by_code, $data_api['id']);
-
+        if ($product_id_by_code = wc_get_product_id_by_sku($data_api['code'])) {
             return $product_id_by_code;
         }
 
         return $product_id;
     }
 
-
-    /**
-     * if isset product with uuid
-     */
-    public static function delete_other_product_with_uuid($product_id_by_code, $uuid)
-    {
-        if (!$product_id = self::get_product_id_by_uuid($uuid)) {
-            return;
-        }
-
-        if ($product_id_by_code != $product_id) {
-            wp_delete_post($product_id, true);
-
-            do_action(
-                'wooms_logger',
-                __CLASS__,
-                sprintf('Удаление дубликата по uuid (name: %s, id product %s, uuid: %s)', get_the_title( $product_id_by_code ), $product_id_by_code, $uuid)
-            );
-        }
-    }
-
-    /**
-     * get_product_id_by_uuid
-     */
-    public static function get_product_id_by_uuid($uuid)
-    {
-
-        $posts = get_posts('post_type=product&post_status=any&meta_key=wooms_id&meta_value=' . $uuid);
-
-        if (empty($posts[0]->ID)) {
-            return false;
-        } else {
-            return $posts[0]->ID;
-        }
-    }
-
-
-    public static function is_enable()
+    public static function is_disable()
     {
         if (get_option('wooms_use_code_as_article_enable')) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
