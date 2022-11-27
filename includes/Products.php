@@ -20,8 +20,11 @@ add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\
 
 
 
-function walker()
+function walker($args = [])
 {
+
+  // error_log(print_r($args, true));
+
   $state = get_state();
 
   //state reset for new session
@@ -65,13 +68,16 @@ function walker()
 
     $data = wooms_request($url);
 
+    if(isset($data['errors'])){
+      throw new \Exception(print_r($data['errors'], true));
+    }
 
     do_action('wooms_logger', __NAMESPACE__, sprintf('Отправлен запрос %s', $url));
 
     //If no rows, that send 'end' and stop walker
     if (isset($data['rows']) && empty($data['rows'])) {
       walker_finish();
-      return;
+      return ['result' => 'finish'];
     }
 
     do_action('wooms_walker_start_iteration', $data);
@@ -88,6 +94,7 @@ function walker()
     add_schedule_hook(true);
 
     do_action('wooms_products_batch_end');
+    return ['result' => 'restart'];
   } catch (\Exception $e) {
 
     /**
@@ -100,6 +107,7 @@ function walker()
     delete_option('wooms_session_id');
 
     do_action('wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой' . $e->getMessage());
+    return ['result' => 'error'];
   }
 }
 
@@ -108,8 +116,6 @@ function process_rows($rows = [])
   if(empty($rows)){
     return false;
   }
-
-  // var_dump($rows); exit;
 
   $rr = json_encode($rows);
   echo $rr;
@@ -462,8 +468,16 @@ function add_settings()
  */
 function get_product_id_by_uuid($uuid)
 {
+  $types = wc_get_product_types();
+  $types = array_keys($types);
 
-  $posts = get_posts('post_type=product&post_status=any&meta_key=wooms_id&meta_value=' . $uuid);
+  $args = [
+    'post_type' => $types,
+    'post_status' => 'any',
+    'meta_key' => 'wooms_id',
+    'meta_value' => $uuid,
+  ];
+  $posts = get_posts($types);
 
   if (empty($posts[0]->ID)) {
     return false;
@@ -509,6 +523,11 @@ function add_schedule_hook($force = false)
 function is_wait()
 {
   if (get_state('finish')) {
+    return true;
+  }
+
+  //if no password
+  if(empty(get_option('woomss_pass'))){
     return true;
   }
 
