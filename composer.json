@@ -13,8 +13,7 @@
         "yoast/phpunit-polyfills": "^1.0"
     },
     "scripts": {
-        "main": "@php ./vendor/phpunit/phpunit/phpunit tests/checks/Main.php",
-        "test": "@php ./vendor/phpunit/phpunit/phpunit tests/tdd/BaseCase.php",
-        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --debug --testsuite tdd"
+        "tests": "@php ./vendor/phpunit/phpunit/phpunit tests/checks/Main.php",
+        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --testsuite tdd"
     }
 }

@@ -5,14 +5,45 @@
  * @package Unit_Test_Plugin
  */
 
-use PHPUnit\Framework\TestCase;
+use WooMS\Products;
+use function WooMS\Products\get_product_id_by_uuid;
+use function WooMS\Products\walker;
 
 /**
  * Sample test case.
  */
-class Products extends TestCase {
+class ProductsTests extends WP_UnitTestCase {
 
   private $product_id = null;
+
+
+  public function test_walker(){
+    $data = [
+      'stop_manual' => 0,
+      'timestamp' => '20221127110457',
+      'finish' => NULL,
+      'wooms_end_timestamp' => '2022-11-27 11:02:13',
+      'session_id' => '20221127110457',
+      'end_timestamp' => 0,
+      'count' => 0,
+      'query_arg' => array ( 'offset' => 0, 'limit' => '20', ),
+    ];
+
+    $result = walker();
+
+    var_dump($result);
+
+  }
+
+  /**
+   * check product by UUID
+   */
+  public function test_checkProductByUuid(){
+    $json = $this->getJsonForSimpleProduct_code00045();
+    $product_id = get_product_id_by_uuid($json['id']);
+		$this->assertIsInt( $product_id );
+  }
+
 	/**
 	 * Product Loaded by JSON and get ID
 	 */
@@ -30,13 +61,6 @@ class Products extends TestCase {
 	}
 
 
-  public function test_CanStart() {
-    $can_start = wooms_can_start();
-
-		$this->assertTrue( $can_start );
-	}
-
-
   function getJsonForSimpleProduct_code00045(){
     $rows = $this->readJsonApiFromFile();
     foreach($rows as $row){
@@ -48,7 +72,7 @@ class Products extends TestCase {
   }
 
   function readJsonApiFromFile(){
-    $strJsonFileContents = file_get_contents(__DIR__ . "/json/rows.json");
+    $strJsonFileContents = file_get_contents(__DIR__ . "/../json/rows.json");
     $data = json_decode($strJsonFileContents, true);
     return $data;
   }
@@ -67,7 +91,4 @@ class Products extends TestCase {
       //TBD
       parent::tearDown();
   }
-
-
-
 }
