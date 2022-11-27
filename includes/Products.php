@@ -23,25 +23,14 @@ add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\
  */
 function walker($args = [])
 {
-  error_log(print_r($args, true));
-  $state = get_state();
-
-  //state reset for new session
-  if (empty($state['timestamp'])) {
-
+  if(empty($args)){
     walker_started();
-
-    $batch_size = get_option('wooms_batch_size', 20);
-
-    $query_arg_default = [
-      'offset' => 0,
-      'limit'  => apply_filters('wooms_iteration_size', $batch_size),
-    ];
-
-    set_state('query_arg', $query_arg_default);
+    $state = get_state();
+  } else {
+    $state = $args;
   }
 
-  $query_arg = get_state('query_arg');
+  $query_arg = $state['query_arg'];
 
   /**
    * issue https://github.com/wpcraft-ru/wooms/issues/296
@@ -83,12 +72,10 @@ function walker($args = [])
 
     process_rows($data['rows']);
 
-    //update count
-    set_state('count', get_state('count') + count($data['rows']));
+    $state['query_arg']['offset'] += count($data['rows']);
 
-    //update offset
-    $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
-    set_state('query_arg', $query_arg);
+    set_state($state);
+    // error_log(print_r($state, true));
 
     add_schedule_hook(true);
 
@@ -375,7 +362,7 @@ function walker_finish()
     $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
   }
 
-  set_state('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer);
+  set_state('wooms_end_timestamp', date("Y-m-d H:i:s"));
   set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer); //need delete after all tests
 
   do_action('wooms_main_walker_finish');
@@ -484,9 +471,15 @@ function walker_started()
   // backward compatibility - need delete after all updates
   update_option('wooms_session_id', $now, 'no'); //set id session sync
 
+  $batch_size = get_option('wooms_batch_size', 20);
+  $query_arg_default = [
+    'offset' => 0,
+    'limit'  => apply_filters('wooms_iteration_size', $batch_size),
+  ];
+  set_state('query_arg', $query_arg_default);
+
   set_state('timestamp', $now);
   set_state('end_timestamp', 0);
-  set_state('count', 0);
   set_state('stop_manual', 0);
 
   do_action('wooms_main_walker_started');
@@ -563,9 +556,13 @@ function get_state($key = '')
   return $value[$key] ?? null;
 }
 
-function set_state($key, $value)
+function set_state($key, $value = null)
 {
   $option_key = HOOK_NAME . '_state';
+  if(empty($value) && is_array($key)){
+    return update_option($option_key, $key);
+  }
+
   $state = get_option($option_key, []);
   if (!is_array($state)) {
     $state = [];
