@@ -29,7 +29,7 @@
 
 ## Вопросы и ответы
 
-https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa 
+https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa
 
 
 ## Ссылки
@@ -50,7 +50,7 @@ https://github.com/wpcraft-ru/wooms/releases
 https://github.com/wpcraft-ru/wooms/projects/1
 
 
-## SVN 
+## SVN
 
 - клонирование
 ```

@@ -8,10 +8,6 @@
 	convertWarningsToExceptions="true"
 	>
 	<testsuites>
-		<testsuite name="default">
-			<file>./tests/examples/smoke.php</file>
-			<exclude>./tests/examples/old.php</exclude>
-		</testsuite>
 		<testsuite name="full">
 			<directory suffix=".php">./tests/full/</directory>
 		</testsuite>

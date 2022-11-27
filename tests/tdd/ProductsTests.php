@@ -7,12 +7,13 @@
 
 use WooMS\Products;
 use function WooMS\Products\get_product_id_by_uuid;
-use function WooMS\Products\process_rows;
+// use function WooMS\Products\process_rows;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Sample test case.
+ * Products sync
  */
-class ProductsTests extends WP_UnitTestCase {
+class ProductsTests extends TestCase {
 
   private $product_id = null;
 
