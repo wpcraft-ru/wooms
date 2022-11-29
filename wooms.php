@@ -19,7 +19,7 @@
  * WC requires at least: 6.0
  * WC tested up to: 6.3.1
  *
- * Version: 9.0.rc20220407-2
+ * Version: 9.0.rc20221129
  */
 
 namespace WooMS;
