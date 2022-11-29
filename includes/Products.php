@@ -525,12 +525,15 @@ function render_ui()
     printf('<a href="%s" class="button button-secondary">Остановить синхронизацию</a>', add_query_arg('a', 'wooms_products_stop_import', admin_url('admin.php?page=moysklad')));
     $strings[] = sprintf('Статус: <strong>%s</strong>', 'синхронизация в процессе');
     $strings[] = do_shortcode('[wooms_loader_icon]');
+
   } else {
     $strings[] = sprintf('Статус: %s', 'Завершено');
+    $strings[] = sprintf('Время последнего завершения: %s', wooms_get_timestamp_last_job_by_hook(HOOK_NAME));
     printf(
       '<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>',
       add_query_arg('a', 'wooms_products_start_import', admin_url('admin.php?page=moysklad'))
     );
+
   }
   $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker&orderby=schedule&order=desc'));
 

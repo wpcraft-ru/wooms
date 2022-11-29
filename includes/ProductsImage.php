@@ -221,6 +221,7 @@ function product_image_download($product_id, $meta_key = 'wooms_url_for_get_thum
     }
 }
 
+
 /**
  * Manual start images download
  */
@@ -237,6 +238,7 @@ function render_ui()
         $strings[] = '<p>Загрузка изображений по 5 штук за раз.</p>';
     } else {
         $strings[] = sprintf('Статус: %s', 'в ожидании новых задач');
+        $strings[] = sprintf('Время последней задачи в очереди: %s', wooms_get_timestamp_last_job_by_hook(HOOK_NAME));
     }
 
     $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_product_image_sync&orderby=schedule&order=desc'));
