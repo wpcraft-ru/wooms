@@ -9,14 +9,13 @@ add_action('init', function () {
     add_filter('wooms_product_save', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
     add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 15);
     add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
-    add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
     add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\restart');
 });
 
-function walker()
+function walker($state = [])
 {
     if (!is_enable()) {
-        return;
+        return ['result' => 'disable'];
     }
 
     $args = array(
@@ -36,7 +35,6 @@ function walker()
     $items = get_posts($args);
 
     if (empty($items)) {
-        set_state('finish', date("Y-m-d H:i:s"));
 
         do_action(
             'wooms_logger',
@@ -44,96 +42,36 @@ function walker()
             sprintf('Главные изображения продуктов загружены')
         );
 
-        return false;
+        return ['result' => 'finish'];
     }
 
-    set_state('last_count', count($items));
-
-    $result = [];
+    $ids = [];
 
     foreach ($items as $key => $value) {
         if (product_image_download($value->ID)) {
-            $result[] = $value->ID;
+            $ids[] = $value->ID;
         }
-
 
         delete_post_meta($value->ID, 'wooms_url_for_get_thumbnail');
     }
 
-    set_state('last_result', $result);
+    $state['ids'] = $ids;
+    if(empty($state['count'])){
+      $state['count'] = count($items);
+    } else {
+      $state['count'] += count($items);
+    }
 
-    add_schedule_hook(true);
+    as_schedule_single_action(time(), HOOK_NAME, [$state], 'WooMS');
+
+    return ['result' => 'restart'];
 }
-
-
-function add_settings()
-{
-    add_settings_section('woomss_section_images', 'Изображения', null, 'mss-settings');
-
-    register_setting('mss-settings', 'woomss_images_sync_enabled');
-    add_settings_field(
-        $id = 'woomss_images_sync_enabled',
-        $title = 'Включить синхронизацию картинок',
-        $callback = function ($args) {
-            $option = 'woomss_images_sync_enabled';
-            $desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
-            printf('<input type="checkbox" name="%s" value="1" %s /> %s', $args['key'], $args['value'], $desc);
-        },
-        $page = 'mss-settings',
-        $section = 'woomss_section_images',
-        $args = [
-            'key' => 'woomss_images_sync_enabled',
-            'value' => checked(1, get_option('woomss_images_sync_enabled'), false),
-        ],
-    );
-
-    register_setting('mss-settings', 'woomss_images_replace_to_sync');
-    add_settings_field(
-        'woomss_images_replace_to_sync',
-        'Замена изображении при синхронизации',
-        $callback = function ($args) {
-            $option = 'woomss_images_sync_enabled';
-            $desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
-            printf('<input type="checkbox" name="%s" value="1" %s /> %s', $args['key'], $args['value'], $desc);
-        },
-        $page = 'mss-settings',
-        $section = 'woomss_section_images',
-        $args = [
-            'key' => 'woomss_images_replace_to_sync',
-            'value' => checked(1, get_option('woomss_images_replace_to_sync'), false),
-        ],
-    );
-}
-
 
 function restart()
 {
-    set_state('finish', null);
+  as_schedule_single_action(time(), HOOK_NAME, [], 'WooMS');
 }
 
-/**
- * Init Scheduler
- */
-function add_schedule_hook($force = false)
-{
-    if (!is_enable()) {
-        return;
-    }
-
-    if (is_wait()) {
-        return;
-    }
-
-    if (as_next_scheduled_action(HOOK_NAME) && !$force) {
-        return;
-    }
-
-    if(!$state = get_state()){
-        $state = ['started' => date("Y-m-d H:i:s")];
-    }
-
-    as_schedule_single_action(time() + 11, HOOK_NAME, $state, 'WooMS');
-}
 
 function uploadRemoteImageAndAttach($image_url, $product_id, $filename = 'image.jpg')
 {
@@ -283,44 +221,6 @@ function product_image_download($product_id, $meta_key = 'wooms_url_for_get_thum
     }
 }
 
-
-/**
- * checking the pause state
- */
-function is_wait()
-{
-    if (get_state('finish')) {
-        return true;
-    }
-
-    return false;
-}
-
-function get_state($key = '')
-{
-    $option_key = HOOK_NAME . '_state';
-    $value = get_option($option_key, []);
-    if(!is_array($value)){
-        $value = [];
-    }
-    if (empty($key)) {
-        return $value ?? [];
-    }
-
-    return $value[$key] ?? null;
-}
-
-function set_state($key, $value)
-{
-    $option_key = HOOK_NAME . '_state';
-    $state = get_option($option_key, []);
-    if(!is_array($state)){
-        $state = [];
-    }
-    $state[$key] = $value;
-    return update_option($option_key, $state);
-}
-
 /**
  * Manual start images download
  */
@@ -334,6 +234,7 @@ function render_ui()
 
     if (as_next_scheduled_action(HOOK_NAME)) {
         $strings[] = sprintf('Статус: <strong>%s</strong>', 'Выполняется очередями в фоне');
+        $strings[] = '<p>Загрузка изображений по 5 штук за раз.</p>';
     } else {
         $strings[] = sprintf('Статус: %s', 'в ожидании новых задач');
     }
@@ -347,7 +248,7 @@ function render_ui()
     // }
 
     echo '<h2>Изображения</h2>';
-    echo '<p>Загрузка изображений по 5 штук за раз.</p>';
+
     foreach ($strings as $string) {
         printf('<p>%s</p>', $string);
     }
@@ -356,7 +257,6 @@ function render_ui()
 
 
 }
-
 
 /**
  * add image to metafield for download
@@ -395,9 +295,43 @@ function is_enable()
     return true;
 }
 
-function get_config()
+
+
+function add_settings()
 {
-    return [
-        'walker_hook_name' => 'wooms_product_image_sync',
-    ];
+    add_settings_section('woomss_section_images', 'Изображения', null, 'mss-settings');
+
+    register_setting('mss-settings', 'woomss_images_sync_enabled');
+    add_settings_field(
+        $id = 'woomss_images_sync_enabled',
+        $title = 'Включить синхронизацию картинок',
+        $callback = function ($args) {
+            $option = 'woomss_images_sync_enabled';
+            $desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
+            printf('<input type="checkbox" name="%s" value="1" %s /> %s', $args['key'], $args['value'], $desc);
+        },
+        $page = 'mss-settings',
+        $section = 'woomss_section_images',
+        $args = [
+            'key' => 'woomss_images_sync_enabled',
+            'value' => checked(1, get_option('woomss_images_sync_enabled'), false),
+        ],
+    );
+
+    register_setting('mss-settings', 'woomss_images_replace_to_sync');
+    add_settings_field(
+        'woomss_images_replace_to_sync',
+        'Замена изображении при синхронизации',
+        $callback = function ($args) {
+            $option = 'woomss_images_sync_enabled';
+            $desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
+            printf('<input type="checkbox" name="%s" value="1" %s /> %s', $args['key'], $args['value'], $desc);
+        },
+        $page = 'mss-settings',
+        $section = 'woomss_section_images',
+        $args = [
+            'key' => 'woomss_images_replace_to_sync',
+            'value' => checked(1, get_option('woomss_images_replace_to_sync'), false),
+        ],
+    );
 }
