@@ -9,7 +9,7 @@ const HOOK_NAME = 'wooms_products_walker';
 add_action(HOOK_NAME, __NAMESPACE__ . '\\walker');
 
 add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
-add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
+// add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
 
 add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
 add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
@@ -17,6 +17,13 @@ add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
+
+add_action('init', function(){
+  if (!wp_next_scheduled('wooms_monitoring')) {
+    wp_schedule_event( time(), 'every_minute', 'wooms_monitoring' );
+  }
+});
+add_action('wooms_monitoring', __NAMESPACE__ . '\\check_and_restart_job_queue');
 
 /**
  * main walker for start sync
@@ -72,12 +79,13 @@ function walker($args = [])
 
     process_rows($data['rows']);
 
+    $state['count'] += count($data['rows']);
     $state['query_arg']['offset'] += count($data['rows']);
 
     set_state($state);
     // error_log(print_r($state, true));
 
-    add_schedule_hook(true);
+    as_schedule_single_action(time(), HOOK_NAME, [$state], 'WooMS');
 
     do_action('wooms_products_batch_end');
     return ['result' => 'restart'];
@@ -126,23 +134,16 @@ function process_rows($rows = [])
 
 }
 
-
-function get_session_id()
-{
-  return get_state('session_id');
-}
-
 /**
  * Start manually actions
  */
 function start_manually()
 {
-  set_state('finish', null);
-  set_state('timestamp', null);
+  set_state([]);
 
   do_action('wooms_products_sync_manual_start');
 
-  walker();
+  as_schedule_single_action(time(), HOOK_NAME, [], 'WooMS');
 
   wp_redirect(admin_url('admin.php?page=moysklad'));
 }
@@ -355,15 +356,7 @@ function walker_finish()
 {
   set_state('finish', date("Y-m-d H:i:s"));
 
-  //Отключаем обработчик или ставим на паузу
-  if (empty(get_option('woomss_walker_cron_enabled'))) {
-    $timer = 0;
-  } else {
-    $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
-  }
-
-  set_state('wooms_end_timestamp', date("Y-m-d H:i:s"));
-  set_transient('wooms_end_timestamp', date("Y-m-d H:i:s"), $timer); //need delete after all tests
+  set_state('end_timestamp', time());
 
   do_action('wooms_main_walker_finish');
 
@@ -465,22 +458,27 @@ function get_product_id_by_uuid($uuid)
 
 function walker_started()
 {
-  $now = date("YmdHis");
-  set_state('session_id', $now); //set id session sync
 
   // backward compatibility - need delete after all updates
-  update_option('wooms_session_id', $now, 'no'); //set id session sync
+  // update_option('wooms_session_id', $now, 'no'); //set id session sync
 
   $batch_size = get_option('wooms_batch_size', 20);
   $query_arg_default = [
     'offset' => 0,
     'limit'  => apply_filters('wooms_iteration_size', $batch_size),
   ];
-  set_state('query_arg', $query_arg_default);
+  // set_state('query_arg', );
 
-  set_state('timestamp', $now);
-  set_state('end_timestamp', 0);
-  set_state('stop_manual', 0);
+  $now = date("YmdHis");
+  $state = [
+    'count' => 0,
+    'session_id' => $now,
+    'timestamp' => $now,
+    'query_arg' => $query_arg_default,
+    'end_timestamp' => 0,
+  ];
+
+  set_state($state);
 
   do_action('wooms_main_walker_started');
 
@@ -489,6 +487,7 @@ function walker_started()
 
 function add_schedule_hook($force = false)
 {
+  $need_new_job = false;
   if (is_wait()) {
     return;
   }
@@ -497,7 +496,7 @@ function add_schedule_hook($force = false)
     return;
   }
 
-  as_schedule_single_action(time() + 11, HOOK_NAME, [get_state()], 'WooMS');
+  as_schedule_single_action(time(), HOOK_NAME, [get_state()], 'WooMS');
 }
 
 /**
@@ -540,6 +539,29 @@ function render_ui()
   }
 
   do_action('wooms_products_display_state');
+}
+
+
+function check_and_restart_job_queue(){
+  $end_timestamp = get_state('end_timestamp');
+  $is_enable_cron = get_option('woomss_walker_cron_enabled', false);
+  if(empty($end_timestamp)){
+    return false;
+  }
+  if(empty($is_enable_cron)){
+    return false;
+  }
+
+  $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
+  $time_has_passed = time() - $end_timestamp;
+
+  if($time_has_passed < $timer){
+    return false;
+  }
+
+  as_schedule_single_action(time(), HOOK_NAME, [], 'WooMS');
+
+  return true;
 }
 
 function get_state($key = '')

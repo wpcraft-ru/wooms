@@ -8,12 +8,42 @@
 use WooMS\Products;
 use function WooMS\Products\get_product_id_by_uuid;
 use function WooMS\Products\process_rows;
+use function WooMS\Products\set_state;
+use function WooMS\Products\check_and_restart_job_queue;
 
 
-class Main extends WP_UnitTestCase {
+class ProductsTest extends WP_UnitTestCase {
 
   private $product_id = null;
 
+
+  /**
+   * Check restart queue if enable cron and time pased
+   */
+  public function test_RestartIfEnableCronAndTimePassed(){
+    $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
+    $end_timestamp = time() - $timer - 11;
+    set_state('end_timestamp', $end_timestamp);
+    update_option('woomss_walker_cron_enabled', 1);
+
+    $check = check_and_restart_job_queue();
+
+    $this->assertTrue($check);
+  }
+
+  /**
+   * Check restart queue if enable cron and is still time
+   */
+  public function test_RestartIfEnableCronAndIsStillTime(){
+    $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
+    $end_timestamp = time() - $timer + 11;
+    set_state('end_timestamp', $end_timestamp);
+    update_option('woomss_walker_cron_enabled', 1);
+
+    $check = check_and_restart_job_queue();
+
+    $this->assertFalse($check);
+  }
   /**
    * check product by UUID
    */
