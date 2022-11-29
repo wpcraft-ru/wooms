@@ -14,6 +14,7 @@
     },
     "scripts": {
         "tdd": "@php ./vendor/phpunit/phpunit/phpunit --testsuite tdd",
-        "tests": "@php ./vendor/phpunit/phpunit/phpunit --testsuite full"
+        "tests": "@php ./vendor/phpunit/phpunit/phpunit --testsuite full",
+        "temp": "@php ./vendor/phpunit/phpunit/phpunit tests/tdd/TempTest.php"
     }
 }
