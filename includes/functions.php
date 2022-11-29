@@ -247,6 +247,7 @@ function wooms_get_timestamp_last_job_by_hook($hook = null){
     'orderby' => 'date',
     'order' => 'DESC',
   ]);
+
   if(empty($data[0])){
     return 'no data';
   }
