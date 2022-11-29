@@ -15,14 +15,9 @@ class TempTest extends TestCase {
   public function test_check(){
 
 
+    $this->assertTrue(true);
   }
 
-  function check_action( ActionScheduler_Action $item ){
-
-    $data = $item->get_args();
-    var_dump($data);
-
-  }
 
 
   protected function setUp(): void

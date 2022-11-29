@@ -253,6 +253,5 @@ function wooms_get_timestamp_last_job_by_hook($hook = null){
 
   $date = $store->get_date($data[0]);
   $date->setTimezone(new \DateTimeZone(wp_timezone_string()));
-  return $date->format('Y-m-d H:m:s');
-
+  return $date->format('Y-m-d H:i:s');
 }
