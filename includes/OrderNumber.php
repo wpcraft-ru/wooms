@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 /**
  * Get and save order number from MoySklad
- * 
+ *
  * issue https://github.com/wpcraft-ru/wooms/issues/319
  */
 class OrderNumber
@@ -18,13 +18,13 @@ class OrderNumber
         add_filter('wooms_order_update', array(__CLASS__, 'set_order_number'), 10, 2);
         add_filter('wooms_update_order_from_moysklad', array(__CLASS__, 'set_order_number'), 10, 2);
 
-        add_action('admin_init', array(__CLASS__, 'add_settings'), 50);
+        add_action('admin_init', array(__CLASS__, 'add_settings'), 30);
         add_action('pre_get_posts', array(__CLASS__, 'search_by_number_from_moysklad'));
     }
 
     /**
      * set_order_number
-     * 
+     *
      * use hook $order = apply_filters('wooms_order_update', $order, $result);
      */
     public static function set_order_number($order, $data_api)
@@ -55,7 +55,7 @@ class OrderNumber
     }
 
     /**
-     * 
+     *
      * use hook $data = apply_filters('wooms_order_data', $data, $order_id);
      */
     public static function disable_order_number($data, $order_id)
@@ -146,7 +146,7 @@ class OrderNumber
 
     /**
      *  Если используются номера заказов из Мой Склад, чиним поиску по номеру заказа
-     * 
+     *
      *  issue https://github.com/wpcraft-ru/wooms/issues/331
      */
     public static function search_by_number_from_moysklad($query)
@@ -166,7 +166,7 @@ class OrderNumber
 		if(is_numeric($query->query['s']) === false){
 			return;
         }
-        
+
 		$custom_order_id = $query->query['s'];
 		$query->query_vars['post__in']=array();
 		$query->query['s']='';

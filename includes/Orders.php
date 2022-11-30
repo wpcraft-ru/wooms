@@ -59,7 +59,7 @@ class Orders
 
         add_action('wooms_order_metabox_controls', array(__CLASS__, 'add_controle_for_sync'));
 
-        add_action('admin_init', array(__CLASS__, 'add_settings'), 40);
+        add_action('admin_init', array(__CLASS__, 'add_settings'), 10);
 
         add_action( 'woocommerce_order_item_meta_start', function () {
 
