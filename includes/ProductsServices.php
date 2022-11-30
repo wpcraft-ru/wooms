@@ -15,7 +15,7 @@ class ProductsServices extends AbstractWalker
 
     /**
      * Save state in DB
-     * 
+     *
      * @var string
      */
     public static $state_transient_key = 'wooms_services_walker_state';
@@ -138,7 +138,7 @@ class ProductsServices extends AbstractWalker
             //update count
             self::set_state('count', self::get_state('count') + $i);
 
-            //update offset 
+            //update offset
             $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
 
             self::set_state('query_arg', $query_arg);
@@ -257,6 +257,9 @@ class ProductsServices extends AbstractWalker
 
     /**
      * update_product
+     *
+     * @param \WC_Product $product
+     * @param array $api_data
      */
     public static function update_product($product, $api_data)
     {

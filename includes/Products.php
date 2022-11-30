@@ -97,9 +97,6 @@ function walker($args = [])
      */
     set_state('session_id', null);
 
-    //backwards compatible - to delete
-    delete_option('wooms_session_id');
-
     do_action('wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой... ' . $e->getMessage());
     return ['result' => 'error'];
   }
@@ -162,11 +159,14 @@ function stop_manually()
   /**
    * issue https://github.com/wpcraft-ru/wooms/issues/305
    */
-  // delete_option('wooms_session_id');
   set_state('session_id', null);
 
   wp_redirect(admin_url('admin.php?page=moysklad'));
   exit;
+}
+
+function get_session_id(){
+  return get_state('session_id');
 }
 
 /**
@@ -175,7 +175,6 @@ function stop_manually()
 function update_product($product, $data_api, $data = 'deprecated')
 {
   $data_of_source = $data_api;
-  $product_id = $product->get_id();
 
   //Set session id for product
   if ($session_id = get_state('session_id')) {
@@ -458,9 +457,6 @@ function get_product_id_by_uuid($uuid)
 
 function walker_started()
 {
-
-  // backward compatibility - need delete after all updates
-  // update_option('wooms_session_id', $now, 'no'); //set id session sync
 
   $batch_size = get_option('wooms_batch_size', 20);
   $query_arg_default = [

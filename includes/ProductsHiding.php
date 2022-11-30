@@ -43,7 +43,7 @@ function walker($state = [])
     $ids[] = $product_id;
 
     if ($product->get_type() == 'variable') {
-      $product->set_manage_stock('yes');
+      // $product->set_manage_stock('yes');
     }
 
     $product->set_catalog_visibility('hidden');
@@ -102,7 +102,7 @@ function get_products_old_session()
   }
 
   $args = array(
-    'post_type' => 'product',
+    'post_type' => ['product', 'product_variation'],
     'numberposts' => 30,
     'fields' => 'ids',
     'tax_query' => array(
