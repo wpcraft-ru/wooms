@@ -448,9 +448,7 @@ class Orders
 
         if (empty($result['id']) || !isset($result['id']) || isset($result['errors'])) {
             update_post_meta($order_id, 'wooms_send_timestamp', date("Y-m-d H:i:s"));
-            // $errors = "\n\r" . 'Код ошибки:' . $result['errors'][0]['code'] . "\n\r";
-            // $errors .= 'Параметр:' . $result['errors'][0]['parameter'] . "\n\r";
-            // $errors .= $result['errors'][0]['error'];
+            delete_post_meta( $order_id, 'wooms_order_sync' );
 
             do_action(
                 'wooms_logger_error',
