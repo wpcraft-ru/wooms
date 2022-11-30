@@ -9,3 +9,4 @@ composer.json
 composer.lock
 phpunit.xml.dist
 docs
+.editorconfig

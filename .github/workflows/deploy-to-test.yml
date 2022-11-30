@@ -1,6 +1,8 @@
 name: Deploy To Test
 on: [workflow_dispatch]
 
+# https://github.com/10up/action-wordpress-plugin-deploy
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
