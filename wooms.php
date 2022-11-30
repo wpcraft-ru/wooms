@@ -11,15 +11,15 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- *
  * Requires Plugins: woocommerce
+ *
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
- * Tested up to: 5.9
+ * Tested up to: 6.1
  * WC requires at least: 6.0
- * WC tested up to: 6.3.1
+ * WC tested up to: 7.1
  *
- * Version: 9.0.rc20220407-2
+ * Version: 9.0
  */
 
 namespace WooMS;
@@ -41,10 +41,6 @@ register_deactivation_hook(__FILE__, function () {
 
 require_once __DIR__ . '/includes/functions.php';
 
-add_action('tdd', function(){
-  tdd(wooms_can_start());
-});
-
 add_action('plugins_loaded', function () {
   if (!wooms_can_start()) {
     return;
@@ -58,7 +54,6 @@ add_action('plugins_loaded', function () {
   add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
 });
 
-
 add_filter('wooms_xt_load', '__return_false');
 add_filter("plugin_action_links_" . plugin_basename(__FILE__), __NAMESPACE__ . '\\plugin_add_settings_link');
 add_filter('plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2);
@@ -67,7 +62,6 @@ add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\xt
 function xt_plugin_update_message($data, $response)
 {
 
-  echo 1;
   $wp_list_table = _get_list_table('WP_Plugins_List_Table');
 
   printf(

@@ -237,3 +237,22 @@ function wooms_id_check_if_unique($post_ID, $post = '', $update = '') {
         $title =  sprintf('Дубли meta-полей wooms для товаров и вариаций (%s) удалены', implode(', ', $ids))
     );
 }
+
+
+
+function wooms_get_timestamp_last_job_by_hook($hook = null){
+  $store = \ActionScheduler::store();
+  $data = $store->query_actions([
+    'hook' => $hook,
+    'orderby' => 'date',
+    'order' => 'DESC',
+  ]);
+
+  if(empty($data[0])){
+    return 'no data';
+  }
+
+  $date = $store->get_date($data[0]);
+  $date->setTimezone(new \DateTimeZone(wp_timezone_string()));
+  return $date->format('Y-m-d H:i:s');
+}

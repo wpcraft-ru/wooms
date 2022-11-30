@@ -9,7 +9,6 @@ defined('ABSPATH') || exit;
  */
 class Orders
 {
-
     /**
      * Hookd and key for ActionSheduler
      *
@@ -22,19 +21,6 @@ class Orders
      */
     public static function init()
     {
-
-        // add_action('init', function () {
-        //   if (!isset($_GET['dd'])) {
-        //     return;
-        //   }
-
-        //   echo '<pre>';
-
-        //   $check = self::order_update_to_moysklad(26455);
-
-        //   die(0);
-        // });
-
 
         add_action('wooms_send_order_in_moysklad', function($args){
 
@@ -89,12 +75,12 @@ class Orders
     public static function wooms_id_remove_from_order_data( $attr, $data ) {
 
         foreach( $attr as $key => $att ) {
-    
+
             if ( $att->key == 'wooms_id' ) {
                 unset( $attr[$key] );
             }
         }
-    
+
         return $attr;
     }
 
@@ -394,7 +380,7 @@ class Orders
         foreach ($orders as $order) {
 
             self::add_task_order_update($order->ID);
-          
+
         }
 
         self::add_schedule_hook(true);
@@ -1041,7 +1027,7 @@ class Orders
         }
 
         if($date = $order->get_date_created()){
-            $timezone = new \DateTimeZone("Europe/Moscow");
+            $timezone = new \DateTimeZone(wp_timezone_string());
             $date = $date->setTimeZone($timezone);
             $date = $date->date('Y-m-d H:i:s');
             $data_order['moment'] = $date;
@@ -1059,8 +1045,6 @@ class Orders
      */
     public static function get_order_note($order)
     {
-        // $order         = wc_get_order($order_id);
-
         $customer_notes = [];
         $customer_notes['order_url'] = sprintf('Посмотреть заказ на сайте: %s', $order->get_edit_order_url());
 
@@ -1319,7 +1303,7 @@ class Orders
 
     /**
      * add_controle_for_sync
-     * 
+     *
      * issue https://github.com/wpcraft-ru/wooms/issues/316
      */
     public static function add_controle_for_sync()
