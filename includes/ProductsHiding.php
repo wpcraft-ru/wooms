@@ -102,7 +102,7 @@ function get_products_old_session()
   }
 
   $args = array(
-    'post_type' => 'product',
+    'post_type' => ['product', 'product_variation'],
     'numberposts' => 30,
     'fields' => 'ids',
     'tax_query' => array(
