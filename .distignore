@@ -1,0 +1,11 @@
+tests
+/.wordpress-org
+/.git
+/.github
+/node_modules
+.distignore
+.gitignore
+composer.json
+composer.lock
+phpunit.xml.dist
+docs
