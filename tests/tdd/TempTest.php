@@ -14,7 +14,11 @@ class TempTest extends TestCase {
    */
   public function test_check(){
 
-    ProductVariable::process_rows($this->getVariantsRows());
+    $rows = $this->getVariantsRows();
+    $product = wc_get_product(252);
+    $wooms_id = $product->get_meta('wooms_id');
+    var_dump($wooms_id);
+    // ProductVariable::process_rows();
 
     $this->assertTrue(true);
   }

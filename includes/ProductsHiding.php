@@ -43,7 +43,7 @@ function walker($state = [])
     $ids[] = $product_id;
 
     if ($product->get_type() == 'variable') {
-      $product->set_manage_stock('yes');
+      // $product->set_manage_stock('yes');
     }
 
     $product->set_catalog_visibility('hidden');

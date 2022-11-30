@@ -410,10 +410,13 @@ class ProductVariable
    * @param $product_id
    * @param $value
    */
-  public static function update_variant_for_product($product_id, $data_api)
+  public static function update_variant_for_product($product_id, $variant_data)
   {
-    $variant_data = $data_api;
-    if (empty($data_api)) {
+    if (empty($variant_data)) {
+      return;
+    }
+
+    if (!empty($variant_data['archived'])) {
       return;
     }
 
@@ -434,8 +437,6 @@ class ProductVariable
     } else {
       $price = 0;
     }
-
-    // $price = apply_filters('wooms_product_price', $price, $data_api, $variation_id);
 
     $price = floatval($price) / 100;
     $variation->set_price($price);
@@ -459,16 +460,16 @@ class ProductVariable
       );
     }
 
+    if ($session_id = self::get_session_id()) {
+      $variation->update_meta_data('wooms_session_id', $session_id);
+    }
+
     /**
      * deprecated
      */
     $variation = apply_filters('wooms_save_variation', $variation, $variant_data, $product_id);
 
     $variation = apply_filters('wooms_variation_save', $variation, $variant_data, $product_id);
-
-    if ($session_id = get_option('wooms_session_id')) {
-      $variation->update_meta_data('wooms_session_id', $session_id);
-    }
 
     $variation->save();
 
@@ -487,7 +488,9 @@ class ProductVariable
     do_action('wooms_variation_id', $variation_id, $variant_data);
   }
 
-
+  public static function get_session_id(){
+    return \WooMS\Products\get_session_id();
+  }
   /**
    * Get product parent ID
    */
