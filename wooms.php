@@ -15,11 +15,11 @@
  *
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
- * Tested up to: 5.9
+ * Tested up to: 6.1
  * WC requires at least: 6.0
- * WC tested up to: 6.3.1
+ * WC tested up to: 7.1
  *
- * Version: 9.0.rc20221129
+ * Version: 9.0
  */
 
 namespace WooMS;

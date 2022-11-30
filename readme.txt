@@ -2,10 +2,9 @@
 Contributors: casepress
 Donate link: https://wpcraft.ru/product/wooms-extra/
 Tags: moysklad, woocommerce, sync, integration
-Requires at least: 4.0
-Tested up to: 5.8
-Stable tag: 4.3
-Requires PHP: 5.6
+Requires at least: 5.0
+Tested up to: 6.1
+Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,8 +27,6 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 [Инструкция по правильному запуску Интернет магазина на базе WordPress & WooCommerce](https://wpcraft.ru/blog/internet-magazin-na-wordpress-woocommerce-storefront-mojsklad/)
 
-Для больших возможностей можно приобрести расширенную версию: [https://wpcraft.ru/product/wooms-extra/](https://wpcraft.ru/product/wooms-extra/)
-
 Исходники для желающих принять участие в разработке: [https://github.com/wpcraft-ru/wooms/](https://github.com/wpcraft-ru/wooms/)
 
 По вопросам доработки: [https://github.com/wpcraft-ru/wooms/issues](https://github.com/wpcraft-ru/wooms/issues)
@@ -38,7 +35,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 Страница плагина: [https://wordpress.org/plugins/wooms/](https://wordpress.org/plugins/wooms/)
 
-Roadmap (Статус задача по разработке): [https://github.com/wpcraft-ru/wooms/projects/1](https://github.com/wpcraft-ru/wooms/projects/1)
+Roadmap (Статус задач по разработке): [https://github.com/wpcraft-ru/wooms/projects/1](https://github.com/wpcraft-ru/wooms/projects/1)
 
 Плагин спроектирован таким образом, что относительно просто позволяет дорабатывать механику под задачи и автоматизацию конкретного магазина/каталога.
 
@@ -72,7 +69,7 @@ e.g.
 = Какие минимальные требования? =
 
 WordPress 5.0
-PHP 5.6
+PHP 7.0
 
 
 == Screenshots ==
@@ -85,9 +82,12 @@ PHP 5.6
 
 = 9.0 =
 - Плагин стал бесплатным - изменения 2022 https://github.com/wpcraft-ru/wooms/wiki/2022
-- Проверка совместимости с WordPress 5.9
-- Проверка совместимости с WooCommerce 6.2.0
-- Интеграция платных опций в базовый плагин
+- Интеграция платных опций в базовый плагин. Плагин WooMS XT более не используется и его следует отключить
+- Переработан механизм очередей на более стабильный
+- Добавленая первая версия авто тестов для будущей стабильности
+- Проверка совместимости с WordPress 6.1
+- Проверка совместимости с WooCommerce 7.1.0
+
 
 = 8.6 =
 - Проверка совместимости с WooCommerce 6.1.0
@@ -96,7 +96,7 @@ PHP 5.6
 = 8.5 =
 - Проверка совместимости с WooCommerce 5.9
 - Проверка совместимости с php 8.0
-- Исправлена ошибка деплоя WooMS на wordpress.org 
+- Исправлена ошибка деплоя WooMS на wordpress.org
 
 = 8.4 =
 - Проверка совместимости с WooCommerce 5.8
@@ -134,7 +134,7 @@ PHP 5.6
 * Исправлено. Ошибка при загрузке картинок https://github.com/wpcraft-ru/wooms/issues/348
 * Улучшение. Документация и инструкции по плагину https://github.com/wpcraft-ru/wooms/issues/325
 * Тест плагинов с новой версией WooCommerce https://github.com/wpcraft-ru/wooms/issues/351
-* [XT] Пропал метод доставки в комментах к заказу https://github.com/wpcraft-ru/wooms/issues/357 
+* [XT] Пропал метод доставки в комментах к заказу https://github.com/wpcraft-ru/wooms/issues/357
 
 = 7.12 =
 * [XT] Рефакторинг кода по отправке заказов https://github.com/wpcraft-ru/wooms/issues/342
@@ -166,7 +166,7 @@ PHP 5.6
 * XT: Учет НДС в Заказе https://github.com/wpcraft-ru/wooms/issues/173
 * XT: Работа с валютой в WooCommerce и МойСклад (USD, EUR) https://github.com/wpcraft-ru/wooms/issues/189
 * XT: Конвертер валют если цена указана в евро, долларах и рублях https://github.com/wpcraft-ru/wooms/issues/277
-* Рефакторинг, мелкие улучшения и исправления 
+* Рефакторинг, мелкие улучшения и исправления
 
 = 7.7 =
 * Добавить поддержку услуг с учетом REST API 1.2 https://github.com/wpcraft-ru/wooms/issues/314
@@ -174,17 +174,17 @@ PHP 5.6
 * XT Fix в версии 7.5 не работает синхранизация сетов https://github.com/wpcraft-ru/wooms/issues/313
 * XT Скрытие товаров в черновики если нет остатков - добавлен хук https://github.com/wpcraft-ru/wooms/issues/287
 * XT Заказы - опция передачи вручную, если автомат отключен https://github.com/wpcraft-ru/wooms/issues/316
-* Рефакторинг, мелкие улучшения и исправления 
+* Рефакторинг, мелкие улучшения и исправления
 
 = 7.6 =
 * Добавлена опция указания всего деревая категорий по продукту https://github.com/wpcraft-ru/wooms/issues/282
 * Исправлена проблема при которой товары иногда могли скрываться без причины https://github.com/wpcraft-ru/wooms/issues/305
 * Данные для отладки теперь сохраняются только если включена опция с журналом https://github.com/wpcraft-ru/wooms/issues/300
-* Рефакторинг, мелкие улучшения и исправления 
+* Рефакторинг, мелкие улучшения и исправления
 
 = 7.5 =
 * Анимация синхронизации https://github.com/wpcraft-ru/wooms/issues/306
-* Мелкие улучшения и исправления 
+* Мелкие улучшения и исправления
 * XT Улучшен лог данных. Товары в наличии пропадают в каталоге https://github.com/wpcraft-ru/wooms/issues/302
 * XT Исправлено - Заказы передаются с отключенной опцией https://github.com/wpcraft-ru/wooms/issues/309
 * XT Рефакторинг опции выбора склада https://github.com/wpcraft-ru/wooms/issues/308
@@ -211,7 +211,7 @@ PHP 5.6
 * Импорт услуг - первая версия https://github.com/wpcraft-ru/wooms/issues/60
 * Доступ к принудительной синхронизации для менеджеров https://github.com/wpcraft-ru/wooms/issues/280
 * Если ошибка передачи Заказа - сброс очереди https://github.com/wpcraft-ru/wooms/issues/191
-* Мелкие улучшения и исправления 
+* Мелкие улучшения и исправления
 
 = 7.0 =
 * глобальный рефакторинг, много улучшений
@@ -220,14 +220,14 @@ PHP 5.6
 * в здоровье сайта проверка на наличие платного тарифа МойСклад https://github.com/wpcraft-ru/wooms/issues/252
 * улучшения механизмов диагностики проблем https://github.com/wpcraft-ru/wooms/issues/264
 * диагностика проблем - добавлена ссылка https://github.com/wpcraft-ru/wooms/issues/260
-* рефакторинг механизма скрытия продутов - выше надежность, меньше ошибок 
-* оптимизация главного обработчика продуктов 
+* рефакторинг механизма скрытия продутов - выше надежность, меньше ошибок
+* оптимизация главного обработчика продуктов
 * оптимизация обработчика картинок по продуктам
 * XT: синк комплектов (сгруппированных продуктов) - рефакторинг, исправление ошибок https://github.com/wpcraft-ru/wooms/issues/256
 
 = 6.3 =
 * XT исправление проблемы с множеством вебхуков и статусами Заказов https://github.com/wpcraft-ru/wooms/issues/246
-* обновлены данные в readme.txt 
+* обновлены данные в readme.txt
 * обновление скриншотов
 
 = 6.2 =
@@ -235,7 +235,7 @@ PHP 5.6
 * тест WooCommerce 4.0 https://github.com/wpcraft-ru/wooms/issues/242
 * XT исправлена ошибка по неправильной стоимости доставки https://github.com/wpcraft-ru/wooms/issues/244
 
-= 6.1 = 
+= 6.1 =
 * исправлена ошибка по дублированию картинок https://github.com/wpcraft-ru/wooms/issues/221
 * добавлен вывод ошибок в новой странице Инструменты->Здоровье сайта ( проверка и вывод всех возможных ошибок )
 * перенесено большинство крон задач на Action Sheduler
@@ -245,8 +245,8 @@ PHP 5.6
 
 = 6.0 =
 * добавлена поддержка галлереи изображений продукта https://github.com/wpcraft-ru/wooms/issues/27
-* XT улучшена работа обновления статусов из Сайта на Склад - удалено накопление очереди без активной опции 
-* XT улучшен лог передачи данных по юр лицам 
+* XT улучшена работа обновления статусов из Сайта на Склад - удалено накопление очереди без активной опции
+* XT улучшен лог передачи данных по юр лицам
 
 = < 6.0 =
 * More https://github.com/wpcraft-ru/wooms/releases
