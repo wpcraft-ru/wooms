@@ -13,7 +13,7 @@ const CONFIG_KEY = 'product_skip_if_no_sku';
 
 add_action('admin_init', __NAMESPACE__ . '\\add_settings', 30);
 
-add_filter('wooms_skip_product_import', __NAMESPACE__ . '\\explude_products_from_walker', 20, 2);
+add_filter('wooms_skip_product_import', __NAMESPACE__ . '\\process', 20, 2);
 
 function process($is_skip, $item)
 {
