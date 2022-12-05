@@ -106,6 +106,8 @@ class MenuSettings
 
 		add_settings_section('woomss_section_login', 'Данные для доступа МойСклад', null, 'mss-settings');
 
+    register_setting( 'mss-settings', 'wooms_config' );
+
 		register_setting('mss-settings', 'woomss_login');
 		add_settings_field(
 			$id = 'woomss_login',
@@ -239,11 +241,11 @@ class MenuSettings
 
 	?>
 		<form method="POST" action="options.php">
-		
+
 			<h1>Настройки интеграции МойСклад</h1>
 
 			<?php do_action('wooms_settings_after_header') ?>
-		
+
 			<?php
 
 			settings_fields('mss-settings');
