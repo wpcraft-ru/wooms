@@ -53,24 +53,31 @@ class MenuTools {
       sprintf('<a href="%s">Настройки</a>', admin_url("admin.php?page=mss-settings") ),
       '<a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>',
       sprintf('<a href="%s">Диагностика проблем</a>', admin_url("site-health.php") ),
-      '<a href="https://wpcraft.ru/wordpress/hosting/" target="_blank">Рекомендуемые хостинги</a>',
-      '<a href="https://wpcraft.ru/wordpress-woocommerce-mentoring/" target="_blank">Сопровождение магазинов и консалтинг</a>',
+      '<a href="https://wpcraft.ru/hosting-wordpress-woocommerce/" target="_blank">Рекомендуемые хостинги</a>',
+      '<a href="https://wpcraft.ru/contacts/" target="_blank">Контакты</a>',
     ];
 
     printf( '<p>%s</p>', implode('<span> | </span>', $items) );
 
-    if( empty($_GET['a']) ){
-      do_action('woomss_tool_actions_btns');
-
-      do_action('wooms_tools_sections');
-
+    if(empty(get_option('woomss_pass'))){
+      printf('<p>Укажите логин и пароль на <a href="%s">странице настроек</a></p>', admin_url('admin.php?page=mss-settings'));
     } else {
+      if( empty($_GET['a']) ){
 
-      printf('<a href="%s">Вернуться...</a>', remove_query_arg( 'a', self::$url));
-      do_action('woomss_tool_actions');
-      do_action('woomss_tool_actions_' . $_GET['a']);
+        do_action('wooms_tools_sections');
 
+        // deprecated
+        do_action('woomss_tool_actions_btns');
+
+      } else {
+
+        printf('<a href="%s">Вернуться...</a>', remove_query_arg( 'a', self::$url));
+        do_action('woomss_tool_actions');
+        do_action('woomss_tool_actions_' . $_GET['a']);
+
+      }
     }
+
 
   }
 

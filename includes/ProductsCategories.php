@@ -2,9 +2,7 @@
 
 namespace WooMS;
 
-if (!defined('ABSPATH')) {
-  exit; // Exit if accessed directly
-}
+defined('ABSPATH') || exit;
 
 /**
  * Import Product Categories from MoySklad
@@ -17,16 +15,6 @@ class ProductsCategories
    */
   public static function init()
   {
-
-    // add_action('init', function () {
-    //   if (!isset($_GET['dd'])) {
-    //     return;
-    //   }
-
-    //   dd(get_option());
-
-    //   dd(0);
-    // });
 
     add_filter('wooms_product_save', array(__CLASS__, 'product_save'), 10, 3);
     add_filter('wooms_product_save', array(__CLASS__, 'add_ancestors'), 15, 2);
@@ -332,7 +320,7 @@ class ProductsCategories
   public static function add_settings()
   {
 
-    add_settings_section('wooms_product_cat', 'Категории продуктов', null, 'mss-settings');
+    add_settings_section('wooms_product_cat', 'Категории продуктов', __return_empty_string(), 'mss-settings');
 
     self::add_setting_categories_sync_enabled();
     self::add_setting_include_children();

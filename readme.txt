@@ -80,8 +80,12 @@ PHP 7.0
 
 == Changelog ==
 
-= 9.0.1 =
+= 9.1 =
+- возврат опции про пропуск продуктов без артикула https://github.com/wpcraft-ru/wooms/issues/461
+- из карточки товара в WP пропал блок с ссылкой на этот же товар в МС https://github.com/wpcraft-ru/wooms/issues/468
+- тест WooCommerce 7.2.2
 - исправлена ошибка синхронизации вариаций
+- мелкие исправления и рефакторинг
 
 = 9.0 =
 - Плагин стал бесплатным - изменения 2022 https://github.com/wpcraft-ru/wooms/wiki/2022

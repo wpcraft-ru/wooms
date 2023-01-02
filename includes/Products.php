@@ -14,23 +14,26 @@ add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
 add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
 add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 
-add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
+add_action('wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 
-add_action('init', function(){
+add_action('add_meta_boxes', function () {
+  add_meta_box('wooms_product', 'МойСклад', __NAMESPACE__ . '\\display_metabox_for_product', 'product', 'side', 'low');
+});
+
+add_action('init', function () {
   if (!wp_next_scheduled('wooms_monitoring')) {
-    wp_schedule_event( time(), 'every_minute', 'wooms_monitoring' );
+    wp_schedule_event(time(), 'every_minute', 'wooms_monitoring');
   }
 });
-add_action('wooms_monitoring', __NAMESPACE__ . '\\check_and_restart_job_queue');
 
 /**
  * main walker for start sync
  */
 function walker($args = [])
 {
-  if(empty($args)){
+  if (empty($args)) {
     walker_started();
     $state = get_state();
   } else {
@@ -63,7 +66,7 @@ function walker($args = [])
 
     $data = wooms_request($url);
 
-    if(isset($data['errors'])){
+    if (isset($data['errors'])) {
       throw new \Exception(print_r($data['errors'], true));
     }
 
@@ -104,7 +107,7 @@ function walker($args = [])
 
 function process_rows($rows = [])
 {
-  if(empty($rows)){
+  if (empty($rows)) {
     return false;
   }
 
@@ -165,7 +168,8 @@ function stop_manually()
   exit;
 }
 
-function get_session_id(){
+function get_session_id()
+{
   return get_state('session_id');
 }
 
@@ -232,7 +236,7 @@ function update_product($product, $data_api, $data = 'deprecated')
   // issue https://github.com/wpcraft-ru/wooms/issues/302
   $product->set_catalog_visibility('visible');
 
-  if ( apply_filters('wooms_reset_state_products', true) ) {
+  if (apply_filters('wooms_reset_state_products', true)) {
     $product->set_stock_status('instock');
     $product->set_manage_stock('no');
     $product->set_status('publish');
@@ -291,7 +295,7 @@ function load_product($value)
 
   $product_id = get_product_id_by_uuid($value['id']);
 
-  if(empty($product_id) && !empty($value['article'])){
+  if (empty($product_id) && !empty($value['article'])) {
     $product_id = wc_get_product_id_by_sku($value['article']);
   }
 
@@ -461,7 +465,7 @@ function walker_started()
   $batch_size = get_option('wooms_batch_size', 20);
   $query_arg_default = [
     'offset' => 0,
-    'limit'  => apply_filters('wooms_iteration_size', $batch_size),
+    'limit' => apply_filters('wooms_iteration_size', $batch_size),
   ];
   // set_state('query_arg', );
 
@@ -505,7 +509,7 @@ function is_wait()
   }
 
   //if no password
-  if(empty(get_option('woomss_pass'))){
+  if (empty(get_option('woomss_pass'))) {
     return true;
   }
 
@@ -541,20 +545,21 @@ function render_ui()
 }
 
 
-function check_and_restart_job_queue(){
+function check_and_restart_job_queue()
+{
   $end_timestamp = get_state('end_timestamp');
   $is_enable_cron = get_option('woomss_walker_cron_enabled', false);
-  if(empty($end_timestamp)){
+  if (empty($end_timestamp)) {
     return false;
   }
-  if(empty($is_enable_cron)){
+  if (empty($is_enable_cron)) {
     return false;
   }
 
   $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
   $time_has_passed = time() - $end_timestamp;
 
-  if($time_has_passed < $timer){
+  if ($time_has_passed < $timer) {
     return false;
   }
 
@@ -580,7 +585,7 @@ function get_state($key = '')
 function set_state($key, $value = null)
 {
   $option_key = HOOK_NAME . '_state';
-  if(empty($value) && is_array($key)){
+  if (empty($value) && is_array($key)) {
     return update_option($option_key, $key);
   }
 
@@ -590,4 +595,31 @@ function set_state($key, $value = null)
   }
   $state[$key] = $value;
   return update_option($option_key, $state);
+}
+
+/**
+ * Meta box in product
+ */
+function display_metabox_for_product()
+{
+  $post = get_post();
+  $box_data = '';
+  $data_id = get_post_meta($post->ID, 'wooms_id', true);
+  $data_meta = get_post_meta($post->ID, 'wooms_meta', true);
+  $data_updated = get_post_meta($post->ID, 'wooms_updated', true);
+  if ($data_id) {
+    printf('<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id);
+  } else {
+    echo '<p>Товар еще не синхронизирован с МойСклад.</p> <p>Ссылка на товар отсутствует</p>';
+  }
+
+  if ($data_meta) {
+    printf('<p><a href="%s" target="_blank">Посмотреть товар в МойСклад</a></p>', $data_meta['uuidHref']);
+  }
+
+  if ($data_updated) {
+    printf('<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated);
+  }
+
+  do_action('wooms_display_product_metabox', $post->ID);
 }

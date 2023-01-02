@@ -43,7 +43,7 @@ class ProductStocks
     add_action('init', array(__CLASS__, 'add_schedule_hook'));
 
     add_action('admin_init', array(__CLASS__, 'add_settings'), 30);
-    add_action('woomss_tool_actions_btns', array(__CLASS__, 'display_state'), 17);
+    add_action('wooms_tools_sections', array(__CLASS__, 'display_state'), 17);
 
     add_filter('wooms_stock_type', array(__CLASS__, 'select_type_stock'));
 
