@@ -14,7 +14,7 @@ add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
 add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
 add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 
-add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 9);
+add_action('wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
 add_action('woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually');
 

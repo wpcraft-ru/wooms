@@ -9,7 +9,7 @@ add_action('init', function () {
   add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\add_task_for_hide');
   add_action('wooms_main_walker_started', __NAMESPACE__ . '\\remove_task_for_hide');
   add_action('admin_init', __NAMESPACE__ . '\\add_settings');
-  add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\display_state', 22);
+  add_action('wooms_tools_sections', __NAMESPACE__ . '\\display_state', 22);
 });
 
 function walker($state = [])

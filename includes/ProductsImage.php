@@ -7,7 +7,7 @@ const HOOK_NAME = 'wooms_product_image_sync';
 add_action('init', function () {
     add_action('wooms_product_image_sync', __NAMESPACE__ . '\\walker');
     add_filter('wooms_product_save', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
-    add_action('woomss_tool_actions_btns', __NAMESPACE__ . '\\render_ui', 15);
+    add_action('wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 15);
     add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
     add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\restart');
 });

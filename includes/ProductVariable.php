@@ -45,7 +45,7 @@ class ProductVariable
     add_action('wooms_main_walker_finish', array(__CLASS__, 'reset_after_main_walker_finish'));
     add_action('wooms_main_walker_started', array(__CLASS__, 'set_wait'));
 
-    add_action('woomss_tool_actions_btns', array(__CLASS__, 'display_state'), 15);
+    add_action('wooms_tools_sections', array(__CLASS__, 'display_state'), 15);
 
     add_action('woocommerce_variation_header', array(__CLASS__, 'variation_sync_id'), 10);
   }
