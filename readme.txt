@@ -35,7 +35,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 Страница плагина: [https://wordpress.org/plugins/wooms/](https://wordpress.org/plugins/wooms/)
 
-Roadmap (Статус задач по разработке): [https://github.com/wpcraft-ru/wooms/projects/1](https://github.com/wpcraft-ru/wooms/projects/1)
+Статус задач по разработке: [https://github.com/orgs/wpcraft-ru/projects/2](roadmap)
 
 Плагин спроектирован таким образом, что относительно просто позволяет дорабатывать механику под задачи и автоматизацию конкретного магазина/каталога.
 
@@ -81,11 +81,12 @@ PHP 7.0
 == Changelog ==
 
 = 9.1 =
-- возврат опции про пропуск продуктов без артикула https://github.com/wpcraft-ru/wooms/issues/461
-- из карточки товара в WP пропал блок с ссылкой на этот же товар в МС https://github.com/wpcraft-ru/wooms/issues/468
+- fix. возврат опции про пропуск продуктов без артикула https://github.com/wpcraft-ru/wooms/issues/461
+- fix. из карточки товара в WP пропал блок с ссылкой на этот же товар в МС https://github.com/wpcraft-ru/wooms/issues/468
+- fix. При передачи заказа в мой склад передается только карточка клиента, а суммы заказа, наименование товара, зарезервировано - не отображается https://github.com/wpcraft-ru/wooms/issues/469
+- fix. исправлена ошибка синхронизации вариаций
+- fix. мелкие исправления и рефакторинг
 - тест WooCommerce 7.2.2
-- исправлена ошибка синхронизации вариаций
-- мелкие исправления и рефакторинг
 
 = 9.0 =
 - Плагин стал бесплатным - изменения 2022 https://github.com/wpcraft-ru/wooms/wiki/2022
