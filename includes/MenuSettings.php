@@ -261,7 +261,7 @@ class MenuSettings
 		printf('<p><a href="%s" target="_blank">Расширения и дополнения</a></p>', "https://github.com/topics/wooms");
 		printf('<p><a href="%s" target="_blank">Предложения по улучшению и запросы на доработку</a></p>', "https://github.com/wpcraft-ru/wooms/issues");
 		printf('<p><a href="%s" target="_blank">Рекомендуемые хостинги</a></p>', "https://wpcraft.ru/hosting-wordpress-woocommerce/");
-		printf('<p><a href="%s" target="_blank">Контакты</a></p>', "https://wpcraft.ru/contacts/");
+		printf('<p><a href="%s" target="_blank">Контакты</a></p>', "https://wpcraft.ru/wooms/");
 	}
 }
 
