@@ -6,10 +6,21 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
+const OPTION_KEY = 'wooms_config';
+const OPTIONS_PAGE = 'mss-settings';
+
+function get_config($key = null){
+  $config = get_option(OPTION_KEY, []);
+  if(empty($key)){
+    return $config;
+  }
+  return $config[$key] ?? null;
+}
+
 /**
  * Settings
  */
-class MenuSettings
+class Settings
 {
 
 	/**
@@ -41,8 +52,7 @@ class MenuSettings
 			30
 		);
 
-		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
-		add_action('admin_init', array(__CLASS__, 'settings_shedules'), $priority = 20, $accepted_args = 1);
+		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 5, $accepted_args = 1);
 		add_action('admin_init', array(__CLASS__, 'settings_other'), $priority = 100, $accepted_args = 1);
 
 		add_action('wooms_settings_after_header', [__CLASS__, 'render_nav_menu']);
@@ -64,42 +74,8 @@ class MenuSettings
 	}
 
 
-	public static function settings_shedules()
-	{
 
-		add_settings_section('wooms_section_cron', 'Расписание синхронизации', null, 'mss-settings');
 
-		register_setting('mss-settings', 'woomss_walker_cron_enabled');
-		add_settings_field(
-			$id = 'woomss_walker_cron_enabled',
-			$title = 'Включить синхронизацию продуктов по расписанию',
-			$callback = array(__CLASS__, 'woomss_walker_cron_display',),
-			$page = 'mss-settings',
-			$section = 'wooms_section_cron'
-		);
-
-		register_setting('mss-settings', 'woomss_walker_cron_timer');
-		add_settings_field(
-			$id = 'woomss_walker_cron_timer',
-			$title = 'Перерыв синхронизации в часах',
-			$callback = array(__CLASS__, 'woomss_walker_cron_timer_display',),
-			$page = 'mss-settings',
-			$section = 'wooms_section_cron'
-		);
-	}
-
-	public static function woomss_walker_cron_timer_display()
-	{
-		$option_name = 'woomss_walker_cron_timer';
-		printf('<input type="number" name="%s" value="%s"  />', $option_name, get_option($option_name, 24));
-	}
-
-	public static function woomss_walker_cron_display()
-	{
-
-		$option_name = 'woomss_walker_cron_enabled';
-		printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked(1, get_option($option_name), false));
-	}
 
 	public static function settings_general()
 	{
@@ -265,4 +241,4 @@ class MenuSettings
 	}
 }
 
-MenuSettings::init();
+Settings::init();

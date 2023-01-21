@@ -78,6 +78,10 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.2 =
+- fix. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
+- тест WooCommerce 7.3.0
+
 = 9.1 =
 - fix. возврат опции про пропуск продуктов без артикула https://github.com/wpcraft-ru/wooms/issues/461
 - fix. из карточки товара в WP пропал блок с ссылкой на этот же товар в МС https://github.com/wpcraft-ru/wooms/issues/468
