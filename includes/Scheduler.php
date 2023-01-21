@@ -73,5 +73,3 @@ function add_settings()
     ]
   );
 }
-
-
