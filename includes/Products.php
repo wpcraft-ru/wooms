@@ -22,11 +22,6 @@ add_action('add_meta_boxes', function () {
   add_meta_box('wooms_product', 'МойСклад', __NAMESPACE__ . '\\display_metabox_for_product', 'product', 'side', 'low');
 });
 
-add_action('init', function () {
-  if (!wp_next_scheduled('wooms_monitoring')) {
-    wp_schedule_event(time(), 'every_minute', 'wooms_monitoring');
-  }
-});
 
 /**
  * main walker for start sync
@@ -544,29 +539,6 @@ function render_ui()
   do_action('wooms_products_display_state');
 }
 
-
-function check_and_restart_job_queue()
-{
-  $end_timestamp = get_state('end_timestamp');
-  $is_enable_cron = get_option('woomss_walker_cron_enabled', false);
-  if (empty($end_timestamp)) {
-    return false;
-  }
-  if (empty($is_enable_cron)) {
-    return false;
-  }
-
-  $timer = 60 * 60 * intval(get_option('woomss_walker_cron_timer', 24));
-  $time_has_passed = time() - $end_timestamp;
-
-  if ($time_has_passed < $timer) {
-    return false;
-  }
-
-  as_schedule_single_action(time(), HOOK_NAME, [], 'WooMS');
-
-  return true;
-}
 
 function get_state($key = '')
 {
