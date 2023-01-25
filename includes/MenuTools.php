@@ -54,7 +54,7 @@ class MenuTools {
       '<a href="https://online.moysklad.ru/app/" target="_blank">Вход в МойСклад</a>',
       sprintf('<a href="%s">Диагностика проблем</a>', admin_url("site-health.php") ),
       '<a href="https://wpcraft.ru/hosting-wordpress-woocommerce/" target="_blank">Рекомендуемые хостинги</a>',
-      '<a href="https://wpcraft.ru/contacts/" target="_blank">Контакты</a>',
+      '<a href="https://wpcraft.ru/wooms/" target="_blank">Контакты</a>',
     ];
 
     printf( '<p>%s</p>', implode('<span> | </span>', $items) );

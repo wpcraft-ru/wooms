@@ -167,6 +167,7 @@ class ProductsCategories
       }
 
       if (apply_filters('wooms_skip_update_select_category', true, $url_parent)) {
+        $args_update = apply_filters('wooms_update_category_args', $args_update, $term_id, $data);
         $term = wp_update_term($term_id, 'product_cat', $args_update);
       }
 
