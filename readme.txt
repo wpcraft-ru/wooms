@@ -80,6 +80,8 @@ PHP 7.0
 
 = 9.2 =
 - fix. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
+- удаление продуктов https://github.com/wpcraft-ru/wooms/issues/456
+- очередная проверка хостинга https://github.com/wpcraft-ru/wooms/issues/466
 - тест WooCommerce 7.3.0
 
 = 9.1 =

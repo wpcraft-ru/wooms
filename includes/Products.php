@@ -279,9 +279,6 @@ function add_product($data_source)
  */
 function load_product($value)
 {
-  if (!empty($value['archived'])) {
-    return false;
-  }
 
   /**
    * Определение способов связи
@@ -289,6 +286,13 @@ function load_product($value)
   $product_id = 0;
 
   $product_id = get_product_id_by_uuid($value['id']);
+
+  if (!empty($value['archived'])) {
+    if($product_id){
+      wp_delete_post($product_id);
+    }
+    return false;
+  }
 
   if (empty($product_id) && !empty($value['article'])) {
     $product_id = wc_get_product_id_by_sku($value['article']);
