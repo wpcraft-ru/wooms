@@ -79,10 +79,11 @@ PHP 7.0
 == Changelog ==
 
 = 9.2 =
-- fix. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
-- удаление продуктов https://github.com/wpcraft-ru/wooms/issues/456
-- очередная проверка хостинга https://github.com/wpcraft-ru/wooms/issues/466
-- тест WooCommerce 7.3.0
+- Исправлено. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
+- Удаление продуктов на сайте если удален на складе https://github.com/wpcraft-ru/wooms/issues/456
+- Добавлен Хук для изменения описания категории https://github.com/wpcraft-ru/wooms/issues/463
+- Очередная проверка хостинга https://github.com/wpcraft-ru/wooms/issues/466
+- Тест совместимости WooCommerce 7.3.0
 
 = 9.1 =
 - fix. возврат опции про пропуск продуктов без артикула https://github.com/wpcraft-ru/wooms/issues/461
