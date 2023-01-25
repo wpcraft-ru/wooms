@@ -55,7 +55,6 @@ add_action('plugins_loaded', function () {
 });
 
 add_filter('wooms_xt_load', '__return_false');
-add_filter("plugin_action_links_" . plugin_basename(__FILE__), __NAMESPACE__ . '\\plugin_add_settings_link');
 add_filter('plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2);
 add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\xt_plugin_update_message', 10, 2);
 
@@ -77,17 +76,6 @@ function xt_plugin_update_message($data, $response)
 }
 
 
-/**
- * Add Settings link in pligins list
- */
-function plugin_add_settings_link($links)
-{
-  $settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
-  $xt_link = '<a href="https://github.com/wpcraft-ru/wooms/wiki/2022" target="_blank">Изменения 2022</a>';
-  array_unshift($links, $xt_link);
-  array_unshift($links, $settings_link);
-  return $links;
-}
 
 
 /**
