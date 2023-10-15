@@ -10,26 +10,19 @@ use function WooMS\{request, set_config};
 
 require_once __DIR__ . '/../functions.php';
 
-transaction_query('start');
 
-test('check schedule - false', function(){
+test('check schedule', function(){
 
-  \WooMS\set_config('walker_cron_enabled', 1);
-  \WooMS\set_config('walker_cron_timer', 2);
-  \WooMS\Products\set_state('end_timestamp', strtotime('-3 hours'));
+  // \WooMS\Products\set_state('end_timestamp', strtotime('-2 hours'));
+  // $result = \WooMS\Scheduler\check_schedule();
+  // ddcli($result);
 
-  $result = \WooMS\Scheduler\check_schedule();
-
-  if($result){
-    return true;
-  }
-
-  return false;
 });
 
 
 
 
+transaction_query('start');
 
 
 

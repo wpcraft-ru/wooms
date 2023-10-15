@@ -20,12 +20,14 @@ add_action('admin_init', __NAMESPACE__ . '\\add_settings', 20);
 
 
 function check_schedule(){
+
   if(empty(get_config('walker_cron_enabled'))){
     return false;
   }
 
   $end_timestamp = \WooMS\Products\get_state('end_timestamp');
   if (empty($end_timestamp)) {
+
     return false;
   }
 
