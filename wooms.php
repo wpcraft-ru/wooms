@@ -184,3 +184,8 @@ function request($path = '', $data = array(), $type = 'GET'){
 
   return $response;
 }
+
+
+function get_session_id(){
+  return \WooMS\Products\get_session_id();
+}
