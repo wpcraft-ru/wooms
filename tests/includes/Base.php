@@ -5,11 +5,14 @@ namespace WooMS\Tests\Base;
 use function Testeroid\{test, transaction_query, ddcli};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows, walker};
 
+transaction_query('start');
+
 test('wooms active?', function(){
   $can_start = wooms_can_start();
   return $can_start;
 
 });
+
 
 
 /**
@@ -45,3 +48,6 @@ test('Test walker', function(){
   return true;
 
 });
+
+
+transaction_query('rollback');

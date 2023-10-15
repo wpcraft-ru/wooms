@@ -104,7 +104,6 @@ function walker( $args = [] ) {
 
 		$args['rows_in_bunch'] += count( $data['rows'] );
 		$args['query_arg']['offset'] += count( $data['rows'] );
-		$args['latest_timer_stop'] = timer_stop();
 
 		// set_state( $args );
 
