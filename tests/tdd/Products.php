@@ -11,6 +11,9 @@ use function WooMS\{request, set_config};
 require_once __DIR__ . '/../functions.php';
 
 
+transaction_query('start');
+
+
 test('check schedule', function(){
 
   // \WooMS\Products\set_state('end_timestamp', strtotime('-2 hours'));
@@ -22,33 +25,8 @@ test('check schedule', function(){
 
 
 
-transaction_query('start');
 
 
-
-test('Test walker', function(){
-
-  $now = $now = date("YmdHis");
-
-  $args = [
-    'session_id' => $now,
-    'query_arg' => [
-      'offset' => 20,
-      'limit' => get_option('wooms_batch_size', 20),
-    ],
-    'rows_in_bunch' => 20,
-    'timestamp' => $now,
-    'end_timestamp' => 0,
-  ];
-
-  $r = walker($args);
-
-
-
-
-  ddcli($r);
-
-}, 0);
 
 test('check load simple product', function(){
 
