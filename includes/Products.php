@@ -2,6 +2,10 @@
 
 namespace WooMS\Products;
 
+use function WooMS\request;
+use function Testeroid\ddcli;
+use Error, Throwable;
+
 defined('ABSPATH') || exit;
 
 const HOOK_NAME = 'wooms_products_walker';
@@ -12,7 +16,7 @@ add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
 // add_action('init', __NAMESPACE__ . '\\add_schedule_hook');
 
 add_action('wooms_product_data_item', __NAMESPACE__ . '\\load_product');
-add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
+// add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 
 add_action('wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 9);
 add_action('woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually');
@@ -40,7 +44,7 @@ function walker($args = [])
   /**
    * issue https://github.com/wpcraft-ru/wooms/issues/296
    */
-  $url = 'https://online.moysklad.ru/api/remap/1.2/entity/product';
+  $url = 'entity/product';
 
   $url = add_query_arg($query_arg, $url);
 
@@ -59,7 +63,7 @@ function walker($args = [])
 
   try {
 
-    $data = wooms_request($url);
+    $data = request($url);
 
     if (isset($data['errors'])) {
       throw new \Exception(print_r($data['errors'], true));
@@ -87,7 +91,7 @@ function walker($args = [])
 
     do_action('wooms_products_batch_end');
     return ['result' => 'restart'];
-  } catch (\Exception $e) {
+  } catch (Throwable $e) {
 
     /**
      * need to protect the site
@@ -106,9 +110,9 @@ function process_rows($rows = [])
     return false;
   }
 
-  foreach ($rows as $key => $value) {
+  foreach ($rows as $row) {
 
-    if (apply_filters('wooms_skip_product_import', false, $value)) {
+    if (apply_filters('wooms_skip_product_import', false, $row)) {
       continue;
     }
 
@@ -116,18 +120,21 @@ function process_rows($rows = [])
      * в выдаче могут быть не только товары, но и вариации и мб что-то еще
      * птм нужна проверка что это точно продукт
      */
-    if ('variant' == $value["meta"]["type"]) {
+    if ('variant' == $row["meta"]["type"]) {
       continue;
     }
 
+    $data = apply_filters('wooms_product_data', [], $row);
+    product_update($row, $data);
 
-    do_action('wooms_product_data_item', $value);
+    // do_action('wooms_product_data_item', $row);
 
   }
 
   return true;
 
 }
+
 
 /**
  * Start manually actions
@@ -275,9 +282,159 @@ function add_product($data_source)
 
 
 /**
+ * to replace load_product
+ */
+function product_update( array $row, array $data = []){
+
+  $product_id = 0;
+
+  $product_id = get_product_id_by_uuid($row['id']);
+
+  if (!empty($row['archived'])) {
+    if($product_id){
+      wp_delete_post($product_id);
+    }
+    return false;
+  }
+
+  if (empty($product_id) && !empty($row['article'])) {
+    $product_id = wc_get_product_id_by_sku($row['article']);
+  }
+
+  //попытка получить id по другим параметрам
+  if (empty($product_id)) {
+    $product_id = apply_filters('wooms_get_product_id', $product_id, $row);
+  }
+
+  //создаем продукт, если не нашли
+  if (empty(intval($product_id))) {
+    $product_id = add_product($row);
+  }
+
+
+  if (empty(intval($product_id))) {
+    do_action(
+      'wooms_logger_error',
+      __NAMESPACE__,
+      'Ошибка определения и добавления ИД продукта',
+      $row
+    );
+    return false;
+  }
+
+  $product = wc_get_product($product_id);
+
+  /**
+   * rename vars
+   */
+  $data_api = $row;
+
+  $product->update_meta_data('wooms_id_' . $row['id'], 1);
+
+  /**
+   * Хук позволяет работать с методами WC_Product
+   * Сохраняет в БД все изменения за 1 раз
+   * Снижает нагрузку на БД
+   *
+   * DEPRECATED
+   */
+   $product = apply_filters('wooms_product_save', $product, $data_api, $product_id);
+
+
+
+  //save data of source
+  if (apply_filters('wooms_logger_enable', false)) {
+    $product->update_meta_data('wooms_data_api', json_encode($data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+  } else {
+    $product->delete_meta_data('wooms_data_api');
+  }
+
+  $data_of_source = $data_api;
+
+  //Set session id for product
+  if ($session_id = get_state('session_id')) {
+    $product->update_meta_data('wooms_session_id', $session_id);
+  }
+
+  $product->update_meta_data('wooms_updated_timestamp', date("Y-m-d H:i:s"));
+
+  $product->update_meta_data('wooms_id', $data_api['id']);
+
+  $product->update_meta_data('wooms_updated_from_api', $data_api['updated']);
+
+  //update title
+  if (isset($data_api['name']) and $data_api['name'] != $product->get_title()) {
+    if (!empty(get_option('wooms_replace_title'))) {
+      $product->set_name($data_api['name']);
+    }
+  }
+
+  $product_description = isset($data_of_source['description']) ? $data_of_source['description'] : '';
+  //update description
+  if (apply_filters('wooms_added_description', true, $product_description)) {
+
+    if ($product_description && !empty(get_option('wooms_replace_description'))) {
+
+      if (get_option('wooms_short_description')) {
+        $product->set_short_description($product_description);
+      } else {
+        $product->set_description($product_description);
+      }
+    } else {
+
+      if (empty($product->get_description())) {
+
+        if (get_option('wooms_short_description')) {
+          $product->set_short_description($product_description);
+        } else {
+          $product->set_description($product_description);
+        }
+      }
+    }
+  }
+
+  //Price Retail 'salePrices'
+  if (isset($data_of_source['salePrices'][0]['value'])) {
+
+    $price_source = floatval($data_of_source['salePrices'][0]['value']);
+
+    $price = floatval($price_source) / 100;
+
+    $product->set_price($price);
+    $product->set_regular_price($price);
+  }
+
+  // issue https://github.com/wpcraft-ru/wooms/issues/302
+  $product->set_catalog_visibility('visible');
+
+  if (apply_filters('wooms_reset_state_products', true)) {
+    $product->set_stock_status('instock');
+    $product->set_manage_stock(false);
+    $product->set_status('publish');
+  }
+
+  $product = apply_filters('wooms_product_update', $product, $row, $data);
+
+  // return $product;
+
+  $product_id = $product->save();
+
+  do_action(
+    'wooms_logger',
+    __NAMESPACE__,
+    sprintf('Продукт: %s (%s) сохранен', $product->get_title(), $product_id)
+  );
+
+  return $product;
+
+}
+
+
+
+/**
  * Load data and set product type simple
  */
-function load_product($value)
+function load_product( array $value )
 {
 
   /**
@@ -437,10 +594,6 @@ function add_settings()
   do_action('wooms_add_settings');
 }
 
-
-/**
- * get_product_id_by_uuid
- */
 function get_product_id_by_uuid($uuid)
 {
   $args = [

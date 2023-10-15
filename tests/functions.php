@@ -1,0 +1,15 @@
+<?php
+
+namespace WooMS\Tests;
+
+function getProductsRows(){
+  $strJsonFileContents = file_get_contents(__DIR__ . "/data/products.json");
+  $data = json_decode($strJsonFileContents, true);
+  return $data['rows'];
+}
+
+function getVariantsRows(){
+  $strJsonFileContents = file_get_contents(__DIR__ . "/data/variants.json");
+  $data = json_decode($strJsonFileContents, true);
+  return $data['rows'];
+}
