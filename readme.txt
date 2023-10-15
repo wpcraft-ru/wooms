@@ -78,6 +78,10 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.3 =
+- Тест совместимости WooCommerce 8.2.0
+- Реализация новой версии REST API MoySklad
+
 = 9.2 =
 - Исправлено. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
 - Удаление продуктов на сайте если удален на складе https://github.com/wpcraft-ru/wooms/issues/456
