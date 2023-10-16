@@ -43,10 +43,10 @@ function walker( $args = [] ) {
 
 		$now = date( "YmdHis" );
 
-    set_state('session_id', $now);
+		set_state( 'session_id', $now );
 
 		$args = [
-			'session_id' => get_state('session_id'),
+			'session_id' => get_state( 'session_id' ),
 			'query_arg' => [
 				'offset' => 0,
 				'limit' => get_option( 'wooms_batch_size', 20 ),
@@ -107,7 +107,7 @@ function walker( $args = [] ) {
 
 		// set_state( $args );
 
-		as_schedule_single_action( time(), HOOK_NAME, [$args], 'WooMS' );
+		as_schedule_single_action( time(), HOOK_NAME, [ $args ], 'WooMS' );
 
 		do_action( 'wooms_products_batch_end' );
 
