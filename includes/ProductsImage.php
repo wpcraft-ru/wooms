@@ -326,7 +326,7 @@ function add_settings()
         'Замена изображении при синхронизации',
         $callback = function ($args) {
             $option = 'woomss_images_sync_enabled';
-            $desc = '<small>Если включить опцию, то плагин будет загружать изображения из МойСклад.</small>';
+            $desc = '<small>Если включить опцию, то плагин будет проверять и заменять изображения из МойСклад если они там обновятся.</small>';
             printf('<input type="checkbox" name="%s" value="1" %s /> %s', $args['key'], $args['value'], $desc);
         },
         $page = 'mss-settings',

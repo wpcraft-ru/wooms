@@ -1,5 +1,7 @@
 <?php
 
+
+
 /**
  * General functions
  */
@@ -13,6 +15,7 @@
  */
 function wooms_request($url = '', $data = array(), $type = 'GET')
 {
+
   if (empty($url)) {
     return false;
   }
@@ -256,3 +259,5 @@ function wooms_get_timestamp_last_job_by_hook($hook = null){
   $date->setTimezone(new \DateTimeZone(wp_timezone_string()));
   return $date->format('Y-m-d H:i:s');
 }
+
+

@@ -58,9 +58,7 @@ class SiteHealthWebHooks
      */
     public static function check_webhooks()
     {
-        $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/webhook';
 
-        $employee_url = 'https://online.moysklad.ru/api/remap/1.1/context/employee';
 
         // создаем веб хук в МойСклад
         $data   = array(
@@ -68,7 +66,8 @@ class SiteHealthWebHooks
             'action'     => "UPDATE",
             "entityType" => "customerorder",
         );
-        $api_result = wooms_request($url, $data);
+
+        $api_result = request('entity/webhook', $data);
 
         $result = [
             'label' => "Проверка подписки МойСклад",
@@ -93,7 +92,7 @@ class SiteHealthWebHooks
         }
 
         // Checking permissions too
-        $data_api_p = wooms_request($employee_url, [], 'GET');
+        $data_api_p = request('context/employee', [], 'GET');
 
         foreach ($data_api_p['permissions']['webhook'] as $permission) {
             if (!$permission) {

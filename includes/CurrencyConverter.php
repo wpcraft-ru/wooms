@@ -28,8 +28,7 @@ class CurrencyConverter
         }
 
         if (!$currency = get_transient('wooms_currency_api')) {
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/currency/';
-            $currency = wooms_request($url);
+            $currency = request('entity/currency/');
             set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
         }
 
@@ -67,8 +66,7 @@ class CurrencyConverter
 
     public static function update_price_by_rate($price = 0, $api_currency = 'RUB'){
         if (!$currency = get_transient('wooms_currency_api')) {
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/currency/';
-            $currency = wooms_request($url);
+            $currency = request('entity/currency');
             set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
         }
 
@@ -95,8 +93,7 @@ class CurrencyConverter
         $price_currency_href = $price_meta['currency']['meta']['href'];
 
         if (!$currency = get_transient('wooms_currency_api')) {
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/currency/';
-            $currency = wooms_request($url);
+            $currency = request('entity/currency');
             set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
         }
 

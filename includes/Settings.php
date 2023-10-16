@@ -17,6 +17,13 @@ function get_config($key = null){
   return $config[$key] ?? null;
 }
 
+function set_config($key, $value){
+  $config = get_option(OPTION_KEY, []);
+  $config[$key] = $value;
+  return update_option(OPTION_KEY, $config, false);
+}
+
+
 /**
  * Settings
  */

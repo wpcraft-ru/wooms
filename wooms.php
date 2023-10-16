@@ -19,7 +19,7 @@
  * WC requires at least: 7.0
  * WC tested up to: 7.2.2
  *
- * Version: 9.2
+ * Version: 9.3
  */
 
 namespace WooMS;
@@ -55,9 +55,19 @@ add_action('plugins_loaded', function () {
 });
 
 add_filter('wooms_xt_load', '__return_false');
-add_filter("plugin_action_links_" . plugin_basename(__FILE__), __NAMESPACE__ . '\\plugin_add_settings_link');
 add_filter('plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2);
 add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\xt_plugin_update_message', 10, 2);
+
+add_filter( "plugin_action_links_" . plugin_basename(__FILE__), function($links){
+	$mng_link = '<a href="admin.php?page=moysklad">Управление</a>';
+	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
+    $ask = '<a href="https://wpcraft.ru/wooms/?utm_source=plugin" target="_blank">Консультации</a>';
+    array_unshift($links, $ask);
+    array_unshift($links, $mng_link);
+    array_unshift($links, $settings_link);
+    return $links;
+});
+
 
 function xt_plugin_update_message($data, $response)
 {
@@ -77,17 +87,7 @@ function xt_plugin_update_message($data, $response)
 }
 
 
-/**
- * Add Settings link in pligins list
- */
-function plugin_add_settings_link($links)
-{
-  $settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
-  $xt_link = '<a href="https://github.com/wpcraft-ru/wooms/wiki/2022" target="_blank">Изменения 2022</a>';
-  array_unshift($links, $xt_link);
-  array_unshift($links, $settings_link);
-  return $links;
-}
+
 
 
 /**
@@ -97,7 +97,8 @@ function add_wooms_plugin_row_meta($links, $file)
 {
   if (strpos($file, 'wooms.php') !== false) {
     $new_links = array(
-      '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>'
+      '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>',
+      '<a style="color:green;" href="https://github.com/orgs/wpcraft-ru/projects/2" target="_blank"><strong>Задачи</strong></a>',
     );
 
     $links = array_merge($links, $new_links);
@@ -117,4 +118,87 @@ function admin_styles()
   $admin_style = plugin_dir_url(__FILE__) . 'css/admin.css';
 
   wp_enqueue_style('wooms_styles', $admin_style, array());
+}
+
+function request($path = '', $data = array(), $type = 'GET'){
+  // https://api.moysklad.ru/api/remap/1.2/
+
+
+  if (empty($path)) {
+    return false;
+  }
+
+  $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+
+
+  //@link https://github.com/wpcraft-ru/wooms/issues/177
+  $url = str_replace('product_id', 'product.id', $url);
+  $url = str_replace('store_id', 'store.id', $url);
+  $url = str_replace('consignment_id', 'consignment.id', $url);
+  $url = str_replace('variant_id', 'variant.id', $url);
+  $url = str_replace('productFolder_id', 'productFolder.id', $url);
+
+  if (!empty($data) && 'GET' == $type) {
+    $type = 'POST';
+  }
+  if ('GET' == $type) {
+    $data = null;
+  } else {
+    $data = json_encode($data);
+  }
+
+  $args = array(
+    'method'      => $type,
+    'timeout'     => 45,
+    'redirection' => 5,
+    'headers'     => array(
+      "Content-Type"  => 'application/json;charset=utf-8',
+      "Accept-Encoding" => "gzip",
+      'Authorization' => 'Basic ' .
+        base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
+    ),
+    'body'        => $data,
+  );
+
+  $request = wp_remote_request($url, $args);
+  if (is_wp_error($request)) {
+    do_action(
+      'wooms_logger_error',
+      $type = 'WooMS-Request',
+      $title = 'Ошибка REST API WP Error',
+      $desc = $request->get_error_message()
+    );
+
+    return false;
+  }
+
+  if (empty($request['body'])) {
+    do_action(
+      'wooms_logger_error',
+      $type = 'WooMS-Request',
+      $title = 'REST API вернулся без требуемых данных'
+    );
+
+    return false;
+  }
+
+  $response = json_decode($request['body'], true);
+
+  if (!empty($response["errors"]) and is_array($response["errors"])) {
+    foreach ($response["errors"] as $error) {
+      do_action(
+        'wooms_logger_error',
+        $type = 'WooMS-Request',
+        $title = $url,
+        $response
+      );
+    }
+  }
+
+  return $response;
+}
+
+
+function get_session_id(){
+  return \WooMS\Products\get_session_id();
 }
