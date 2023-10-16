@@ -25,6 +25,10 @@ function check_schedule(){
     return false;
   }
 
+  if ( as_next_scheduled_action( \WooMS\Products\HOOK_NAME ) ) {
+    return;
+  }
+
   $end_timestamp = \WooMS\Products\get_state('end_timestamp');
   if (empty($end_timestamp)) {
 
