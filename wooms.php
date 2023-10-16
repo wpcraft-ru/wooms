@@ -97,7 +97,8 @@ function add_wooms_plugin_row_meta($links, $file)
 {
   if (strpos($file, 'wooms.php') !== false) {
     $new_links = array(
-      '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>'
+      '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>',
+      '<a style="color:green;" href="https://github.com/orgs/wpcraft-ru/projects/2" target="_blank"><strong>Задачи</strong></a>',
     );
 
     $links = array_merge($links, $new_links);
