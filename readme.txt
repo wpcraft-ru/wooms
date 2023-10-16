@@ -80,7 +80,7 @@ PHP 7.0
 
 = 9.3 =
 - Тест совместимости WooCommerce 8.2.0
-- Реализация новой версии REST API MoySklad
+- Реализация новой версии REST API MoySklad (пока частично)
 
 = 9.2 =
 - Исправлено. Нет синхронизации остатков в автоматическом режиме https://github.com/wpcraft-ru/wooms/issues/473
