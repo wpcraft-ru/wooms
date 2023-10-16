@@ -1,6 +1,6 @@
 <?php
 
-namespace WooMS\Scheduler;
+namespace WooMS\ProductsScheduler;
 
 use function WooMS\get_config as get_config;
 // use function WooMS\Products\get_state as get_state;
