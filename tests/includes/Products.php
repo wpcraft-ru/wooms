@@ -16,7 +16,7 @@ test('check schedule - false', function(){
   \WooMS\set_config('walker_cron_timer', 2);
   \WooMS\Products\set_state('end_timestamp', strtotime('-3 hours'));
 
-  $result = \WooMS\Scheduler\check_schedule();
+  $result = \WooMS\ProductsScheduler\check_schedule();
 
   if($result){
     return true;
@@ -31,7 +31,7 @@ test('check schedule - true', function(){
   \WooMS\set_config('walker_cron_timer', 2);
   \WooMS\Products\set_state('end_timestamp', strtotime('-1 hours'));
 
-  $result = \WooMS\Scheduler\check_schedule();
+  $result = \WooMS\ProductsScheduler\check_schedule();
 
   if(empty($result)){
     return true;
