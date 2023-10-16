@@ -19,7 +19,7 @@
  * WC requires at least: 7.0
  * WC tested up to: 7.2.2
  *
- * Version: 9.2
+ * Version: 9.3
  */
 
 namespace WooMS;
@@ -58,6 +58,17 @@ add_filter('wooms_xt_load', '__return_false');
 add_filter('plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2);
 add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\xt_plugin_update_message', 10, 2);
 
+add_filter( "plugin_action_links_" . plugin_basename(__FILE__), function($links){
+	$mng_link = '<a href="admin.php?page=moysklad">Управление</a>';
+	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
+    $ask = '<a href="https://wpcraft.ru/wooms/?utm_source=plugin" target="_blank">Консультации</a>';
+    array_unshift($links, $ask);
+    array_unshift($links, $mng_link);
+    array_unshift($links, $settings_link);
+    return $links;
+});
+
+
 function xt_plugin_update_message($data, $response)
 {
 
@@ -74,6 +85,7 @@ function xt_plugin_update_message($data, $response)
     $wp_list_table->get_column_count()
   );
 }
+
 
 
 
