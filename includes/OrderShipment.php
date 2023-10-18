@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -21,7 +23,7 @@ class OrderShipment
 
     /**
      * skip import service if the service is shipment
-     * 
+     *
      * issue https://github.com/wpcraft-ru/wooms/issues/314
      */
     public static function skip_service_if_shipment($skip_boolean, $row_api_data)
@@ -39,7 +41,7 @@ class OrderShipment
 
     /**
      * chg_order_data
-     * 
+     *
      * fix https://github.com/wpcraft-ru/wooms/issues/186
      */
     public static function chg_order_data($data, $order_id)
@@ -77,9 +79,9 @@ class OrderShipment
      */
     public static function get_meta_for_shipment_item($order_shipment_item_code)
     {
-        $url = 'https://online.moysklad.ru/api/remap/1.2/entity/service';
+        $url = 'entity/service';
         $url = add_query_arg('filter=code', $order_shipment_item_code, $url);
-        $data = wooms_request($url);
+        $data = request($url);
 
         if (empty($data['rows'][0]['meta'])) {
             return false;

@@ -4,6 +4,9 @@ namespace WooMS;
 
 use Exception;
 
+use function WooMS\request;
+
+
 /**
  * Send statuses from moysklad.ru to WooCommerce
  */
@@ -71,11 +74,11 @@ class OrderUpdateFromMoySklad
 
     /**
      * update_order_status
-     * 
+     *
      * use hook wooms_update_order_from_moysklad
-     * 
+     *
      * @param \WC_Order $order
-     * 
+     *
      * @return \WC_Order - order object
      */
     public static function update_order_status($order, $data_api)
@@ -85,7 +88,7 @@ class OrderUpdateFromMoySklad
         }
 
         $state_url  = $data_api["state"]["meta"]["href"];
-        $state_data = wooms_request($state_url);
+        $state_data = request($state_url);
         if (empty($state_data['name'])) {
             return $order;
         }
@@ -116,9 +119,9 @@ class OrderUpdateFromMoySklad
 
     /**
      * update_order_items
-     * 
+     *
      * @param \WC_Order $order
-     * 
+     *
      * @return \WC_Order - order object
      */
     public static function update_order_items($order, $data_api)
@@ -130,7 +133,7 @@ class OrderUpdateFromMoySklad
 
         $url_api = $data_api['positions']['meta']['href'];
 
-        $data = wooms_request($url_api);
+        $data = request($url_api);
 
 
         $shipment_product_href = self::get_shipment_product_href();
@@ -219,7 +222,7 @@ class OrderUpdateFromMoySklad
 
     /**
      * get item_id from order and wooms_id
-     * 
+     *
      * @param string $wooms_uuid
      * @param \WC_Order $order
      */
@@ -246,7 +249,7 @@ class OrderUpdateFromMoySklad
 
     /**
      * Get wooms id from line item
-     * 
+     *
      * @param \WC_Order_Item_Product $line_item
      */
     public static function get_wooms_id_from_line_item($line_item)
@@ -271,10 +274,10 @@ class OrderUpdateFromMoySklad
 
     /**
      * Skip order update from site, if exist task to update from MoySklad
-     * 
+     *
      * @param bool $skip
      * @param \WC_Order $order
-     * 
+     *
      * @return bool - skip or no
      */
     public static function skip_order_update_from_site($skip, $order)
@@ -303,9 +306,9 @@ class OrderUpdateFromMoySklad
             return false;
         }
 
-        $url_api = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/service?filter=code=%s', $code);
+        $url_api = sprintf('entity/service?filter=code=%s', $code);
 
-        $data = wooms_request($url_api);
+        $data = request($url_api);
 
         if (empty($data['rows'][0]['meta']['href'])) {
             return false;
@@ -383,9 +386,9 @@ class OrderUpdateFromMoySklad
             return false;
         }
 
-        $url_api = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/customerorder/%s', $wooms_id);
+        $url_api = sprintf('entity/customerorder/%s', $wooms_id);
 
-        $data = wooms_request($url_api);
+        $data = request($url_api);
 
         $order = apply_filters('wooms_update_order_from_moysklad', $order, $data);
 
@@ -520,8 +523,8 @@ class OrderUpdateFromMoySklad
     {
 
         $check    = self::check_webhooks_and_try_fix();
-        $url      = 'https://online.moysklad.ru/api/remap/1.2/entity/webhook?limit=50';
-        $data     = wooms_request($url);
+        $url      = 'entity/webhook?limit=50';
+        $data     = request($url);
 
         $webhooks = array();
 
@@ -568,8 +571,8 @@ class OrderUpdateFromMoySklad
     public static function check_webhooks_and_try_fix()
     {
 
-        $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/webhook';
-        $data = wooms_request($url);
+        $url  = 'entity/webhook';
+        $data = request($url);
 
         $webhooks = array();
 
@@ -599,8 +602,8 @@ class OrderUpdateFromMoySklad
             } else {
                 //пытаемся удалить лишний хук
                 foreach ($webhooks as $id => $value) {
-                    $url   = 'https://online.moysklad.ru/api/remap/1.2/entity/webhook/' . $id;
-                    $check = wooms_request($url, null, 'DELETE');
+                    $url   = 'entity/webhook/' . $id;
+                    $check = request($url, null, 'DELETE');
                 }
 
                 return false;
@@ -615,7 +618,7 @@ class OrderUpdateFromMoySklad
                     'action'     => "UPDATE",
                     "entityType" => "customerorder",
                 );
-                $result = wooms_request($url, $data);
+                $result = request($url, $data);
 
                 if (empty($result)) {
                     return false;
@@ -752,7 +755,7 @@ class OrderUpdateFromMoySklad
 
             $url = $data["events"][0]["meta"]["href"];
 
-            $data_order = wooms_request($url);
+            $data_order = request($url);
             if (empty($data_order['id'])) {
                 return;
             }
