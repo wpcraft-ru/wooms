@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -132,9 +134,8 @@ class Orders
             }
         }
 
-        $url    = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder/' . $wooms_id;
-
-        $data = wooms_request($url);
+		$api_path = 'entity/customerorder/' . $wooms_id;
+        $data = request($api_path);
 
         /**
          * Preparation the data for update an existing order
@@ -166,7 +167,7 @@ class Orders
         }
 
 
-        $result = wooms_request($url, $data, 'PUT');
+        $result = request($api_path, $data, 'PUT');
 
         if (empty($result["id"])) {
             do_action(
@@ -220,8 +221,7 @@ class Orders
         }
 
         if (!$data = get_transient('wooms_currency_api')) {
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/currency/';
-            $data = wooms_request($url);
+            $data = request('entity/currency/');
             set_transient('wooms_currency_api', $data, HOUR_IN_SECONDS);
         }
 
@@ -442,9 +442,7 @@ class Orders
          */
         $data = apply_filters('wooms_order_data', $data, $order_id, $order);
 
-        $url = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder';
-
-        $result = wooms_request($url, $data, 'POST');
+        $result = request('entity/customerorder', $data, 'POST');
 
         if (empty($result['id']) || !isset($result['id']) || isset($result['errors'])) {
             update_post_meta($order_id, 'wooms_send_timestamp', date("Y-m-d H:i:s"));
@@ -627,8 +625,7 @@ class Orders
      */
     public static function get_data_organization()
     {
-        $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/organization';
-        $data = wooms_request($url);
+        $data = request('entity/organization');
 
         if (empty($data['rows'][0]['meta'])) {
             do_action(
@@ -697,7 +694,7 @@ class Orders
         );
 
         $url    = $data_order['agent']['meta']['href'];
-        $result = wooms_request($url, $data, 'PUT');
+        $result = request($url, $data, 'PUT');
 
         return $data_order;
     }

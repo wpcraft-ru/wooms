@@ -128,7 +128,12 @@ function request($path = '', $data = array(), $type = 'GET'){
     return false;
   }
 
-  $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+  if(str_contains($path, 'https://api.moysklad.ru/api/remap/1.2/')){
+	$url = $path;
+  } else {
+	$url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+  }
+
 
 
   //@link https://github.com/wpcraft-ru/wooms/issues/177
