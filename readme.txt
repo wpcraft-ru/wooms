@@ -33,8 +33,6 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 
 Страница плагина: [https://wpcraft.ru/wooms/](https://wpcraft.ru/wooms/)
 
-Статус задач по разработке: [https://github.com/orgs/wpcraft-ru/projects/2](roadmap)
-
 Плагин спроектирован таким образом, что относительно просто позволяет дорабатывать механику под задачи и автоматизацию конкретного магазина/каталога.
 
 == Installation ==
