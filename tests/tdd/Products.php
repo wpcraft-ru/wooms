@@ -14,6 +14,18 @@ require_once __DIR__ . '/../functions.php';
 transaction_query('start');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 test('check woooms request new api', function(){
 
 	$data = request('https://api.moysklad.ru/api/remap/1.2/entity/product');
@@ -24,7 +36,7 @@ test('check woooms request new api', function(){
 
 	return false;
 
-});
+}, 0);
 
 test('check woooms request new api', function(){
 
@@ -36,8 +48,7 @@ test('check woooms request new api', function(){
 
 	return false;
 
-});
-
+}, 0);
 
 
 test('check schedule', function(){
