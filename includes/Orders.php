@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -132,9 +134,8 @@ class Orders
             }
         }
 
-        $url    = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder/' . $wooms_id;
-
-        $data = wooms_request($url);
+		$api_path = 'entity/customerorder/' . $wooms_id;
+        $data = request($api_path);
 
         /**
          * Preparation the data for update an existing order
@@ -166,7 +167,7 @@ class Orders
         }
 
 
-        $result = wooms_request($url, $data, 'PUT');
+        $result = request($api_path, $data, 'PUT');
 
         if (empty($result["id"])) {
             do_action(
@@ -220,8 +221,7 @@ class Orders
         }
 
         if (!$data = get_transient('wooms_currency_api')) {
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/currency/';
-            $data = wooms_request($url);
+            $data = request('entity/currency/');
             set_transient('wooms_currency_api', $data, HOUR_IN_SECONDS);
         }
 
@@ -442,9 +442,7 @@ class Orders
          */
         $data = apply_filters('wooms_order_data', $data, $order_id, $order);
 
-        $url = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder';
-
-        $result = wooms_request($url, $data, 'POST');
+        $result = request('entity/customerorder', $data, 'POST');
 
         if (empty($result['id']) || !isset($result['id']) || isset($result['errors'])) {
             update_post_meta($order_id, 'wooms_send_timestamp', date("Y-m-d H:i:s"));
@@ -581,7 +579,7 @@ class Orders
                 'vat'        => 0,
                 'assortment' => array(
                     'meta' => array(
-                        "href"      => "https://online.moysklad.ru/api/remap/1.2/entity/{$product_type}/" . $uuid,
+                        "href"      => \WooMS\get_api_url("entity/{$product_type}/" . $uuid),
                         "type"      => "{$product_type}",
                         "mediaType" => "application/json",
                     ),
@@ -627,8 +625,7 @@ class Orders
      */
     public static function get_data_organization()
     {
-        $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/organization';
-        $data = wooms_request($url);
+        $data = request('entity/organization');
 
         if (empty($data['rows'][0]['meta'])) {
             do_action(
@@ -697,7 +694,7 @@ class Orders
         );
 
         $url    = $data_order['agent']['meta']['href'];
-        $result = wooms_request($url, $data, 'PUT');
+        $result = request($url, $data, 'PUT');
 
         return $data_order;
     }
@@ -728,9 +725,7 @@ class Orders
         if (!empty($phone)) {
 
             $phone = self::phone_prepare($phone);
-            $url_search_agent = 'https://online.moysklad.ru/api/remap/1.2/entity/counterparty?search=' . $phone;
-
-            $data_agents      = wooms_request($url_search_agent);
+            $data_agents      = request('entity/counterparty?search=' . $phone);
             if (isset($data_agents['rows'][0]['phone'])) {
                 $agent_meta = $data_agents['rows'][0];
             }
@@ -775,8 +770,8 @@ class Orders
             "email"         => $order->get_billing_email()
         );
 
-        $url    = 'https://online.moysklad.ru/api/remap/1.2/entity/counterparty';
-        $result = wooms_request($url, $data, 'POST');
+        $url    = 'entity/counterparty';
+        $result = request($url, $data, 'POST');
 
         if (empty($result["meta"])) {
             return $data_order;
@@ -820,8 +815,8 @@ class Orders
         $agent_meta = [];
 
         if (!empty($data['email'])) {
-            $url_search_agent = 'https://online.moysklad.ru/api/remap/1.2/entity/counterparty?filter=email=' . $data['email'];
-            $data_agents      = wooms_request($url_search_agent);
+            $url_search_agent = 'entity/counterparty?filter=email=' . $data['email'];
+            $data_agents      = request($url_search_agent);
             if (isset($data_agents['rows'][0]['email'])) {
                 $agent_meta = $data_agents['rows'][0];
             }
@@ -847,8 +842,8 @@ class Orders
             return false;
         }
 
-        $url    = 'https://online.moysklad.ru/api/remap/1.2/entity/counterparty/' . $agent_uuid;
-        $result = wooms_request($url);
+        $url    = 'entity/counterparty/' . $agent_uuid;
+        $result = request($url);
         if (empty($result['id'])) {
             return false;
         }
@@ -991,8 +986,8 @@ class Orders
      */
     public static function get_agent_meta_by_email($email = '')
     {
-        $url_search_agent = 'https://online.moysklad.ru/api/remap/1.2/entity/counterparty?filter=email=' . $email;
-        $data_agents      = wooms_request($url_search_agent);
+        $url_search_agent = 'entity/counterparty?filter=email=' . $email;
+        $data_agents      = request($url_search_agent);
         if (empty($data_agents['rows'][0]['meta'])) {
             return false;
         }

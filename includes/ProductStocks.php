@@ -2,6 +2,9 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 defined('ABSPATH') || exit; // Exit if accessed directly
 
 /**
@@ -86,7 +89,7 @@ class ProductStocks
       $filters[] = 'id=' . get_post_meta($product->ID, 'wooms_id', true);
     }
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/assortment';
+    $url = 'entity/assortment';
 
     $filters = apply_filters('wooms_assortment_sync_filters', $filters);
 
@@ -100,7 +103,7 @@ class ProductStocks
       sprintf('Запрос на остатки %s', $url)
     );
 
-    $data_api = wooms_request($url);
+    $data_api = request($url);
 
     if (empty($data_api['rows'])) {
       return;
@@ -348,6 +351,7 @@ class ProductStocks
     if (strpos($uuid, 'http') !== false) {
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.1/entity/product/', '', $uuid);
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
+      $uuid = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
     }
 
     $args = array(
@@ -383,8 +387,8 @@ class ProductStocks
     }
 
     if (!$wh_name = get_transient('wooms_warehouse_name')) {
-      $url = sprintf('https://online.moysklad.ru/api/remap/1.2/entity/store/%s', $warehouse_id);
-      $data = wooms_request($url);
+      $url = sprintf('entity/store/%s', $warehouse_id);
+      $data = request($url);
       if (isset($data["name"])) {
         $wh_name = $data["name"];
         set_transient('wooms_warehouse_name', $wh_name, HOUR_IN_SECONDS);
@@ -405,7 +409,7 @@ class ProductStocks
       return $filter;
     }
 
-    $filter[] = 'stockStore=' . sprintf('https://online.moysklad.ru/api/remap/1.2/entity/store/%s', $warehouse_id);
+    $filter[] = 'stockStore=' . \WooMS\get_api_url(sprintf('entity/store/%s', $warehouse_id));
 
     return $filter;
   }
@@ -526,8 +530,8 @@ class ProductStocks
       $title = 'Учитывать остатки по складу',
       $callback = function ($args) {
 
-        $url  = 'https://online.moysklad.ru/api/remap/1.2/entity/store';
-        $data = wooms_request($url);
+        $url  = 'entity/store';
+        $data = request($url);
         if (empty($data['rows'])) {
           echo 'Система не смогла получить список складов из МойСклад';
           return;

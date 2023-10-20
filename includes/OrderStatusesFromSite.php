@@ -2,6 +2,9 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 /**
  * Send statuses from WooCommerce to moysklad.ru
  */
@@ -91,8 +94,8 @@ class OrderStatusesFromSite
 
         $statuses = get_transient('wooms_order_statuses');
         if (empty($statuses)) {
-            $url_statuses = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder/metadata';
-            $statuses = wooms_request($url_statuses);
+            $url_statuses = 'entity/customerorder/metadata';
+            $statuses = request($url_statuses);
             $statuses = $statuses["states"];
             set_transient('wooms_order_statuses', $statuses, 600);
         }

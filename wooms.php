@@ -19,7 +19,7 @@
  * WC requires at least: 7.0
  * WC tested up to: 7.2.2
  *
- * Version: 9.3
+ * Version: 9.4
  */
 
 namespace WooMS;
@@ -120,6 +120,12 @@ function admin_styles()
   wp_enqueue_style('wooms_styles', $admin_style, array());
 }
 
+
+
+function get_api_url($path){
+	return $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+}
+
 function request($path = '', $data = array(), $type = 'GET'){
   // https://api.moysklad.ru/api/remap/1.2/
 
@@ -128,7 +134,12 @@ function request($path = '', $data = array(), $type = 'GET'){
     return false;
   }
 
-  $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+  if(str_contains($path, 'https://api.moysklad.ru/api/remap/1.2/')){
+	$url = $path;
+  } else {
+	$url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+  }
+
 
 
   //@link https://github.com/wpcraft-ru/wooms/issues/177

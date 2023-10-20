@@ -2,6 +2,9 @@
 
 namespace WooMS\SiteHealth;
 
+use function WooMS\request;
+
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
@@ -12,8 +15,6 @@ add_action('plugins_loaded', function(){
     add_filter('add_wooms_plugin_debug', __NAMESPACE__ . '\\' . 'check_moy_sklad_user_tarrif');
 
 });
-
-
 
 /**
  * check user tariff
@@ -31,7 +32,7 @@ function check_moy_sklad_user_tarrif($debug_info){
         'label'    => 'Тариф МойСклад',
         'value'   => sprintf('Для корректной работы плагина нужно сменить тариф %s', '❌'),
     ];
-    
+
 
     return $debug_info;
 }
@@ -105,8 +106,8 @@ function wooms_check_login_password()
         wp_send_json_error();
     }
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/security/token';
-    $data_api = wooms_request($url, [], 'POST');
+    $url = 'security/token';
+    $data_api = request($url, [], 'POST');
 
     $result = [
         'label' => "Проверка логина и пароля МойСклад",

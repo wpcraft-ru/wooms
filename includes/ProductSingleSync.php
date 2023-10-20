@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
@@ -135,7 +137,7 @@ class ProductSingleSync
       $url_args['offset'] = $offset;
     }
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/variant/?filter=productid=' . $wooms_id;
+    $url = 'entity/variant/?filter=productid=' . $wooms_id;
     $url = add_query_arg($url_args, $url);
 
     do_action(
@@ -144,7 +146,7 @@ class ProductSingleSync
       sprintf('API запрос на вариации: %s (продукт ID %s)', $url, $product_id)
     );
 
-    $data_api = wooms_request($url);
+    $data_api = request($url);
 
     if (empty($data_api['rows'])) {
       //finish
@@ -242,9 +244,9 @@ class ProductSingleSync
       return false;
     }
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/assortment?filter=id=' . $uuid;
+    $url = 'entity/assortment?filter=id=' . $uuid;
 
-    $data = wooms_request($url);
+    $data = request($url);
 
     if (!isset($data['rows'][0])) {
       return false;

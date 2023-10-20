@@ -2,6 +2,9 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 // Exit if accessed directly
 defined('ABSPATH') || exit;
 
@@ -75,7 +78,7 @@ class ProductVariable
     /**
      * issue https://github.com/wpcraft-ru/wooms/issues/296
      */
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/variant';
+    $url = 'entity/variant';
 
     $url = add_query_arg($state['query_arg'], $url);
 
@@ -96,7 +99,7 @@ class ProductVariable
         $state
       );
 
-      $data = wooms_request($url);
+      $data = request($url);
 
       //Check for errors and send message to UI
       if (isset($data['errors'][0]["error"])) {
@@ -393,6 +396,7 @@ class ProductVariable
     if (strpos($uuid, 'http') !== false) {
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.1/entity/product/', '', $uuid);
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
+      $uuid = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
     }
 
     $posts = get_posts('post_type=product&meta_key=wooms_id&meta_value=' . $uuid);

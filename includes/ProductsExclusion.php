@@ -21,7 +21,7 @@ add_action('plugins_loaded', function(){
 function explude_products_from_walker( $filters ) {
 
     $flag = get_option( OPTION_KEY );
-    $attr_url = 'https://online.moysklad.ru/api/remap/1.2/entity/product/metadata/attributes/';
+    $attr_url = \WooMS\get_api_url('entity/product/metadata/attributes/');
 
     if ( $flag ) {
         $filters[] = $attr_url . trim( $flag ) . '=false';
@@ -31,7 +31,7 @@ function explude_products_from_walker( $filters ) {
 }
 
 
-function add_settings() 
+function add_settings()
 {
     register_setting( 'mss-settings', OPTION_KEY );
 

@@ -2,6 +2,9 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 if ( ! defined( 'ABSPATH' ) ) {
   exit; // Exit if accessed directly
 }
@@ -36,7 +39,7 @@ class ProductAttributes
     return $atts;
   }
 
-  
+
   /**
    * Update product
    */
@@ -85,7 +88,7 @@ class ProductAttributes
     $product_attributes = apply_filters('wooms_attributes', $product_attributes, $product_id, $item);
 
     do_action( 'wooms_logger', __CLASS__,
-      sprintf('Артибуты Продукта: %s (%s) сохранены', $product->get_title(), $product->get_id()), 
+      sprintf('Артибуты Продукта: %s (%s) сохранены', $product->get_title(), $product->get_id()),
       $product_attributes
     );
 
@@ -207,7 +210,7 @@ class ProductAttributes
       $url = $value['country']["meta"]["href"];
     }
 
-    $data_api = wooms_request($url);
+    $data_api = request($url);
 
     if(empty($data_api["name"])){
       return $product_attributes;

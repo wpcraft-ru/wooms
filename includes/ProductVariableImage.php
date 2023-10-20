@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 
 class ProductVariableImage
 {
@@ -98,7 +100,7 @@ class ProductVariableImage
         }
 
         $href = $variant_data['images']['meta']['href'];
-        $img_metadata = wooms_request($href);
+        $img_metadata = request($href);
 
         if (empty($img_metadata['rows'][0])) {
             return $variation;
@@ -126,7 +128,7 @@ class ProductVariableImage
         if (as_next_scheduled_action('wooms_variaion_image_sync')) {
             return;
         }
-        
+
         // Adding schedule hook
         as_schedule_single_action(
             time() + 60,

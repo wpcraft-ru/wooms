@@ -2,9 +2,12 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 /**
  * Products Bundle Managment
- * 
+ *
  * issue https://github.com/wpcraft-ru/wooms/issues/313
  */
 class ProductGrouped extends AbstractWalker
@@ -12,7 +15,7 @@ class ProductGrouped extends AbstractWalker
 
   /**
    * Save state in DB
-   * 
+   *
    * @var string
    */
   public static $state_transient_key = 'wooms_bundle_walker_state';
@@ -84,7 +87,7 @@ class ProductGrouped extends AbstractWalker
 
     $query_arg = self::get_state('query_arg');
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/bundle';
+    $url = 'entity/bundle';
 
     $url = add_query_arg($query_arg, $url);
 
@@ -105,7 +108,7 @@ class ProductGrouped extends AbstractWalker
         $state
       );
 
-      $data = wooms_request($url);
+      $data = request($url);
 
       //Check for errors and send message to UI
       if (isset($data['errors'][0]["error"])) {
@@ -132,7 +135,7 @@ class ProductGrouped extends AbstractWalker
       //update count
       self::set_state('count', self::get_state('count') + $i);
 
-      //update offset 
+      //update offset
       $query_arg['offset'] = $query_arg['offset'] + count($data['rows']);
 
       self::set_state('query_arg', $query_arg);
@@ -288,7 +291,7 @@ class ProductGrouped extends AbstractWalker
 
     $url_api = $value["components"]["meta"]["href"];
 
-    $data_components = wooms_request($url_api);
+    $data_components = request($url_api);
 
     // dd($data_components);
 
@@ -313,6 +316,7 @@ class ProductGrouped extends AbstractWalker
     $subproducts_ids = array();
     foreach ($data_components["rows"] as $row_component) {
       $product_uuid = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $row_component["assortment"]["meta"]["href"]);
+      $product_uuid = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $row_component["assortment"]["meta"]["href"]);
       $subproduct_id = self::get_product_id_by_uuid($product_uuid);
 
       if (empty($subproduct_id)) {

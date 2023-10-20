@@ -2,6 +2,9 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
@@ -90,7 +93,7 @@ class ProductsServices extends AbstractWalker
 
             $query_arg = self::get_state('query_arg');
 
-            $url = 'https://online.moysklad.ru/api/remap/1.2/entity/service';
+            $url = 'entity/service';
 
             $url = add_query_arg($query_arg, $url);
 
@@ -109,7 +112,7 @@ class ProductsServices extends AbstractWalker
                 $state
             );
 
-            $data = wooms_request($url);
+            $data = request($url);
 
             //Check for errors and send message to UI
             if (isset($data['errors'][0]["error"])) {

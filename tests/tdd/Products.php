@@ -14,19 +14,50 @@ require_once __DIR__ . '/../functions.php';
 transaction_query('start');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+test('check woooms request new api', function(){
+
+	$data = request('https://api.moysklad.ru/api/remap/1.2/entity/product');
+
+	if(isset($data['context'])){
+		return true;
+	}
+
+	return false;
+
+}, 0);
+
+test('check woooms request new api', function(){
+
+	$data = request('entity/product');
+
+	if(isset($data['context'])){
+		return true;
+	}
+
+	return false;
+
+}, 0);
+
+
 test('check schedule', function(){
 
   // \WooMS\Products\set_state('end_timestamp', strtotime('-2 hours'));
   // $result = \WooMS\Scheduler\check_schedule();
   // ddcli($result);
 
-});
-
-
-
-
-
-
+}, 0);
 
 test('check load simple product', function(){
 

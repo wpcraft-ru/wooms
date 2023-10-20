@@ -2,6 +2,8 @@
 
 namespace WooMS;
 
+use function WooMS\request;
+
 if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
@@ -244,7 +246,7 @@ class ProductGallery
 
     $img_data_list = $imgages_url;
 
-    $images_data = wooms_request($imgages_url);
+    $images_data = request($imgages_url);
 
     if (empty($images_data['rows'])) {
       return false;
