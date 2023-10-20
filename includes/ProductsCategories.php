@@ -105,6 +105,7 @@ class ProductsCategories
   {
     //if uuid as url - get uuid only
     $id = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/productfolder/', '', $id);
+    $id = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/productfolder/', '', $id);
 
     $terms = get_terms(array(
       'taxonomy'   => array('product_cat'),

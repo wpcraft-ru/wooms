@@ -120,6 +120,12 @@ function admin_styles()
   wp_enqueue_style('wooms_styles', $admin_style, array());
 }
 
+
+
+function get_api_url($path){
+	return $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+}
+
 function request($path = '', $data = array(), $type = 'GET'){
   // https://api.moysklad.ru/api/remap/1.2/
 

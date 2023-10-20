@@ -87,7 +87,7 @@ class ProductGrouped extends AbstractWalker
 
     $query_arg = self::get_state('query_arg');
 
-    $url = 'https://online.moysklad.ru/api/remap/1.2/entity/bundle';
+    $url = 'entity/bundle';
 
     $url = add_query_arg($query_arg, $url);
 
@@ -316,6 +316,7 @@ class ProductGrouped extends AbstractWalker
     $subproducts_ids = array();
     foreach ($data_components["rows"] as $row_component) {
       $product_uuid = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $row_component["assortment"]["meta"]["href"]);
+      $product_uuid = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $row_component["assortment"]["meta"]["href"]);
       $subproduct_id = self::get_product_id_by_uuid($product_uuid);
 
       if (empty($subproduct_id)) {

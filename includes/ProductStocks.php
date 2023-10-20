@@ -351,6 +351,7 @@ class ProductStocks
     if (strpos($uuid, 'http') !== false) {
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.1/entity/product/', '', $uuid);
       $uuid = str_replace('https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
+      $uuid = str_replace('https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid);
     }
 
     $args = array(
@@ -408,7 +409,7 @@ class ProductStocks
       return $filter;
     }
 
-    $filter[] = 'stockStore=' . sprintf('https://online.moysklad.ru/api/remap/1.2/entity/store/%s', $warehouse_id);
+    $filter[] = 'stockStore=' . \WooMS\get_api_url(sprintf('entity/store/%s', $warehouse_id));
 
     return $filter;
   }

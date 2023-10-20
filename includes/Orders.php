@@ -579,7 +579,7 @@ class Orders
                 'vat'        => 0,
                 'assortment' => array(
                     'meta' => array(
-                        "href"      => "https://online.moysklad.ru/api/remap/1.2/entity/{$product_type}/" . $uuid,
+                        "href"      => \WooMS\get_api_url("entity/{$product_type}/" . $uuid),
                         "type"      => "{$product_type}",
                         "mediaType" => "application/json",
                     ),
