@@ -76,6 +76,10 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.4 =
+- Тест совместимости WooCommerce 8.2.1
+- Реализация новой версии REST API MoySklad
+
 = 9.3 =
 - Тест совместимости WooCommerce 8.2.0
 - Реализация новой версии REST API MoySklad (пока частично)
