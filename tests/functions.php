@@ -13,3 +13,9 @@ function getVariantsRows(){
   $data = json_decode($strJsonFileContents, true);
   return $data['rows'];
 }
+
+function get_productfolder(){
+  $strJsonFileContents = file_get_contents(__DIR__ . "/data/productfolder.json");
+  $data = json_decode($strJsonFileContents, true);
+  return $data;
+}
