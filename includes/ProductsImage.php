@@ -4,9 +4,13 @@ namespace WooMS\ProductsImage;
 
 const HOOK_NAME = 'wooms_product_image_sync';
 
+/**
+ * @todo добавить проверку по урл изображения - если урл поменялся - обновлять, иначе - не делать лишние запросы
+ */
+
 add_action('init', function () {
     add_action('wooms_product_image_sync', __NAMESPACE__ . '\\walker');
-    add_filter('wooms_product_save', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
+    add_filter('wooms_product_update', __NAMESPACE__ . '\\add_image_task_to_product', 35, 2);
     add_action('wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 15);
     add_action('admin_init', __NAMESPACE__ . '\\add_settings', 50);
     add_action('wooms_main_walker_finish', __NAMESPACE__ . '\\restart');
@@ -183,8 +187,7 @@ function product_image_download($product_id, $meta_key = 'wooms_url_for_get_thum
         return false;
     }
 
-    $images_data = wooms_request($url);
-
+	$images_data = \WooMS\request( $url );
 
     if (empty($images_data['rows'][0]['filename'])) {
         do_action(
@@ -263,23 +266,21 @@ function render_ui()
 /**
  * add image to metafield for download
  */
-function add_image_task_to_product($product, $value)
+function add_image_task_to_product($product, $row)
 {
     if (!is_enable()) {
         return $product;
     }
 
-    $product_id = $product->get_id();
-
     //Check image
-    if (empty($value['images']['meta']['size'])) {
+    if (empty($row['images']['meta']['size'])) {
         return $product;
     } else {
-        $url = $value['images']['meta']['href'];
+        $url = $row['images']['meta']['href'];
     }
     $product->update_meta_data('test_wooms_url_for_get_thumbnail', $url);
     //check current thumbnail. if isset - break, or add url for next downloading
-    if ($id = get_post_thumbnail_id($product_id) && empty(get_option('woomss_images_replace_to_sync'))) {
+    if ($id = get_post_thumbnail_id($product->get_id()) && empty(get_option('woomss_images_replace_to_sync'))) {
         return $product;
     } else {
         $product->update_meta_data('wooms_url_for_get_thumbnail', $url);
