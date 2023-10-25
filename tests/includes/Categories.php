@@ -242,9 +242,8 @@ test( 'save categories and product', function () {
 	return true;
 
 } );
-/**
- * to tests
- */
+
+
 test( 'save categories', function () {
 
 	$args = array(
