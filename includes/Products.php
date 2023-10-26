@@ -4,7 +4,7 @@ namespace WooMS\Products;
 
 use function WooMS\request;
 use function Testeroid\ddcli;
-use Error, Throwable;
+use Error, Throwable, WC_Product;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -301,6 +301,8 @@ function add_product( $data_source ) {
 
 /**
  * to replace load_product
+ *
+ * @return WC_Product
  */
 function product_update( array $row, array $data = [] ) {
 

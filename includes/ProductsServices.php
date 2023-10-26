@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Select specific price is setup
+ * @todo refactoring
  */
 class ProductsServices extends AbstractWalker
 {
