@@ -5,6 +5,10 @@ namespace WooMS\Tests\RestApi;
 use function Testeroid\{test, transaction_query, ddcli};
 use function WooMS\{request, set_config};
 
+
+/**
+ * wp test tdd/RestApi.php
+ */
 test('check woooms request new api', function(){
 
 	$data = request('https://api.moysklad.ru/api/remap/1.2/entity/product');

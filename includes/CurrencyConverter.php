@@ -9,6 +9,9 @@ defined('ABSPATH') || exit;
  */
 class CurrencyConverter
 {
+
+	const OPTION_KEY = 'wooms_currency_converter_enable';
+
     public static function init()
     {
         add_filter('wooms_product_price', [__CLASS__, 'chg_price'], 33, 4);
@@ -115,7 +118,7 @@ class CurrencyConverter
 
     public static function is_enable()
     {
-        if (get_option('wooms_currency_converter_enable')) {
+        if (get_option(self::OPTION_KEY)) {
             return true;
         }
 
@@ -127,7 +130,7 @@ class CurrencyConverter
      */
     public static function add_settings()
     {
-        $option_key = 'wooms_currency_converter_enable';
+        $option_key = self::OPTION_KEY;
 
         register_setting('mss-settings', $option_key);
         add_settings_field(

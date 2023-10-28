@@ -35,7 +35,6 @@ function product_chg_price($product, $data_api)
 
   $price = floatval($price) / 100;
   $price = round($price, 2);
-  // $product->set_price($price);
   $product->set_regular_price($price);
 
   return $product;
