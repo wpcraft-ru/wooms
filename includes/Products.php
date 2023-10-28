@@ -428,13 +428,17 @@ function product_update( array $row, array $data = [] ) {
 
 	$product_id = $product->save();
 
+	if(empty(intval($product_id))){
+		throw new Error('$product_id is broke');
+	}
+
 	do_action(
 		'wooms_logger',
 		__NAMESPACE__,
 		sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id )
 	);
 
-	return $product;
+	return $product_id;
 
 }
 

@@ -14,8 +14,27 @@ require_once __DIR__ . '/../functions.php';
 
 
 
+test('variations - base test', function(){
+	transaction_query('start');
+
+	$data = \WooMS\Tests\get_variant();
+
+	$count = ProductVariable::process_rows($data['rows']);
+
+	transaction_query('rollback');
+
+	if($count){
+		return true;
+	}
+
+	return false;
+
+});
+
+
 
 test('variation - one - Ботинки мужские RINGO (41)', function(){
+	transaction_query('start');
 
 	$row = function(){
 		$json = '{
@@ -147,6 +166,9 @@ test('variation - one - Ботинки мужские RINGO (41)', function(){
 	};
 
 	$result = ProductVariable::update_variation($row());
+
+	transaction_query('rollback');
+
 	if(empty($result[0])){
 		throw new Error( 'не вернулся продукт' );
 	}
@@ -155,23 +177,5 @@ test('variation - one - Ботинки мужские RINGO (41)', function(){
 	}
 
 	return true;
-});
-
-
-test('variations - base test', function(){
-	transaction_query('start');
-
-	$data = \WooMS\Tests\get_variant();
-
-	$count = ProductVariable::process_rows($data['rows']);
-
-	transaction_query('rollback');
-
-	if($count){
-		return true;
-	}
-
-	return false;
-
 });
 

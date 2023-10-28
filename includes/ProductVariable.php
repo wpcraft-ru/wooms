@@ -35,9 +35,9 @@ class ProductVariable {
 		//walker
 		add_action( 'wooms_variables_walker_batch', [__CLASS__, 'walker'] );
 
-		add_filter( 'wooms_product_save', array( __CLASS__, 'update_product' ), 20, 3 );
+		add_filter( 'wooms_product_update', array( __CLASS__, 'update_product' ), 20, 2 );
 
-		add_filter( 'wooms_save_variation', array( __CLASS__, 'save_attributes_for_variation' ), 10, 3 );
+		add_filter( 'wooms_variation_save', array( __CLASS__, 'save_attributes_for_variation' ), 10, 3 );
 
 		//Other
 		add_action( 'admin_init', array( __CLASS__, 'add_settings' ), 150 );
@@ -419,14 +419,13 @@ class ProductVariable {
 			$variation->update_meta_data( 'wooms_session_id', $session_id );
 		}
 
-		/**
-		 * deprecated
-		 */
-		$variation = apply_filters( 'wooms_save_variation', $variation, $row, $product_id );
-
 		$variation = apply_filters( 'wooms_variation_save', $variation, $row, $product_id );
 
 		$variation_id = $variation->save();
+
+		if(empty(intval($variation_id))){
+			throw new \Error('$variation_id not intager');
+		}
 
 		do_action(
 			'wooms_logger',
@@ -472,93 +471,11 @@ class ProductVariable {
 		return $posts[0]->ID;
 	}
 
-
-	/**
-	 * Update and add variables from product
-	 *
-	 * @param $product_id
-	 * @param $value
-	 */
-	public static function update_variant_for_product( $product_id, $variant_data ) {
-		if ( empty( $variant_data ) ) {
-			return;
-		}
-
-		if ( ! empty( $variant_data['archived'] ) ) {
-			return;
-		}
-
-		//добавление атрибутов к основному продукту с пометкой для вариаций
-		self::set_product_attributes_for_variation( $product_id, $variant_data );
-
-		if ( ! $variation_id = self::get_variation_by_wooms_id( $product_id, $variant_data['id'] ) ) {
-			$variation_id = self::add_variation( $product_id, $variant_data );
-		}
-
-		$variation = wc_get_product( $variation_id );
-		$variation->set_name( $variant_data['name'] );
-
-		$variation->set_stock_status( 'instock' );
-
-		if ( ! empty( $variant_data["salePrices"][0]['value'] ) ) {
-			$price = $variant_data["salePrices"][0]['value'];
-		} else {
-			$price = 0;
-		}
-
-		$price = floatval( $price ) / 100;
-		$variation->set_price( $price );
-		$variation->set_regular_price( $price );
-
-		do_action(
-			'wooms_logger',
-			__CLASS__,
-			sprintf( 'Цена %s сохранена (для вариации %s продукта %s)', $price, $variation_id, $product_id )
-		);
-
-		$product_parent = wc_get_product( $product_id );
-		if ( ! $product_parent->is_type( 'variable' ) ) {
-			$product_parent = new \WC_Product_Variable( $product_parent );
-			$product_parent->save();
-
-			do_action(
-				'wooms_logger_error',
-				__CLASS__,
-				sprintf( 'Снова сохранили продукт как вариативный %s', $product_id )
-			);
-		}
-
-		if ( $session_id = self::get_session_id() ) {
-			$variation->update_meta_data( 'wooms_session_id', $session_id );
-		}
-
-		/**
-		 * deprecated
-		 */
-		$variation = apply_filters( 'wooms_save_variation', $variation, $variant_data, $product_id );
-
-		$variation = apply_filters( 'wooms_variation_save', $variation, $variant_data, $product_id );
-
-		$variation->save();
-
-		do_action(
-			'wooms_logger',
-			__CLASS__,
-			sprintf(
-				'Сохранена вариация: %s (%s), для продукта %s (%s)',
-				$variation->get_name(),
-				$variation_id,
-				$product_parent->get_name(),
-				$product_id
-			)
-		);
-
-		do_action( 'wooms_variation_id', $variation_id, $variant_data );
-	}
-
 	public static function get_session_id() {
 		return \WooMS\Products\get_session_id();
 	}
+
+
 	/**
 	 * Get product parent ID
 	 */

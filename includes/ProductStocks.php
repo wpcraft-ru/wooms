@@ -34,7 +34,7 @@ class ProductStocks
     add_action('wooms_assortment_sync', [__CLASS__, 'batch_handler']);
 
     add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 30, 3);
-    add_filter('wooms_save_variation', array(__CLASS__, 'update_variation'), 30, 3);
+    add_filter('wooms_variation_save', array(__CLASS__, 'update_variation'), 30, 3);
 
     add_filter('wooms_assortment_sync_filters', array(__CLASS__, 'assortment_add_filter_by_warehouse_id'), 10);
     add_filter('wooms_stock_log_data', array(__CLASS__, 'add_warehouse_name_to_log_data'), 10);

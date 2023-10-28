@@ -230,7 +230,8 @@ test( 'save categories and product', function () {
 
 	};
 
-	$product = \WooMS\Products\product_update( $row() );
+	$product_id = \WooMS\Products\product_update( $row() );
+	$product = wc_get_product($product_id);
 
 	$ids = $product->get_category_ids();
 

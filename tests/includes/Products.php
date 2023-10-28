@@ -31,6 +31,7 @@ test( 'check schedule - false', function () {
 } , 0);
 
 test( 'check schedule - true', function () {
+
 	transaction_query( 'start' );
 
 	\WooMS\set_config( 'walker_cron_enabled', 1 );
@@ -48,15 +49,11 @@ test( 'check schedule - true', function () {
 } );
 
 
-
 test( 'new product update function', function () {
 	transaction_query( 'start' );
-
 	$row = getJsonForSimpleProduct_code00045();
-
-
-	$product = \WooMS\Products\product_update( $row, $data = [] );
-
+	$product_id = \WooMS\Products\product_update( $row, $data = [] );
+	$product = wc_get_product($product_id);
 	transaction_query( 'rollback' );
 
 	if ( $row['name'] == $product->get_name() ) {
@@ -64,9 +61,7 @@ test( 'new product update function', function () {
 	}
 	return false;
 
-
 } );
-
 
 
 /**
