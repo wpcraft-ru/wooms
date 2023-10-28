@@ -14,8 +14,6 @@ add_action( HOOK_NAME, __NAMESPACE__ . '\\walker' );
 
 add_action( 'admin_init', __NAMESPACE__ . '\\add_settings', 50 );
 
-// add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
-
 add_action( 'wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 9 );
 add_action( 'woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually' );
 add_action( 'woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually' );
@@ -184,77 +182,6 @@ function stop_manually() {
 
 function get_session_id() {
 	return get_state( 'session_id' );
-}
-
-/**
- * Update product from source data
- */
-function update_product( $product, $data_api, $data = 'deprecated' ) {
-	$data_of_source = $data_api;
-
-	//Set session id for product
-	if ( $session_id = get_state( 'session_id' ) ) {
-		$product->update_meta_data( 'wooms_session_id', $session_id );
-	}
-
-	$product->update_meta_data( 'wooms_updated_timestamp', date( "Y-m-d H:i:s" ) );
-
-	$product->update_meta_data( 'wooms_id', $data_api['id'] );
-
-	$product->update_meta_data( 'wooms_updated_from_api', $data_api['updated'] );
-
-	//update title
-	if ( isset( $data_api['name'] ) and $data_api['name'] != $product->get_title() ) {
-		if ( ! empty( get_option( 'wooms_replace_title' ) ) ) {
-			$product->set_name( $data_api['name'] );
-		}
-	}
-
-	$product_description = isset( $data_of_source['description'] ) ? $data_of_source['description'] : '';
-	//update description
-	if ( apply_filters( 'wooms_added_description', true, $product_description ) ) {
-
-		if ( $product_description && ! empty( get_option( 'wooms_replace_description' ) ) ) {
-
-			if ( get_option( 'wooms_short_description' ) ) {
-				$product->set_short_description( $product_description );
-			} else {
-				$product->set_description( $product_description );
-			}
-		} else {
-
-			if ( empty( $product->get_description() ) ) {
-
-				if ( get_option( 'wooms_short_description' ) ) {
-					$product->set_short_description( $product_description );
-				} else {
-					$product->set_description( $product_description );
-				}
-			}
-		}
-	}
-
-	//Price Retail 'salePrices'
-	if ( isset( $data_of_source['salePrices'][0]['value'] ) ) {
-
-		$price_source = floatval( $data_of_source['salePrices'][0]['value'] );
-
-		$price = floatval( $price_source ) / 100;
-
-		$product->set_price( $price );
-		$product->set_regular_price( $price );
-	}
-
-	// issue https://github.com/wpcraft-ru/wooms/issues/302
-	$product->set_catalog_visibility( 'visible' );
-
-	if ( apply_filters( 'wooms_reset_state_products', true ) ) {
-		$product->set_stock_status( 'instock' );
-		$product->set_manage_stock( 'no' );
-		$product->set_status( 'publish' );
-	}
-
-	return $product;
 }
 
 

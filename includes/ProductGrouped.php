@@ -33,20 +33,9 @@ class ProductGrouped extends AbstractWalker
   public static function init()
   {
 
-    // add_action('init', function () {
-    //   if (!isset($_GET['dd'])) {
-    //     return;
-    //   }
-
-    //   self::set_state('timestamp_start', 0);
-    //   self::batch_handler();
-
-    //   dd(0);
-    // });
-
     add_action('wooms_bundle_walker_batch', [__CLASS__, 'batch_handler']);
 
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 2);
+    add_filter('wooms_product_update', array(__CLASS__, 'update_product'), 40, 2);
 
     add_action('wooms_main_walker_finish', array(__CLASS__, 'reset_after_main_walker_finish'));
     add_action('wooms_wakler_variations_finish', array(__CLASS__, 'reset_after_main_walker_finish'));

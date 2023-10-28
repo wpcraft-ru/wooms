@@ -36,20 +36,9 @@ class ProductsServices extends AbstractWalker
     public static function init()
     {
 
-        // add_action('init', function () {
-        //     if (!isset($_GET['dd'])) {
-        //         return;
-        //     }
-
-        //     // self::set_state('timestamp', 0);
-        //     self::batch_handler();
-
-        //     dd(0);
-        // });
-
         add_action('wooms_services_walker_batch', [__CLASS__, 'batch_handler']);
 
-        add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 40, 2);
+        add_filter('wooms_product_update', array(__CLASS__, 'update_product'), 40, 2);
 
         add_action('wooms_main_walker_started', array(__CLASS__, 'reset_walker'));
 
@@ -260,6 +249,8 @@ class ProductsServices extends AbstractWalker
 
     /**
      * update_product
+	 *
+	 * @todo - remove?
      *
      * @param \WC_Product $product
      * @param array $api_data

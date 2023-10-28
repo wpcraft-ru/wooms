@@ -9,40 +9,17 @@ final class TaxSupport
     public static function init()
     {
 
-        //disable for live
-        // if (empty(getenv('LOCAL_SERVER'))) {
-        //     return;
-        // }
-
-
-        // add_action('init', function(){
-        // if(!isset($_GET['dd'])){
-        //     return;
-        // }
-
-        // echo '<pre>';
-
-        // // $url = 'https://online.moysklad.ru/api/remap/1.2/entity/customerorder/1080a7da-edfb-11e9-0a80-03c4001121bb';
-        // // $d = wooms_request($url);
-        // // var_dump($d['positions']);
-
-        // // exit;
-        // OrderSender::update_order(23);
-
-        // var_dump('end'); exit;
-        // });
-
         // add_filter('wooms_order_data', [__CLASS__, 'add_order_tax'], 11, 2);
         add_filter('wooms_order_sender_position', [__CLASS__, 'chg_order_sender_position'], 11, 2);
 
-        add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 50, 3);
+        add_filter('wooms_product_update', array(__CLASS__, 'update_product'), 50, 2);
 
         add_action('admin_init', array(__CLASS__, 'add_settings'), 40);
     }
 
     /**
      * chg_order_sender_position
-     * 
+     *
      * use hook $position = apply_filters('wooms_order_sender_position', $position, $product_id);
      */
     public static function chg_order_sender_position($position, $product_id)
