@@ -78,7 +78,8 @@ PHP 7.0
 
 = 9.6 =
 - Исправлено: Плагин перестанет работать после 1 декабря 2023? https://github.com/wpcraft-ru/wooms/issues/509
-
+- Исправлено: Синхронизация удаленных товаров https://github.com/wpcraft-ru/wooms/issues/456
+- Улучшение: Описание категории https://github.com/wpcraft-ru/wooms/issues/463
 
 
 = 9.5 =

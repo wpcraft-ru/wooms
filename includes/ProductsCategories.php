@@ -216,6 +216,8 @@ class ProductsCategories {
 
 		self::product_categories_update( $productfolder );
 
+		do_action('wooms_product_categories_update', $productfolder);
+
 	}
 
 
