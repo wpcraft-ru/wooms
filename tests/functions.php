@@ -8,10 +8,10 @@ function getProductsRows(){
   return $data['rows'];
 }
 
-function getVariantsRows(){
+function get_variant(){
   $strJsonFileContents = file_get_contents(__DIR__ . "/data/variants.json");
   $data = json_decode($strJsonFileContents, true);
-  return $data['rows'];
+  return $data;
 }
 
 function get_productfolder(){

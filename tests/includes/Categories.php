@@ -4,7 +4,6 @@ namespace WooMS\Tests\Categories;
 
 use Error;
 use function Testeroid\{test, transaction_query, ddcli};
-use function WooMS\Tests\{getProductsRows, getVariantsRows};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 

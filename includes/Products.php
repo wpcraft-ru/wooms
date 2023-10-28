@@ -14,20 +14,11 @@ add_action( HOOK_NAME, __NAMESPACE__ . '\\walker' );
 
 add_action( 'admin_init', __NAMESPACE__ . '\\add_settings', 50 );
 
-// add_action( 'wooms_product_data_item', __NAMESPACE__ . '\\load_product' );
 // add_filter('wooms_product_save', __NAMESPACE__ . '\\update_product', 9, 3);
 
 add_action( 'wooms_tools_sections', __NAMESPACE__ . '\\render_ui', 9 );
 add_action( 'woomss_tool_actions_wooms_products_start_import', __NAMESPACE__ . '\\start_manually' );
 add_action( 'woomss_tool_actions_wooms_products_stop_import', __NAMESPACE__ . '\\stop_manually' );
-
-// add_action('admin_init', function(){
-//     if( ! wp_next_scheduled( 'wooms_auto_starter' ) ) {
-//       wp_schedule_event( time(), 'every_minute', 'wooms_auto_starter');
-//     }
-// });
-// add_action('wooms_auto_starter', __NAMESPACE__ . '\\auto_start');
-
 
 add_action( 'add_meta_boxes', function () {
 	add_meta_box( 'wooms_product', 'МойСклад', __NAMESPACE__ . '\\display_metabox_for_product', 'product', 'side', 'low' );
@@ -300,8 +291,6 @@ function add_product( $data_source ) {
 
 
 /**
- * to replace load_product
- *
  * @return WC_Product
  */
 function product_update( array $row, array $data = [] ) {
@@ -450,84 +439,6 @@ function product_update( array $row, array $data = [] ) {
 }
 
 
-
-/**
- * Load data and set product type simple
- */
-function load_product( array $value ) {
-
-	/**
-	 * Определение способов связи
-	 */
-	$product_id = 0;
-
-	$product_id = get_product_id_by_uuid( $value['id'] );
-
-	if ( ! empty( $value['archived'] ) ) {
-		if ( $product_id ) {
-			wp_delete_post( $product_id );
-		}
-		return false;
-	}
-
-	if ( empty( $product_id ) && ! empty( $value['article'] ) ) {
-		$product_id = wc_get_product_id_by_sku( $value['article'] );
-	}
-
-	//попытка получить id по другим параметрам
-	if ( empty( $product_id ) ) {
-		$product_id = apply_filters( 'wooms_get_product_id', $product_id, $value );
-	}
-
-	//создаем продукт, если не нашли
-	if ( empty( intval( $product_id ) ) ) {
-		$product_id = add_product( $value );
-	}
-
-
-	if ( empty( intval( $product_id ) ) ) {
-		do_action(
-			'wooms_logger_error',
-			__NAMESPACE__,
-			'Ошибка определения и добавления ИД продукта',
-			$value
-		);
-		return false;
-	}
-
-	$product = wc_get_product( $product_id );
-
-	/**
-	 * rename vars
-	 */
-	$data_api = $value;
-
-	$product->update_meta_data( 'wooms_id_' . $data_api['id'], 1 );
-
-	/**
-	 * Хук позволяет работать с методами WC_Product
-	 * Сохраняет в БД все изменения за 1 раз
-	 * Снижает нагрузку на БД
-	 */
-	$product = apply_filters( 'wooms_product_save', $product, $data_api, $product_id );
-
-	//save data of source
-	if ( apply_filters( 'wooms_logger_enable', false ) ) {
-		$product->update_meta_data( 'wooms_data_api', json_encode( $data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
-	} else {
-		$product->delete_meta_data( 'wooms_data_api' );
-	}
-
-	$product_id = $product->save();
-
-	do_action(
-		'wooms_logger',
-		__NAMESPACE__,
-		sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id )
-	);
-
-	return $product_id;
-}
 
 
 function walker_finish() {
