@@ -77,11 +77,12 @@ PHP 7.0
 == Changelog ==
 
 = 9.6 =
+- Исправлено: После обновления не работает синхронизация https://github.com/wpcraft-ru/wooms/issues/518
 - Исправлено: Плагин перестанет работать после 1 декабря 2023? https://github.com/wpcraft-ru/wooms/issues/509
 - Исправлено: Синхронизация удаленных товаров https://github.com/wpcraft-ru/wooms/issues/456
+- Исправлено: wooms_assortment_sync - Статус: Выполняется очередями в фоне https://github.com/wpcraft-ru/wooms/issues/510
 - Улучшение: Описание категории https://github.com/wpcraft-ru/wooms/issues/463
 - Улучшение: Continuous Deployments + автотесты https://github.com/wpcraft-ru/wooms/issues/268
-
 
 = 9.5 =
 - Исправлено: Не работает синхронизация категорий https://github.com/wpcraft-ru/wooms/issues/450

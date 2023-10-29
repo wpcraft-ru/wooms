@@ -19,3 +19,9 @@ function get_productfolder(){
   $data = json_decode($strJsonFileContents, true);
   return $data;
 }
+
+function get_assortment(){
+	$strJsonFileContents = file_get_contents(__DIR__ . "/data/assortment.json");
+	$data = json_decode($strJsonFileContents, true);
+	return $data;
+}

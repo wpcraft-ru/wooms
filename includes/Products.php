@@ -70,80 +70,70 @@ function walker( $args = [] ) {
 		$url = add_query_arg( 'filter', $filters, $url );
 	}
 
-	try {
+	$data = request( $url );
 
-		$data = request( $url );
-
-
-		if ( isset( $data['errors'] ) ) {
-			throw new \Exception( print_r( $data['errors'], true ) );
-		}
-
-		do_action( 'wooms_logger', __NAMESPACE__, sprintf( 'Отправлен запрос %s', $url ) );
-
-		//If no rows, that send 'end' and stop walker
-		if ( empty( $data['rows'] ) ) {
-			walker_finish();
-			return [ 'result' => 'finish' ];
-		}
-
-		do_action( 'wooms_walker_start_iteration', $data );
-
-		process_rows( $data['rows'] );
-
-		$args['rows_in_bunch'] += count( $data['rows'] );
-		$args['query_arg']['offset'] += count( $data['rows'] );
-
-		// set_state( $args );
-
-		as_schedule_single_action( time(), HOOK_NAME, [ $args ], 'WooMS' );
-
-		do_action( 'wooms_products_batch_end' );
-
-		return [
-			'result' => 'restart',
-			'args_next_iteration' => $args,
-		];
-	} catch (Throwable $e) {
-
-		/**
-		 * need to protect the site
-		 * from incorrectly hidden products
-		 */
-		set_state( 'session_id', null );
-
-		do_action( 'wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой... ' . $e->getMessage() );
-		return [ 'result' => 'error' ];
+	if ( isset( $data['errors'] ) ) {
+		throw new \Exception( print_r( $data['errors'], true ) );
 	}
+
+	do_action( 'wooms_logger', __NAMESPACE__, sprintf( 'Отправлен запрос %s', $url ) );
+
+	//If no rows, that send 'end' and stop walker
+	if ( empty( $data['rows'] ) ) {
+		walker_finish();
+		return [ 'result' => 'finish' ];
+	}
+
+	do_action( 'wooms_walker_start_iteration', $data );
+
+	process_rows( $data['rows'] );
+
+	$args['rows_in_bunch'] += count( $data['rows'] );
+	$args['query_arg']['offset'] += count( $data['rows'] );
+
+	as_schedule_single_action( time(), HOOK_NAME, [ $args ], 'WooMS' );
+
+	do_action( 'wooms_products_batch_end' );
+
+	return [
+		'result' => 'restart',
+		'args_next_iteration' => $args,
+	];
+
 }
 
 function process_rows( $rows = [] ) {
-	if ( empty( $rows ) ) {
+
+	try {
+
+		if ( empty( $rows ) ) {
+			throw new Error('$rows is empty');
+		}
+
+		foreach ( $rows as $row ) {
+
+			if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
+				continue;
+			}
+
+			/**
+			 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+			 * птм нужна проверка что это точно продукт
+			 */
+			if ( 'variant' == $row["meta"]["type"] ) {
+				continue;
+			}
+
+			$data = apply_filters( 'wooms_product_data', [], $row );
+			product_update( $row, $data );
+		}
+
+		return true;
+	} catch (Throwable $e) {
+		do_action( 'wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой... ' . $e->getMessage() );
 		return false;
 	}
 
-	foreach ( $rows as $row ) {
-
-		if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
-			continue;
-		}
-
-		/**
-		 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
-		 * птм нужна проверка что это точно продукт
-		 */
-		if ( 'variant' == $row["meta"]["type"] ) {
-			continue;
-		}
-
-		$data = apply_filters( 'wooms_product_data', [], $row );
-		product_update( $row, $data );
-
-		// do_action('wooms_product_data_item', $row);
-
-	}
-
-	return true;
 
 }
 
@@ -218,7 +208,7 @@ function add_product( $data_source ) {
 
 
 /**
- * @return WC_Product
+ * @return WC_Product | bool
  */
 function product_update( array $row, array $data = [] ) {
 
