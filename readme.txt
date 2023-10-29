@@ -76,6 +76,10 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.7 =
+-
+
+
 = 9.6 =
 - Исправлено: После обновления не работает синхронизация https://github.com/wpcraft-ru/wooms/issues/518
 - Исправлено: Плагин перестанет работать после 1 декабря 2023? https://github.com/wpcraft-ru/wooms/issues/509
