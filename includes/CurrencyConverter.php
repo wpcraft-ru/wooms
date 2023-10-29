@@ -17,10 +17,12 @@ class CurrencyConverter
         add_filter('wooms_product_price', [__CLASS__, 'chg_price'], 33, 4);
         add_filter('wooms_sale_price', [__CLASS__, 'chg_price'], 32, 4);
 
+        add_action('wooms_main_walker_started', [__CLASS__, 'cache_data']);
+
         add_action('admin_init', array(__CLASS__, 'add_settings'), 50);
     }
 
-    public static function chg_price($price, $data_api, $product_id, $price_meta)
+	public static function chg_price($price, $data_api, $product_id, $price_meta)
     {
         if (!self::is_enable()) {
             return $price;
@@ -30,23 +32,27 @@ class CurrencyConverter
             return $price;
         }
 
-        if (!$currency = get_transient('wooms_currency_api')) {
-            $currency = request('entity/currency/');
-            set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
-        }
+		$currency_ms = self::get_currency();
 
-        $woocommerce_currency = get_woocommerce_currency();
-        $api_currency = self::get_currency_code_price_meta($price_meta);
+        // $woocommerce_currency = get_woocommerce_currency();
+        // $api_currency = self::get_currency_code_price_meta($price_meta);
 
-        if(empty($api_currency)){
-            return $price;
-        }
+		$price_by_rate = self::get_price_converted($price_meta, $currency_ms);
+		// ddcli($price_by_rate, $price);
+		// ddcli($price, $price_by_rate);
 
-        if ($woocommerce_currency == $api_currency) {
-            return $price;
-        }
+        // if(empty($api_currency)){
+        //     return $price;
+        // }
 
-        $price_by_rate = self::update_price_by_rate($price, $api_currency);
+        // if ($woocommerce_currency == $api_currency) {
+        //     return $price;
+        // }
+		// $price_by_rate = self::get_price_converted($price_meta, $currency_ms);
+		// ddcli($price_by_rate, $price);
+
+        // $price_by_rate = self::update_price_by_rate($price, $api_currency);
+
 
         do_action(
             'wooms_logger',
@@ -55,23 +61,51 @@ class CurrencyConverter
             [
                 'цена исходная' => $price,
                 'цена после конвертации' => $price_by_rate,
-                'валюта сайта' => $woocommerce_currency,
-                'валюта api' => $api_currency,
             ]
         );
-        // if ($product_id == 26226) {
-            // dd($api_currency, $woocommerce_currency, $price, $currency, $price_meta);
-        // }
 
         return $price_by_rate;
     }
 
+    public static function get_price_converted($price_meta, $currency_ms){
+
+		$woocommerce_currency = get_woocommerce_currency();
+
+		$rate = 1;
+
+        foreach($currency_ms['rows'] as $currency_row){
+            if($currency_row['meta']['href'] == $price_meta['currency']['meta']['href']){
+                $rate = $currency_row['rate'];
+
+            }
+        }
+
+        $price = $price_meta['value'] * $rate;
+		return $price;
+
+	}
+
+    public static function get_currency(){
+		$currency = get_transient('wooms_currency_api');
+		if($currency){
+			return $currency;
+		}
+
+		$currency = request('entity/currency/');
+		set_transient('wooms_currency_api', $currency, DAY_IN_SECONDS);
+		return $currency;
+	}
+
+    public static function cache_data(){
+		delete_transient('wooms_currency_api');
+		$currency = request('entity/currency/');
+		set_transient('wooms_currency_api', $currency, DAY_IN_SECONDS);
+	}
+
 
     public static function update_price_by_rate($price = 0, $api_currency = 'RUB'){
-        if (!$currency = get_transient('wooms_currency_api')) {
-            $currency = request('entity/currency');
-            set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
-        }
+
+		$currency = self::get_currency();
 
         $rate = 1;
 
@@ -95,10 +129,7 @@ class CurrencyConverter
 
         $price_currency_href = $price_meta['currency']['meta']['href'];
 
-        if (!$currency = get_transient('wooms_currency_api')) {
-            $currency = request('entity/currency');
-            set_transient('wooms_currency_api', $currency, HOUR_IN_SECONDS);
-        }
+        $currency = self::get_currency();
 
         if (empty($currency['rows'])) {
             return false;

@@ -1,25 +1,12 @@
 <?php
 
-namespace WooMS\Tests\Products;
+namespace WooMS\Tests\Categories;
 
-use WooMS\Products, Error;
-use function WooMS\Products\{get_product_id_by_uuid, process_rows, walker};
+use Error;
 use function Testeroid\{test, transaction_query, ddcli};
-use function WooMS\Tests\{getProductsRows};
-use function WooMS\{request, set_config};
-
-require_once __DIR__ . '/../functions.php';
-/**
- * wp test tdd/t.php
- */
+use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
-
-
-
-/**
- * todo - add test for currencies
- */
 test('currency - https://github.com/wpcraft-ru/wooms/issues/516', function(){
 	transaction_query('start');
 
@@ -36,10 +23,8 @@ test('currency - https://github.com/wpcraft-ru/wooms/issues/516', function(){
 	foreach($currency['rows'] as $row_usd){
 		if($row_usd['isoCode'] == 'USD'){
 			$meta_usd = $row_usd['meta'];
-			// ddcli($meta_usd, $row['salePrices'][0]['currency']['meta']);
 			$row['salePrices'][0]['currency']['meta'] = $meta_usd;
 			$row['salePrices'][0]['value'] = $price_usd * 100;
-			// $price_meta = $row['salePrices'][0];
 			break;
 		}
 	}
