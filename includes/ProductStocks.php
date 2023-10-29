@@ -240,6 +240,10 @@ class ProductStocks {
 
 
 	public static function restart_after_batch() {
+		if(as_has_scheduled_action(self::$walker_hook_name)){
+			return;
+		}
+
 		as_schedule_single_action( time(), self::$walker_hook_name, [], 'WooMS' );
 	}
 
