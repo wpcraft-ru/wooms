@@ -24,9 +24,6 @@ class ProductStocks {
 	 */
 	public static $state_transient_key = 'wooms_assortmen_state';
 
-	/**
-	 * The init
-	 */
 	public static function init() {
 
 		add_action( 'wooms_assortment_sync', [ __CLASS__, 'batch_handler' ] );
