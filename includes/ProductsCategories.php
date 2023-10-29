@@ -100,7 +100,7 @@ class ProductsCategories {
 	public static function product_category_update( $row, $productfolder ) {
 
 		if ( empty( $row['id'] ) ) {
-			// throw new Error( 'product_category_update = no $row[id]' );
+			throw new Error( 'product_category_update = no $row[id]' );
 		}
 
 		$term_id = self::check_term_by_ms_uuid( $row['id'] );
@@ -120,6 +120,8 @@ class ProductsCategories {
 						break;
 					}
 				}
+			} else {
+				$args['parent'] = 0;
 			}
 
 			wp_update_term( $term_id, $taxonomy = 'product_cat', $args );

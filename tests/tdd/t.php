@@ -9,6 +9,9 @@ use function WooMS\Tests\{getProductsRows};
 use function WooMS\{request, set_config};
 
 require_once __DIR__ . '/../functions.php';
+/**
+ * wp test tdd/t.php
+ */
 
 
 
