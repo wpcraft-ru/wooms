@@ -6,6 +6,8 @@ defined('ABSPATH') || exit;
 
 /**
  * Additional notes for send order
+ *
+ * @todo need refactoring after https://github.com/wpcraft-ru/wooms/issues/516
  */
 class CurrencyConverter
 {
@@ -34,25 +36,7 @@ class CurrencyConverter
 
 		$currency_ms = self::get_currency();
 
-        // $woocommerce_currency = get_woocommerce_currency();
-        // $api_currency = self::get_currency_code_price_meta($price_meta);
-
 		$price_by_rate = self::get_price_converted($price_meta, $currency_ms);
-		// ddcli($price_by_rate, $price);
-		// ddcli($price, $price_by_rate);
-
-        // if(empty($api_currency)){
-        //     return $price;
-        // }
-
-        // if ($woocommerce_currency == $api_currency) {
-        //     return $price;
-        // }
-		// $price_by_rate = self::get_price_converted($price_meta, $currency_ms);
-		// ddcli($price_by_rate, $price);
-
-        // $price_by_rate = self::update_price_by_rate($price, $api_currency);
-
 
         do_action(
             'wooms_logger',
