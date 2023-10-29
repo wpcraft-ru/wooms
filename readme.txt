@@ -2,9 +2,9 @@
 Contributors: casepress
 Donate link: https://wpcraft.ru/product/wooms-extra/
 Tags: moysklad, woocommerce, sync, integration
-Requires at least: 5.0
-Tested up to: 6.1
-Requires PHP: 7.0
+Requires at least: 6.0
+Tested up to: 6.4
+Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 *   Синхронизация товаров по протоколу REST API
 *   Загрузка категорий
 *   Загрузка картинок
-*   Простые настройки
+*   Гибкие настройки
 
 [Руководство по быстрому началу работы](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
 
@@ -64,7 +64,7 @@ e.g.
 
 = Какие минимальные требования? =
 
-WordPress 5.0
+WordPress 6.0
 PHP 7.0
 
 
@@ -76,10 +76,17 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.6 =
+- Исправлено: После обновления не работает синхронизация https://github.com/wpcraft-ru/wooms/issues/518
+- Исправлено: Плагин перестанет работать после 1 декабря 2023? https://github.com/wpcraft-ru/wooms/issues/509
+- Исправлено: Синхронизация удаленных товаров https://github.com/wpcraft-ru/wooms/issues/456
+- Исправлено: wooms_assortment_sync - Статус: Выполняется очередями в фоне https://github.com/wpcraft-ru/wooms/issues/510
+- Улучшение: Описание категории https://github.com/wpcraft-ru/wooms/issues/463
+- Улучшение: Continuous Deployments + автотесты https://github.com/wpcraft-ru/wooms/issues/268
+
 = 9.5 =
 - Исправлено: Не работает синхронизация категорий https://github.com/wpcraft-ru/wooms/issues/450
 - Доработана логика API - теперь все работает по новому
-
 
 = 9.4 =
 - Тест совместимости WooCommerce 8.2.1

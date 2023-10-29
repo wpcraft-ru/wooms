@@ -19,7 +19,7 @@
  * WC requires at least: 7.0
  * WC tested up to: 7.2.2
  *
- * Version: 9.5
+ * Version: 9.6
  */
 
 namespace WooMS;
@@ -54,40 +54,37 @@ add_action('plugins_loaded', function () {
   add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
 });
 
-add_filter('wooms_xt_load', '__return_false');
 add_filter('plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2);
-add_action('after_plugin_row_wooms-extra/wooms-extra.php', __NAMESPACE__ . '\\xt_plugin_update_message', 10, 2);
+
 
 add_filter( "plugin_action_links_" . plugin_basename(__FILE__), function($links){
 	$mng_link = '<a href="admin.php?page=moysklad">Управление</a>';
 	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
-    $ask = '<a href="https://wpcraft.ru/wooms/?utm_source=plugin" target="_blank">Консультации</a>';
-    array_unshift($links, $ask);
     array_unshift($links, $mng_link);
     array_unshift($links, $settings_link);
     return $links;
 });
 
 
-function xt_plugin_update_message($data, $response)
-{
+/**
+ * сообщяем про то что Extra плагин более не актуален
+ */
+add_action('after_plugin_row_wooms-extra/wooms-extra.php', function($data, $response){
 
-  $wp_list_table = _get_list_table('WP_Plugins_List_Table');
+	$wp_list_table = _get_list_table('WP_Plugins_List_Table');
 
-  printf(
-    '<tr class="plugin-update-tr">
-        <td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
-          <div class="update-message">
-            <span>Этот плагин следует удалить: <a href="https://github.com/wpcraft-ru/wooms/wiki/2022" target="_blank">https://github.com/wpcraft-ru/wooms/wiki/2022</a></span>
-          </div>
-        </td>
-      </tr>',
-    $wp_list_table->get_column_count()
-  );
-}
-
-
-
+	printf(
+	  '<tr class="plugin-update-tr">
+		  <td colspan="%s" class="plugin-update update-message notice inline notice-warning notice-alt">
+			<div class="update-message">
+			  <span>Этот плагин следует удалить. Теперь все работает на базе 9й версии и в одном плагине</a></span>
+			</div>
+		  </td>
+		</tr>',
+	  $wp_list_table->get_column_count()
+	);
+}, 10, 2);
+add_filter('wooms_xt_load', '__return_false');
 
 
 /**
@@ -97,8 +94,9 @@ function add_wooms_plugin_row_meta($links, $file)
 {
   if (strpos($file, 'wooms.php') !== false) {
     $new_links = array(
-      '<a style="color:green;" href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>',
-      '<a style="color:green;" href="https://github.com/orgs/wpcraft-ru/projects/2" target="_blank"><strong>Задачи</strong></a>',
+      '<a href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>',
+      '<a href="https://wpcraft.ru/wooms/?utm_source=plugin" target="_blank"><strong>Консультации</strong></a>',
+      '<a href="https://github.com/orgs/wpcraft-ru/projects/2" target="_blank"><strong>Задачи</strong></a>',
     );
 
     $links = array_merge($links, $new_links);

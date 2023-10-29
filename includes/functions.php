@@ -96,6 +96,8 @@ function wooms_get_wooms_id_from_href($href = '')
 /**
  * Get product id by UUID from metafield
  * or false
+ *
+ * @todo - add wooms_id_... solution as option
  */
 function wooms_get_product_id_by_uuid($uuid)
 {

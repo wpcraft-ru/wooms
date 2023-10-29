@@ -1,796 +1,787 @@
 {
-    "context": {
-        "employee": {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/context\/employee",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                "type": "employee",
-                "mediaType": "application\/json"
-            }
-        }
-    },
-    "meta": {
-        "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder",
-        "type": "productfolder",
-        "mediaType": "application\/json",
-        "size": 19,
-        "limit": 1000,
-        "offset": 0
-    },
-    "rows": [
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/1bbc413b-ada5-11ea-0a80-030c00217297",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=1bbc413b-ada5-11ea-0a80-030c00217297"
-            },
-            "id": "1bbc413b-ada5-11ea-0a80-030c00217297",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2020-06-13 21:38:43.475",
-            "name": "Авто",
-            "description": "Авто оборот более 150 млн руб - НДС",
-            "externalCode": "TYUfMyH7i6QlCBJcU178V0",
-            "archived": false,
-            "pathName": "",
-            "effectiveVat": 20,
-            "effectiveVatEnabled": true,
-            "vat": 20,
-            "vatEnabled": true,
-            "useParentVat": false
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/228c903e-a0ed-11eb-0a80-041000288acb",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=228c903e-a0ed-11eb-0a80-041000288acb"
-            },
-            "id": "228c903e-a0ed-11eb-0a80-041000288acb",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2021-04-19 11:56:31.224",
-            "name": "Аксессуары",
-            "externalCode": "qQ3MywJRjPGOpqqvhuyGD0",
-            "archived": false,
-            "pathName": "Электроника",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/b3f6975e-9192-11e7-7a34-5acf002db9a8",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=b3f6975e-9192-11e7-7a34-5acf002db9a8"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/380c02c8-d532-11e7-7a6c-d2a90010eb13",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=380c02c8-d532-11e7-7a6c-d2a90010eb13"
-            },
-            "id": "380c02c8-d532-11e7-7a6c-d2a90010eb13",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-11-29 21:22:12.368",
-            "name": "Ботинки",
-            "externalCode": "0J-TyEWug8KrngzhH5cxp0",
-            "archived": false,
-            "pathName": "Одежда\/Обувь",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
-            },
-            "id": "49d4fce1-9192-11e7-7a34-5acf002db217",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-09-04 19:58:34.813",
-            "name": "Мебель",
-            "externalCode": "kdtKQK1ogKhno2c3xZfYm0",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
-            },
-            "id": "5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2018-07-22 02:03:45.694",
-            "name": "Одежда",
-            "description": "Здесь какое-то описание категории",
-            "externalCode": "xfAY3ggCiydqBuADW7aUk0",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/65608988-ada4-11ea-0a80-09080021580f",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=65608988-ada4-11ea-0a80-09080021580f"
-            },
-            "id": "65608988-ada4-11ea-0a80-09080021580f",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2020-06-13 21:33:36.980",
-            "name": "Софт",
-            "externalCode": "T7PptWIRi500wAhn1swG-2",
-            "archived": false,
-            "pathName": "",
-            "effectiveVat": 0,
-            "effectiveVatEnabled": false,
-            "vat": 0,
-            "vatEnabled": false,
-            "useParentVat": false
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/7d637021-d532-11e7-7a34-5acf001098aa",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=7d637021-d532-11e7-7a34-5acf001098aa"
-            },
-            "id": "7d637021-d532-11e7-7a34-5acf001098aa",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-11-29 21:24:08.696",
-            "name": "Полуботинки",
-            "externalCode": "H3DpT-buiV40WH9n8onpf2",
-            "archived": false,
-            "pathName": "Одежда\/Обувь",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/aa89ac9c-145e-11ea-0a80-064d00191137",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=aa89ac9c-145e-11ea-0a80-064d00191137"
-            },
-            "id": "aa89ac9c-145e-11ea-0a80-064d00191137",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2019-12-02 20:28:59.028",
-            "name": "Доп группа для тестов",
-            "externalCode": "Zcc8S2yBhW9FSWMsocFCv3",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/aaaa8669-ad64-11ea-0a80-0180001fd23b",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=aaaa8669-ad64-11ea-0a80-0180001fd23b"
-            },
-            "id": "aaaa8669-ad64-11ea-0a80-0180001fd23b",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2020-06-13 13:57:25.985",
-            "name": "Услуги",
-            "externalCode": "RjKZx9c7hNwy0mnKNsPzB1",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/af65012d-d532-11e7-7a69-8f5500089258",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=af65012d-d532-11e7-7a69-8f5500089258"
-            },
-            "id": "af65012d-d532-11e7-7a69-8f5500089258",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-11-29 21:25:32.590",
-            "name": "Лоферы",
-            "externalCode": "0GZ4YCi6h5zj0hfjEy39Z1",
-            "archived": false,
-            "pathName": "Одежда\/Обувь",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/b3f6975e-9192-11e7-7a34-5acf002db9a8",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=b3f6975e-9192-11e7-7a34-5acf002db9a8"
-            },
-            "id": "b3f6975e-9192-11e7-7a34-5acf002db9a8",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2021-04-19 11:54:37.909",
-            "name": "Электроника",
-            "externalCode": "IBLQlPVTiYzahzLpObsBD3",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/bd78f771-9192-11e7-6b01-4b1d003beb61",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=bd78f771-9192-11e7-6b01-4b1d003beb61"
-            },
-            "id": "bd78f771-9192-11e7-6b01-4b1d003beb61",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2018-10-07 20:26:50.241",
-            "name": "Пицца",
-            "externalCode": "FYAuob0Mg7ZPaZA0KGp4d0",
-            "archived": false,
-            "pathName": "",
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/c5a08c17-0fb2-11ea-0a80-051900175a71",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=c5a08c17-0fb2-11ea-0a80-051900175a71"
-            },
-            "id": "c5a08c17-0fb2-11ea-0a80-051900175a71",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2019-11-25 21:38:32.965",
-            "name": "Комплекты",
-            "externalCode": "su9FWowIhFAT0L2ubj6so3",
-            "archived": false,
-            "pathName": "Одежда",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/ca733750-9192-11e7-7a31-d0fd002d3da1",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=ca733750-9192-11e7-7a31-d0fd002d3da1"
-            },
-            "id": "ca733750-9192-11e7-7a31-d0fd002d3da1",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-09-04 20:02:10.598",
-            "name": "Диваны",
-            "externalCode": "w29B2vvHhcqxLh-xrYvEt1",
-            "archived": false,
-            "pathName": "Мебель",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/d150c807-9192-11e7-7a31-d0fd002d3dd7",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=d150c807-9192-11e7-7a31-d0fd002d3dd7"
-            },
-            "id": "d150c807-9192-11e7-7a31-d0fd002d3dd7",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-09-04 20:02:22.117",
-            "name": "Кресла",
-            "externalCode": "EdUIDtV0hJIqeVABJMPkw3",
-            "archived": false,
-            "pathName": "Мебель",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/d7c8bd44-9192-11e7-7a6c-d2a9002da5c5",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=d7c8bd44-9192-11e7-7a6c-d2a9002da5c5"
-            },
-            "id": "d7c8bd44-9192-11e7-7a6c-d2a9002da5c5",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2018-10-02 18:32:52.491",
-            "name": "Столы",
-            "externalCode": "rvNkUWs5h8K-OaaFP2jN12",
-            "archived": false,
-            "pathName": "Мебель",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/ddb0ca35-9192-11e7-7a6c-d2a9002da7de",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=ddb0ca35-9192-11e7-7a6c-d2a9002da7de"
-            },
-            "id": "ddb0ca35-9192-11e7-7a6c-d2a9002da7de",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-09-04 20:02:42.877",
-            "name": "Футболки",
-            "externalCode": "-fcWZYgJiEDWAYycKyJTO2",
-            "archived": false,
-            "pathName": "Одежда",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
-            },
-            "id": "e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2018-10-02 19:06:09.455",
-            "name": "Обувь",
-            "externalCode": "wtnZARHEiesFHH3VqAQW73",
-            "archived": false,
-            "pathName": "Одежда",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
-                }
-            },
-            "useParentVat": true
-        },
-        {
-            "meta": {
-                "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e9caa413-9192-11e7-7a69-8f550016d504",
-                "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                "type": "productfolder",
-                "mediaType": "application\/json",
-                "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e9caa413-9192-11e7-7a69-8f550016d504"
-            },
-            "id": "e9caa413-9192-11e7-7a69-8f550016d504",
-            "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
-            "owner": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
-                    "type": "employee",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
-                }
-            },
-            "shared": true,
-            "group": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
-                    "type": "group",
-                    "mediaType": "application\/json"
-                }
-            },
-            "updated": "2017-09-04 20:03:03.179",
-            "name": "Штаны",
-            "externalCode": "NP52YvrPhnNRX2denoWTB3",
-            "archived": false,
-            "pathName": "Одежда",
-            "productFolder": {
-                "meta": {
-                    "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
-                    "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
-                    "type": "productfolder",
-                    "mediaType": "application\/json",
-                    "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
-                }
-            },
-            "useParentVat": true
-        }
-    ]
+  "context": {
+      "employee": {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/context\/employee",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+              "type": "employee",
+              "mediaType": "application\/json"
+          }
+      }
+  },
+  "meta": {
+      "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder",
+      "type": "productfolder",
+      "mediaType": "application\/json",
+      "size": 19,
+      "limit": 1000,
+      "offset": 0
+  },
+  "rows": [
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/1bbc413b-ada5-11ea-0a80-030c00217297",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=1bbc413b-ada5-11ea-0a80-030c00217297"
+          },
+          "id": "1bbc413b-ada5-11ea-0a80-030c00217297",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2020-06-13 21:38:43.475",
+          "name": "Авто",
+          "description": "Авто оборот более 150 млн руб - НДС",
+          "externalCode": "TYUfMyH7i6QlCBJcU178V0",
+          "archived": false,
+          "pathName": "",
+          "effectiveVat": 20,
+          "effectiveVatEnabled": true,
+          "vat": 20,
+          "vatEnabled": true,
+          "useParentVat": false
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/228c903e-a0ed-11eb-0a80-041000288acb",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=228c903e-a0ed-11eb-0a80-041000288acb"
+          },
+          "id": "228c903e-a0ed-11eb-0a80-041000288acb",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2023-10-29 13:18:25.282",
+          "name": "Аксессуары",
+          "externalCode": "qQ3MywJRjPGOpqqvhuyGD0",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/380c02c8-d532-11e7-7a6c-d2a90010eb13",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=380c02c8-d532-11e7-7a6c-d2a90010eb13"
+          },
+          "id": "380c02c8-d532-11e7-7a6c-d2a90010eb13",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-11-29 21:22:12.368",
+          "name": "Ботинки",
+          "externalCode": "0J-TyEWug8KrngzhH5cxp0",
+          "archived": false,
+          "pathName": "Одежда\/Обувь",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
+          },
+          "id": "49d4fce1-9192-11e7-7a34-5acf002db217",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-09-04 19:58:34.813",
+          "name": "Мебель",
+          "externalCode": "kdtKQK1ogKhno2c3xZfYm0",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
+          },
+          "id": "5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2018-07-22 02:03:45.694",
+          "name": "Одежда",
+          "description": "Здесь какое-то описание категории",
+          "externalCode": "xfAY3ggCiydqBuADW7aUk0",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/65608988-ada4-11ea-0a80-09080021580f",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=65608988-ada4-11ea-0a80-09080021580f"
+          },
+          "id": "65608988-ada4-11ea-0a80-09080021580f",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2020-06-13 21:33:36.980",
+          "name": "Софт",
+          "externalCode": "T7PptWIRi500wAhn1swG-2",
+          "archived": false,
+          "pathName": "",
+          "effectiveVat": 0,
+          "effectiveVatEnabled": false,
+          "vat": 0,
+          "vatEnabled": false,
+          "useParentVat": false
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/7d637021-d532-11e7-7a34-5acf001098aa",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=7d637021-d532-11e7-7a34-5acf001098aa"
+          },
+          "id": "7d637021-d532-11e7-7a34-5acf001098aa",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-11-29 21:24:08.696",
+          "name": "Полуботинки",
+          "externalCode": "H3DpT-buiV40WH9n8onpf2",
+          "archived": false,
+          "pathName": "Одежда\/Обувь",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/aa89ac9c-145e-11ea-0a80-064d00191137",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=aa89ac9c-145e-11ea-0a80-064d00191137"
+          },
+          "id": "aa89ac9c-145e-11ea-0a80-064d00191137",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2019-12-02 20:28:59.028",
+          "name": "Доп группа для тестов",
+          "externalCode": "Zcc8S2yBhW9FSWMsocFCv3",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/aaaa8669-ad64-11ea-0a80-0180001fd23b",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=aaaa8669-ad64-11ea-0a80-0180001fd23b"
+          },
+          "id": "aaaa8669-ad64-11ea-0a80-0180001fd23b",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2020-06-13 13:57:25.985",
+          "name": "Услуги",
+          "externalCode": "RjKZx9c7hNwy0mnKNsPzB1",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/af65012d-d532-11e7-7a69-8f5500089258",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=af65012d-d532-11e7-7a69-8f5500089258"
+          },
+          "id": "af65012d-d532-11e7-7a69-8f5500089258",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-11-29 21:25:32.590",
+          "name": "Лоферы",
+          "externalCode": "0GZ4YCi6h5zj0hfjEy39Z1",
+          "archived": false,
+          "pathName": "Одежда\/Обувь",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/b3f6975e-9192-11e7-7a34-5acf002db9a8",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=b3f6975e-9192-11e7-7a34-5acf002db9a8"
+          },
+          "id": "b3f6975e-9192-11e7-7a34-5acf002db9a8",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2021-04-19 11:54:37.909",
+          "name": "Электроника",
+          "externalCode": "IBLQlPVTiYzahzLpObsBD3",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/bd78f771-9192-11e7-6b01-4b1d003beb61",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=bd78f771-9192-11e7-6b01-4b1d003beb61"
+          },
+          "id": "bd78f771-9192-11e7-6b01-4b1d003beb61",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2018-10-07 20:26:50.241",
+          "name": "Пицца",
+          "externalCode": "FYAuob0Mg7ZPaZA0KGp4d0",
+          "archived": false,
+          "pathName": "",
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/c5a08c17-0fb2-11ea-0a80-051900175a71",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=c5a08c17-0fb2-11ea-0a80-051900175a71"
+          },
+          "id": "c5a08c17-0fb2-11ea-0a80-051900175a71",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2019-11-25 21:38:32.965",
+          "name": "Комплекты",
+          "externalCode": "su9FWowIhFAT0L2ubj6so3",
+          "archived": false,
+          "pathName": "Одежда",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/ca733750-9192-11e7-7a31-d0fd002d3da1",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=ca733750-9192-11e7-7a31-d0fd002d3da1"
+          },
+          "id": "ca733750-9192-11e7-7a31-d0fd002d3da1",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-09-04 20:02:10.598",
+          "name": "Диваны",
+          "externalCode": "w29B2vvHhcqxLh-xrYvEt1",
+          "archived": false,
+          "pathName": "Мебель",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/d150c807-9192-11e7-7a31-d0fd002d3dd7",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=d150c807-9192-11e7-7a31-d0fd002d3dd7"
+          },
+          "id": "d150c807-9192-11e7-7a31-d0fd002d3dd7",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-09-04 20:02:22.117",
+          "name": "Кресла",
+          "externalCode": "EdUIDtV0hJIqeVABJMPkw3",
+          "archived": false,
+          "pathName": "Мебель",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/d7c8bd44-9192-11e7-7a6c-d2a9002da5c5",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=d7c8bd44-9192-11e7-7a6c-d2a9002da5c5"
+          },
+          "id": "d7c8bd44-9192-11e7-7a6c-d2a9002da5c5",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2018-10-02 18:32:52.491",
+          "name": "Столы",
+          "externalCode": "rvNkUWs5h8K-OaaFP2jN12",
+          "archived": false,
+          "pathName": "Мебель",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/49d4fce1-9192-11e7-7a34-5acf002db217",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=49d4fce1-9192-11e7-7a34-5acf002db217"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/ddb0ca35-9192-11e7-7a6c-d2a9002da7de",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=ddb0ca35-9192-11e7-7a6c-d2a9002da7de"
+          },
+          "id": "ddb0ca35-9192-11e7-7a6c-d2a9002da7de",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-09-04 20:02:42.877",
+          "name": "Футболки",
+          "externalCode": "-fcWZYgJiEDWAYycKyJTO2",
+          "archived": false,
+          "pathName": "Одежда",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e5fc4aab-9192-11e7-7a31-d0fd002d3e90"
+          },
+          "id": "e5fc4aab-9192-11e7-7a31-d0fd002d3e90",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2018-10-02 19:06:09.455",
+          "name": "Обувь",
+          "externalCode": "wtnZARHEiesFHH3VqAQW73",
+          "archived": false,
+          "pathName": "Одежда",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
+              }
+          },
+          "useParentVat": true
+      },
+      {
+          "meta": {
+              "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/e9caa413-9192-11e7-7a69-8f550016d504",
+              "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+              "type": "productfolder",
+              "mediaType": "application\/json",
+              "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=e9caa413-9192-11e7-7a69-8f550016d504"
+          },
+          "id": "e9caa413-9192-11e7-7a69-8f550016d504",
+          "accountId": "1f2036af-9192-11e7-7a69-97110001d249",
+          "owner": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/1f2ec2de-9192-11e7-7a69-97110016a92b",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/employee\/metadata",
+                  "type": "employee",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#employee\/edit?id=1f2ec2de-9192-11e7-7a69-97110016a92b"
+              }
+          },
+          "shared": true,
+          "group": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/1f206231-9192-11e7-7a69-97110001d24a",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/group\/metadata",
+                  "type": "group",
+                  "mediaType": "application\/json"
+              }
+          },
+          "updated": "2017-09-04 20:03:03.179",
+          "name": "Штаны",
+          "externalCode": "NP52YvrPhnNRX2denoWTB3",
+          "archived": false,
+          "pathName": "Одежда",
+          "productFolder": {
+              "meta": {
+                  "href": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/5053b23e-9192-11e7-7a6c-d2a9002d9cf4",
+                  "metadataHref": "https:\/\/api.moysklad.ru\/api\/remap\/1.2\/entity\/productfolder\/metadata",
+                  "type": "productfolder",
+                  "mediaType": "application\/json",
+                  "uuidHref": "https:\/\/online.moysklad.ru\/app\/#good\/edit?id=5053b23e-9192-11e7-7a6c-d2a9002d9cf4"
+              }
+          },
+          "useParentVat": true
+      }
+  ]
 }

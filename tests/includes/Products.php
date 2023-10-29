@@ -2,76 +2,77 @@
 namespace WooMS\Tests\Products;
 
 use function Testeroid\{test, transaction_query, ddcli};
-use function WooMS\Tests\{getProductsRows, getVariantsRows};
+use function WooMS\Tests\{getProductsRows};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
-transaction_query('start');
 
 
+/**
+ * @todo to fix
+ */
+test( 'check schedule - false', function () {
+	transaction_query( 'start' );
 
-test('check schedule - false', function(){
+	\WooMS\set_config( 'walker_cron_enabled', 1 );
+	\WooMS\set_config( 'walker_cron_timer', 2 );
+	\WooMS\Products\set_state( 'end_timestamp', strtotime( '-3 hours' ) );
 
-  \WooMS\set_config('walker_cron_enabled', 1);
-  \WooMS\set_config('walker_cron_timer', 2);
-  \WooMS\Products\set_state('end_timestamp', strtotime('-3 hours'));
+	$r = as_unschedule_action(\WooMS\Products\HOOK_NAME);
 
-  $result = \WooMS\ProductsScheduler\check_schedule();
+	$result = \WooMS\ProductsScheduler\check_schedule();
+	transaction_query( 'rollback' );
 
-  if($result){
-    return true;
-  }
+	if ( $result ) {
+		return true;
+	}
 
-  return false;
-});
+	return false;
+} , 0);
 
-test('check schedule - true', function(){
+test( 'check schedule - true', function () {
 
-  \WooMS\set_config('walker_cron_enabled', 1);
-  \WooMS\set_config('walker_cron_timer', 2);
-  \WooMS\Products\set_state('end_timestamp', strtotime('-1 hours'));
+	transaction_query( 'start' );
 
-  $result = \WooMS\ProductsScheduler\check_schedule();
+	\WooMS\set_config( 'walker_cron_enabled', 1 );
+	\WooMS\set_config( 'walker_cron_timer', 2 );
+	\WooMS\Products\set_state( 'end_timestamp', strtotime( '-1 hours' ) );
 
-  if(empty($result)){
-    return true;
-  }
+	$result = \WooMS\ProductsScheduler\check_schedule();
+	transaction_query( 'rollback' );
 
-  return false;
-});
+	if ( empty( $result ) ) {
+		return true;
+	}
 
-
-
-test('new product update function', function(){
-
-  $row = getJsonForSimpleProduct_code00045();
+	return false;
+} );
 
 
-  $product = \WooMS\Products\product_update($row, $data = []);
+test( 'new product update function', function () {
+	transaction_query( 'start' );
+	$row = getJsonForSimpleProduct_code00045();
+	$product_id = \WooMS\Products\product_update( $row, $data = [] );
+	$product = wc_get_product($product_id);
+	transaction_query( 'rollback' );
 
-  if($row['name'] == $product->get_name()){
-    return true;
-  }
-  return false;
+	if ( $row['name'] == $product->get_name() ) {
+		return true;
+	}
+	return false;
 
-  // ddcli($product);
-
-});
-
+} );
 
 
 /**
  * Яндекс Станция - простой продукт
  */
-function getJsonForSimpleProduct_code00045(){
-  $rows = getProductsRows();
-  foreach($rows as $row){
-    if($row['code'] == "00045"){
-      return $row;
-    }
-  }
-  return false;
+function getJsonForSimpleProduct_code00045() {
+	$rows = getProductsRows();
+	foreach ( $rows as $row ) {
+		if ( $row['code'] == "00045" ) {
+			return $row;
+		}
+	}
+	return false;
 }
-
-
-transaction_query('rollback');

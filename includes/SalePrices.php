@@ -14,7 +14,7 @@ class SalePrices
    */
   public static function init()
   {
-    add_filter('wooms_product_save', array(__CLASS__, 'update_product'), 30, 2);
+    add_filter('wooms_product_update', array(__CLASS__, 'update_product'), 30, 2);
     add_filter('wooms_variation_save', array(__CLASS__, 'update_product'), 30, 2);
 
     add_action('admin_init', array(__CLASS__, 'settings_init'), $priority = 101, $accepted_args = 1);

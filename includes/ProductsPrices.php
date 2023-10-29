@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
   exit; // Exit if accessed directly
 }
 
-add_filter('wooms_product_save', __NAMESPACE__  . '\\product_chg_price', 10, 2);
+add_filter('wooms_product_update', __NAMESPACE__  . '\\product_chg_price', 10, 2);
 add_filter('wooms_variation_save', __NAMESPACE__  . '\\product_chg_price', 10, 2);
 add_action('admin_init', __NAMESPACE__  . '\\add_settings', 101);
 
@@ -35,7 +35,6 @@ function product_chg_price($product, $data_api)
 
   $price = floatval($price) / 100;
   $price = round($price, 2);
-  // $product->set_price($price);
   $product->set_regular_price($price);
 
   return $product;

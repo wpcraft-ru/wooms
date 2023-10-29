@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Single Product Import
+ * Опция которая позволяет синхронизировать продукт по отдельности
  */
 class ProductSingleSync
 {
@@ -162,7 +162,8 @@ class ProductSingleSync
     foreach ($data_api['rows'] as $item) {
       $i++;
 
-      do_action('wooms_products_variations_item', $item);
+	  \WooMS\ProductVariable::update_variation( $item );
+    //   do_action('wooms_products_variations_item', $item);
     }
 
     self::set_state('offset', self::get_state('offset') + $i);

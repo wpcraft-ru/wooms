@@ -4,18 +4,58 @@ namespace WooMS\Tests\Categories;
 
 use Error;
 use function Testeroid\{test, transaction_query, ddcli};
-use function WooMS\Tests\{getProductsRows, getVariantsRows};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
-transaction_query( 'start' );
+test( 'если удалили родительскую категорию в МС - на сайте тоже надо удалить', function () {
+	transaction_query( 'start' );
+
+	$args = array(
+		"hide_empty" => 0,
+		"taxonomy" => "product_cat",
+		"orderby" => "name",
+		"order" => "ASC"
+	);
+	$types = get_categories( $args );
+
+	foreach ( $types as $type ) {
+		wp_delete_category( $type->ID );
+	}
+
+	$data = \WooMS\Tests\get_productfolder();
+
+	$list = \WooMS\ProductsCategories::product_categories_update( $data );
+
+	foreach($data['rows'] as $key => $value){
+		if(isset($value['productFolder'])){
+			$uuid = $value['id'];
+			$term_id = \WooMS\ProductsCategories::check_term_by_ms_uuid( $uuid );
+			unset($data['rows'][$key]['productFolder']);
+			break;
+		}
+	}
+
+	$parent_term_id = get_term_by('id', $term_id, 'product_cat')->parent;
+
+	$list = \WooMS\ProductsCategories::product_categories_update( $data );
+
+	$parent_term_id_2 = get_term_by('id', $term_id, 'product_cat')->parent;
+
+	if(empty($parent_term_id_2)){
+		return true;
+	}
+
+	transaction_query('rollback');
+
+	return false;
+
+} );
 
 
 
-/**
- * to tests
- */
+
 test( 'save categories and product', function () {
+	transaction_query( 'start' );
 
 	$args = array(
 		"hide_empty" => 0,
@@ -231,9 +271,11 @@ test( 'save categories and product', function () {
 
 	};
 
-	$product = \WooMS\Products\product_update( $row() );
+	$product_id = \WooMS\Products\product_update( $row() );
+	$product = wc_get_product($product_id);
 
 	$ids = $product->get_category_ids();
+	transaction_query('rollback');
 
 	if ( empty( $ids ) ) {
 		throw new Error( 'Категорий нет' );
@@ -245,6 +287,7 @@ test( 'save categories and product', function () {
 
 
 test( 'save categories', function () {
+	transaction_query( 'start' );
 
 	$args = array(
 		"hide_empty" => 0,
@@ -259,9 +302,14 @@ test( 'save categories', function () {
 	}
 
 
+
 	$data = \WooMS\Tests\get_productfolder();
+	// $data = \WooMS\request('entity/productfolder');
+	// $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+	// ddcli($json);
 
 	$list = \WooMS\ProductsCategories::product_categories_update( $data );
+	transaction_query('rollback');
 
 	if ( empty( $list ) ) {
 		throw new Error( 'тут нужны категории' );
@@ -271,4 +319,3 @@ test( 'save categories', function () {
 
 } );
 
-transaction_query('rollback');

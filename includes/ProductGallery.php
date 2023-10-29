@@ -23,21 +23,9 @@ class ProductGallery
   public static function init()
   {
 
-
-    // add_action('init', function(){
-    //   if(!isset($_GET['dd'])){
-    //     return;
-    //   }
-
-    //   self::download_images_by_id(12237);
-
-
-    //   dd(0);
-    // });
-
     add_action('gallery_images_download_schedule', [__CLASS__, 'download_images_from_metafield']);
 
-    add_filter('wooms_product_save', [__CLASS__, 'update_product'], 40, 3);
+    add_filter('wooms_product_update', [__CLASS__, 'update_product'], 40, 2);
 
     add_action('admin_init', [__CLASS__, 'settings_init'], 70);
 
@@ -116,7 +104,7 @@ class ProductGallery
   /**
    * update_product
    */
-  public static function update_product($product, $data_api, $data)
+  public static function update_product($product, $data_api)
   {
 
     if (empty(get_option('woomss_gallery_sync_enabled'))) {

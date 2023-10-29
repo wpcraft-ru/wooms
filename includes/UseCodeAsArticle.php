@@ -16,7 +16,7 @@ class UseCodeAsArticle
     public static function init()
     {
         add_filter('wooms_get_product_id', [__CLASS__, 'get_product_id_by_code'], 40, 2);
-        add_filter('wooms_product_save', [__CLASS__, 'product_save'], 40, 2);
+        add_filter('wooms_product_update', [__CLASS__, 'product_save'], 40, 2);
         add_action('admin_init', [__CLASS__, 'add_settings'], 40);
     }
 
