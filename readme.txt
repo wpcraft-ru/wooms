@@ -77,7 +77,7 @@ PHP 7.0
 == Changelog ==
 
 = 9.7 =
--
+- Исправлено: похоже конвертация валюты сломалась... https://github.com/wpcraft-ru/wooms/issues/516
 
 
 = 9.6 =

@@ -19,6 +19,8 @@ function get_variant() {
 }
 
 function get_productfolder() {
+
+	// $data = \WooMS\request( 'entity/productfolder' );
 	$strJsonFileContents = file_get_contents( __DIR__ . "/data/productfolder.json" );
 	$data = json_decode( $strJsonFileContents, true );
 	return $data;
