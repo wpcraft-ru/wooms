@@ -79,6 +79,7 @@ PHP 7.0
 = 9.7 =
 - Исправлено: похоже конвертация валюты сломалась... https://github.com/wpcraft-ru/wooms/issues/516
 - Исправлено: улучшена работа с группами и категориями при наличии фильтрации https://github.com/wpcraft-ru/wooms/issues/520
+- Исправлено: Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
 
 
 = 9.6 =
