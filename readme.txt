@@ -76,6 +76,10 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.8 =
+- TBD
+
+
 = 9.7 =
 - Исправлено: похоже конвертация валюты сломалась... https://github.com/wpcraft-ru/wooms/issues/516
 - Исправлено: улучшена работа с группами и категориями при наличии фильтрации https://github.com/wpcraft-ru/wooms/issues/520
