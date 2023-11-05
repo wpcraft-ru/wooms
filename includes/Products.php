@@ -110,7 +110,9 @@ function process_rows( $rows = [] ) {
 			throw new Error('$rows is empty');
 		}
 
+		$ids = [];
 		foreach ( $rows as $row ) {
+			$ids[] = $row['id'];
 
 			if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
 				continue;
@@ -125,12 +127,18 @@ function process_rows( $rows = [] ) {
 			}
 
 			$data = apply_filters( 'wooms_product_data', [], $row );
+
 			product_update( $row, $data );
 		}
 
+
 		return true;
 	} catch (Throwable $e) {
-		do_action( 'wooms_logger_error', __NAMESPACE__, 'Главный обработчик завершился с ошибкой... ' . $e->getMessage() );
+
+		$message = sprintf("wooms process fails: %s, ids: %s, code: %s", $e->getMessage(), json_encode($ids), $e->getCode());
+		do_action( 'wooms_logger_error', __NAMESPACE__, $message );
+		error_log($message);
+
 		return false;
 	}
 
@@ -266,8 +274,6 @@ function product_update( array $row, array $data = [] ) {
 	 */
 	$product = apply_filters( 'wooms_product_save', $product, $data_api, $product_id );
 
-
-
 	//save data of source
 	if ( apply_filters( 'wooms_logger_enable', false ) ) {
 		$product->update_meta_data( 'wooms_data_api', json_encode( $data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
@@ -341,13 +347,7 @@ function product_update( array $row, array $data = [] ) {
 
 	$product = apply_filters( 'wooms_product_update', $product, $row, $data );
 
-	// return $product;
-
 	$product_id = $product->save();
-
-	if(empty(intval($product_id))){
-		throw new Error('$product_id is broke');
-	}
 
 	do_action(
 		'wooms_logger',

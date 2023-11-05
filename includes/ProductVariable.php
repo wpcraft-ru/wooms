@@ -353,12 +353,24 @@ class ProductVariable {
 		}
 
 		if(empty($row['product']['meta']['href'])){
-			ddcli($row);
 			throw new \Error('empty $row[product][meta][href]');
 		}
+
 		$product_href = $row['product']['meta']['href'];
 		$product_id = self::get_product_id_by_uuid( $product_href );
 		$product_parent = wc_get_product( $product_id );
+
+		if(empty($product_parent)){
+			do_action(
+				'wooms_logger_error',
+				__CLASS__,
+				sprintf( 'Нет базового продукта для вариации. %s', json_encode( ['product_id' => $product_id, '$row id' => $row ] ) )
+			);
+
+			return null;
+
+		}
+
 		if ( ! $product_parent->is_type( 'variable' ) ) {
 			$product_parent = new \WC_Product_Variable( $product_parent );
 			$product_parent->save();
@@ -644,8 +656,6 @@ class ProductVariable {
 		} else {
 			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs' ) );
 		}
-
-		$strings[] = sprintf( 'Количество обработанных записей: %s', empty( self::get_state( 'count' ) ) ? 0 : self::get_state( 'count' ) );
 
 		?>
 		<div>

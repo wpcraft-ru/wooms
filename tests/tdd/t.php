@@ -9,25 +9,25 @@ use function WooMS\Tests\{getProductsRows};
 use function WooMS\{request, set_config};
 
 require_once __DIR__ . '/../functions.php';
-/**
- * wp test tdd/t.php
- */
+// /**
+//  * wp test tdd/t.php
+//  */
 
 
 
 
 
-test('new', function(){
-	transaction_query('start');
+// test('new', function(){
+// 	transaction_query('start');
 
 
 
 
-	transaction_query('rollback');
+// 	transaction_query('rollback');
 
 
 
-	return false;
+// 	return false;
 
-}, 1);
+// }, 1);
 
