@@ -12,7 +12,6 @@ use function WooMS\Tests\{getProductsRows, get_variant};
 require_once __DIR__ . '/../functions.php';
 
 
-
 test('ProductAttributes - base test', function(){
 	transaction_query('start');
 

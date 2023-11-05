@@ -2,7 +2,7 @@
 /**
  * Исключение отмеченных в МойСклад товаров из синхронизации с сайтом
  *
- * @package WooMS XT (Extra)
+ * @todo - need to auto test
  */
 
 namespace WooMS\ProductsExclusion;

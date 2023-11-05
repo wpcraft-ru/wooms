@@ -1,0 +1,116 @@
+Array
+(
+    [context] => Array
+        (
+            [employee] => Array
+                (
+                    [meta] => Array
+                        (
+                            [href] => https://api.moysklad.ru/api/remap/1.2/context/employee
+                            [metadataHref] => https://api.moysklad.ru/api/remap/1.2/entity/employee/metadata
+                            [type] => employee
+                            [mediaType] => application/json
+                        )
+
+                )
+
+        )
+
+    [meta] => Array
+        (
+            [href] => https://api.moysklad.ru/api/remap/1.2/entity/currency/
+            [type] => currency
+            [mediaType] => application/json
+            [size] => 2
+            [limit] => 1000
+            [offset] => 0
+        )
+
+    [rows] => Array
+        (
+            [0] => Array
+                (
+                    [meta] => Array
+                        (
+                            [href] => https://api.moysklad.ru/api/remap/1.2/entity/currency/1f3ac651-9192-11e7-7a69-97110016a959
+                            [metadataHref] => https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata
+                            [type] => currency
+                            [mediaType] => application/json
+                            [uuidHref] => https://online.moysklad.ru/app/#currency/edit?id=1f3ac651-9192-11e7-7a69-97110016a959
+                        )
+
+                    [id] => 1f3ac651-9192-11e7-7a69-97110016a959
+                    [system] => 1
+                    [name] => руб
+                    [fullName] => Российский рубль
+                    [rate] => 1
+                    [multiplicity] => 1
+                    [indirect] => 
+                    [rateUpdateType] => manual
+                    [code] => 643
+                    [isoCode] => RUB
+                    [majorUnit] => Array
+                        (
+                            [gender] => masculine
+                            [s1] => рубль
+                            [s2] => рубля
+                            [s5] => рублей
+                        )
+
+                    [minorUnit] => Array
+                        (
+                            [gender] => feminine
+                            [s1] => копейка
+                            [s2] => копейки
+                            [s5] => копеек
+                        )
+
+                    [archived] => 
+                    [default] => 1
+                )
+
+            [1] => Array
+                (
+                    [meta] => Array
+                        (
+                            [href] => https://api.moysklad.ru/api/remap/1.2/entity/currency/c2404754-ed3c-11e9-0a80-043d00056ac5
+                            [metadataHref] => https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata
+                            [type] => currency
+                            [mediaType] => application/json
+                            [uuidHref] => https://online.moysklad.ru/app/#currency/edit?id=c2404754-ed3c-11e9-0a80-043d00056ac5
+                        )
+
+                    [id] => c2404754-ed3c-11e9-0a80-043d00056ac5
+                    [system] => 1
+                    [name] => доллар
+                    [fullName] => Доллар США
+                    [rate] => 93.2174
+                    [multiplicity] => 1
+                    [indirect] => 
+                    [rateUpdateType] => auto
+                    [code] => 840
+                    [isoCode] => USD
+                    [majorUnit] => Array
+                        (
+                            [gender] => masculine
+                            [s1] => доллар
+                            [s2] => доллара
+                            [s5] => долларов
+                        )
+
+                    [minorUnit] => Array
+                        (
+                            [gender] => masculine
+                            [s1] => цент
+                            [s2] => цента
+                            [s5] => центов
+                        )
+
+                    [archived] => 
+                    [default] => 
+                )
+
+        )
+
+)
+

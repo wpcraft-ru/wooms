@@ -7,7 +7,47 @@ use function Testeroid\{test, transaction_query, ddcli};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
+test('категории должны синхронизироваться с учетом выбранных в настройках', function(){
+
+	//https://github.com/wpcraft-ru/wooms/issues/520
+
+	transaction_query( 'start' );
+
+	$categories = get_categories( [
+		'taxonomy' => 'product_cat',
+		'hide_empty' => false,
+	] );
+
+	if($categories){
+		foreach($categories as $term){
+			wp_delete_term($term->term_id, 'product_cat');
+		}
+	}
+
+	\WooMS\CategoriesFilter::$groups = [];
+
+	$data = \WooMS\Tests\get_productfolder();
+	$ids1 = \WooMS\ProductsCategories::product_categories_update( $data );
+
+	\WooMS\CategoriesFilter::$groups = ['Одежда', 'Аксессуары'];
+
+	$ids2 = \WooMS\ProductsCategories::product_categories_update( $data );
+
+	wc_recount_all_terms();
+
+	transaction_query('rollback');
+
+	$ids3 = array_diff($ids1, $ids2);
+
+	if(count($ids3) > 0){
+		return true;
+	}
+	return false;
+
+});
+
 test( 'если удалили родительскую категорию в МС - на сайте тоже надо удалить', function () {
+	//https://github.com/wpcraft-ru/wooms/issues/520
 	transaction_query( 'start' );
 
 	$args = array(
@@ -35,8 +75,6 @@ test( 'если удалили родительскую категорию в М
 		}
 	}
 
-	$parent_term_id = get_term_by('id', $term_id, 'product_cat')->parent;
-
 	$list = \WooMS\ProductsCategories::product_categories_update( $data );
 
 	$parent_term_id_2 = get_term_by('id', $term_id, 'product_cat')->parent;
@@ -55,6 +93,7 @@ test( 'если удалили родительскую категорию в М
 
 
 test( 'save categories and product', function () {
+	//https://github.com/wpcraft-ru/wooms/issues/520
 	transaction_query( 'start' );
 
 	$args = array(
@@ -301,12 +340,7 @@ test( 'save categories', function () {
 		wp_delete_category( $type->ID );
 	}
 
-
-
 	$data = \WooMS\Tests\get_productfolder();
-	// $data = \WooMS\request('entity/productfolder');
-	// $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-	// ddcli($json);
 
 	$list = \WooMS\ProductsCategories::product_categories_update( $data );
 	transaction_query('rollback');

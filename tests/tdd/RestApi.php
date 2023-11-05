@@ -7,6 +7,48 @@ use function WooMS\{request, set_config};
 
 
 
+/**
+ * for this test we have to use REST API MS
+ */
+test( 'Test walker', function () {
+
+	transaction_query( 'start' );
+
+	$now = $now = date( "YmdHis" );
+
+	$args = [
+		'session_id' => $now,
+		'query_arg' => [
+			'offset' => 10,
+			'limit' => 10,
+		],
+		'rows_in_bunch' => 20,
+		'timestamp' => $now,
+		'end_timestamp' => 0,
+	];
+
+	$r = \WooMS\Products\walker( $args );
+
+	transaction_query( 'rollback' );
+
+	ddcli($r);
+
+	if ( 'restart' != $r['result'] ) {
+		throw new Error('$r[result] should be restart');
+	}
+	if ( 20 != $r['args_next_iteration']['query_arg']['offset'] ) {
+		return false;
+	}
+
+	if ( empty( $r['args_next_iteration']['session_id'] ) ) {
+		return false;
+	}
+
+	return true;
+
+} );
+
+
 test('assotment sync - base test - rest api', function(){
 	transaction_query('start');
 

@@ -12,14 +12,19 @@ defined( 'ABSPATH' ) || exit;
 class ProductsCategories {
 
 	public static function init() {
+		add_action( 'admin_init', array( __CLASS__, 'add_settings' ), 50 );
+		add_action( 'product_cat_edit_form_fields', array( __CLASS__, 'display_data_category' ), 30 );
+
+		if ( self::is_disable() ) {
+			return;
+		}
 
 		add_action( 'wooms_main_walker_started', array( __CLASS__, 'reset' ) );
 
 		add_filter( 'wooms_product_update', [ __CLASS__, 'update' ], 10, 3 );
 		add_filter( 'wooms_product_update', [ __CLASS__, 'add_ancestors' ], 15, 3 );
+		add_filter( 'wooms_main_walker_finish', [ __CLASS__, 'recount' ], 15, 3 );
 
-		add_action( 'admin_init', array( __CLASS__, 'add_settings' ), 50 );
-		add_action( 'product_cat_edit_form_fields', array( __CLASS__, 'display_data_category' ), 30 );
 	}
 
 
@@ -32,7 +37,8 @@ class ProductsCategories {
 		$term_id = self::check_term_by_ms_uuid( $row['productFolder']['meta']['href'] );
 
 		if ( empty( $term_id ) ) {
-			throw new Error( 'ProductsCategories - update - empty($term_id)' );
+
+			do_action( 'wooms_logger_error', __NAMESPACE__, 'ProductsCategories - update - empty($term_id)', $row['id'] );
 		}
 
 		$product->set_category_ids( array( $term_id ) );
@@ -77,27 +83,36 @@ class ProductsCategories {
 			throw new Error( 'No categories for products', 500 );
 		}
 
+		$rows = apply_filters('wooms_productfolder', $productfolder['rows']);
 
-		if ( count( $productfolder['rows'] ) < 1 ) {
-			throw new Error( 'No categories for products', 500 );
+		$ids = [];
+		foreach ( $rows as $row ) {
+			$ids[] = self::product_category_update( $row, $rows );
 		}
 
-
-		$list = [];
-		foreach ( $productfolder['rows'] as $row ) {
-			$list[] = self::product_category_update( $row, $productfolder );
-		}
-
-		if ( empty( $list ) ) {
+		if ( empty( $ids ) ) {
 			throw new Error( 'product_category_update = empty $list[]' );
 		}
 
+		//delete categories not about current iteration
+		$categories = get_categories( [
+			'taxonomy' => 'product_cat',
+			'hide_empty' => false,
+		] );
+		if($categories){
+			foreach($categories as $term){
+				if(in_array($term->term_id, $ids)){
+					continue;
+				}
+				wp_delete_term($term->term_id, 'product_cat');
+			}
+		}
 
-		return $list;
+		return $ids;
 
 	}
 
-	public static function product_category_update( $row, $productfolder ) {
+	public static function product_category_update( $row, $rows ) {
 
 		if ( empty( $row['id'] ) ) {
 			throw new Error( 'product_category_update = no $row[id]' );
@@ -113,9 +128,9 @@ class ProductsCategories {
 
 			if ( isset( $row['productFolder']['meta']['href'] ) ) {
 				$url_parent = $row['productFolder']['meta']['href'];
-				foreach ( $productfolder['rows'] as $parent_row ) {
+				foreach ( $rows as $parent_row ) {
 					if ( $parent_row['meta']['href'] == $url_parent ) {
-						$term_id_parent = self::product_category_update( $parent_row, $productfolder );
+						$term_id_parent = self::product_category_update( $parent_row, $rows );
 						$args['parent'] = $term_id_parent;
 						break;
 					}
@@ -129,8 +144,6 @@ class ProductsCategories {
 			return $term_id;
 		} else {
 
-			$args = array();
-
 			$term_new = array(
 				'wooms_id' => $row['id'],
 				'name' => $row['name'],
@@ -139,56 +152,17 @@ class ProductsCategories {
 
 			if ( isset( $row['productFolder']['meta']['href'] ) ) {
 				$url_parent = $row['productFolder']['meta']['href'];
-				foreach ( $productfolder['rows'] as $parent_row ) {
+
+				foreach ( $rows as $parent_row ) {
 					if ( $parent_row['meta']['href'] == $url_parent ) {
-						$term_id_parent = self::product_category_update( $parent_row, $productfolder );
-						$args['parent'] = $term_id_parent;
+						$term_id_parent = self::product_category_update( $parent_row, $rows );
+						$term_new['parent'] = $term_id_parent;
 						break;
 					}
 				}
 			}
 
-			$url_parent = isset( $row['productFolder']['meta']['href'] ) ? $row['productFolder']['meta']['href'] : '';
-			$path_name = isset( $row['pathName'] ) ? $row['pathName'] : null;
-
-			if ( apply_filters( 'wooms_skip_categories', true, $url_parent, $path_name ) ) {
-
-				$term = wp_insert_term( $term_new['name'], $taxonomy = 'product_cat', $args );
-				if ( is_wp_error( $term ) ) {
-
-					if ( isset( $term->error_data['term_exists'] ) ) {
-						$msg = $term->get_error_message();
-						$msg .= PHP_EOL . sprintf( 'Имя указанное при создании термина: %s', $term_new['name'] );
-						$msg .= PHP_EOL . sprintf( 'Существующий термин: %s', $term->error_data['term_exists'] );
-						$msg .= PHP_EOL . sprintf( 'Аргументы создания термина: %s', print_r( $args, true ) );
-
-					} else {
-						$msg = $term->get_error_message();
-						$msg .= PHP_EOL . print_r( $args, true );
-					}
-					do_action( 'wooms_logger_error', __CLASS__, $term->get_error_code(), $msg );
-				} else {
-					do_action(
-						'wooms_logger',
-						__CLASS__,
-						sprintf( 'Добавлен термин %s', $term_new['name'] ),
-						sprintf( 'Результат обработки %s', PHP_EOL . print_r( $term, true ) )
-					);
-				}
-			}
-
-			if ( isset( $term->errors["term_exists"] ) ) {
-				$term_id = intval( $term->error_data['term_exists'] );
-				if ( empty( $term_id ) ) {
-					return false;
-				}
-			} elseif ( isset( $term->term_id ) ) {
-				$term_id = $term->term_id;
-			} elseif ( is_array( $term ) && ! empty( $term["term_id"] ) ) {
-				$term_id = $term["term_id"];
-			} else {
-				return false;
-			}
+			$term_id = wp_insert_term($row['name'], 'product_cat', $term_new)['term_id'] ?? null;
 
 			update_term_meta( $term_id, 'wooms_id', $row['id'] );
 
@@ -198,7 +172,7 @@ class ProductsCategories {
 				update_term_meta( $term_id, 'wooms_session_id', $session_id );
 			}
 
-			do_action( 'wooms_add_category', $term, $url_parent, $path_name );
+			do_action( 'wooms_add_category', $term_id, $row, $rows );
 
 			return $term_id;
 		}
@@ -391,6 +365,12 @@ class ProductsCategories {
 			]
 		);
 	}
+
+
+	public static function recount( ) {
+		wc_recount_all_terms();
+	}
+
 }
 
 ProductsCategories::init();

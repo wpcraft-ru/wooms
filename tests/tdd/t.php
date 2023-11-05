@@ -9,29 +9,25 @@ use function WooMS\Tests\{getProductsRows};
 use function WooMS\{request, set_config};
 
 require_once __DIR__ . '/../functions.php';
-/**
- * wp test tdd/t.php
- */
+// /**
+//  * wp test tdd/t.php
+//  */
 
 
 
 
 
-/**
- * todo - add test for currencies
- */
-test('currency - https://github.com/wpcraft-ru/wooms/issues/516', function(){
-	transaction_query('start');
-
-	ddcli(\WooMS\CurrencyConverter::OPTION_KEY);
-
-	transaction_query('rollback');
-
-
-}, 0);
+// test('new', function(){
+// 	transaction_query('start');
 
 
 
 
-// transaction_query('rollback');
+// 	transaction_query('rollback');
+
+
+
+// 	return false;
+
+// }, 1);
 
