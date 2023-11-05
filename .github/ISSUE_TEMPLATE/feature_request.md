@@ -1,5 +1,5 @@
 ---
-name: Feature request
+name: Запрос улучшений
 about: Suggest an idea for this project
 title: ''
 labels: ''
@@ -7,14 +7,20 @@ assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Что нужно?**
+...
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Чтобы что?**
+...
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Как?**
+//Тут можно описать детали или варианты того как вы выдите реализацию
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Макеты**
+//Дизайн макеты и/или снимки примеров которые могут улучшить понимание ожидаемых результатов
+
+**Дополнительные детали**
+//Все что может быть полезно для диагностики и поиска решений
+
+**Бюджет**
+//Сколько готовы заплатить за решение? Если интересует помощь за оплату.
