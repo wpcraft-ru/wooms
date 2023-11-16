@@ -1071,7 +1071,7 @@ class Orders
      */
     public static function add_settings()
     {
-        add_settings_section('wooms_section_orders', 'Заказы - передача в МойСклад', '', 'mss-settings');
+        add_settings_section('wooms_section_orders', 'Заказы', '', 'mss-settings');
 
         $orders_sender_enable_key = 'wooms_orders_sender_enable';
         register_setting('mss-settings', $orders_sender_enable_key);
