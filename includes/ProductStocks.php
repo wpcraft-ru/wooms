@@ -196,14 +196,14 @@ class ProductStocks {
 		}
 
 		if ( empty( get_option( 'wooms_warehouse_count' ) ) ) {
-			$product->set_manage_stock( 'no' );
+			$product->set_manage_stock( true );
 		} else {
 			if ( $product->is_type( 'variable' ) ) {
 
 				//для вариативных товаров доступность определяется наличием вариаций
-				$product->set_manage_stock( 'no' );
+				$product->set_manage_stock( false );
 			} else {
-				$product->set_manage_stock( 'yes' );
+				$product->set_manage_stock( true );
 			}
 		}
 
@@ -226,8 +226,6 @@ class ProductStocks {
 
 		return $product;
 	}
-
-
 
 	/**
 	 * restart walker after added tast to queue

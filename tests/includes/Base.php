@@ -11,6 +11,9 @@ test( 'wooms active?', function () {
 	transaction_query( 'start' );
 
 	$can_start = wooms_can_start();
+
+	transaction_query('rollback');
+
 	return $can_start;
 
 } );
