@@ -77,7 +77,8 @@ PHP 7.0
 == Changelog ==
 
 = 9.8 =
-- TBD
+- Тест совместимости WooCommerce 8.3.1
+-
 
 
 = 9.7 =
