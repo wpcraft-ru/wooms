@@ -78,7 +78,7 @@ PHP 7.0
 
 = 9.8 =
 - Тест совместимости WooCommerce 8.3.1
--
+- fix: Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
 
 
 = 9.7 =
