@@ -83,7 +83,8 @@ class ProductStocks {
 			$filters[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
 		}
 
-		$url = 'entity/assortment';
+		// todo - переписать это как то лучше
+		$url = 'https://api.moysklad.ru/api/remap/1.2/entity/assortment';
 
 		$filters = apply_filters( 'wooms_assortment_sync_filters', $filters );
 
@@ -166,9 +167,6 @@ class ProductStocks {
 		return $data;
 	}
 
-	/**
-	 * update_stock
-	 */
 	public static function update_stock( $product, $data_api ) {
 		$product = wc_get_product( $product );
 
@@ -196,10 +194,9 @@ class ProductStocks {
 		}
 
 		if ( empty( get_option( 'wooms_warehouse_count' ) ) ) {
-			$product->set_manage_stock( true );
+			$product->set_manage_stock( false );
 		} else {
 			if ( $product->is_type( 'variable' ) ) {
-
 				//для вариативных товаров доступность определяется наличием вариаций
 				$product->set_manage_stock( false );
 			} else {
@@ -307,14 +304,13 @@ class ProductStocks {
 	/**
 	 * Get product variant ID
 	 *
-	 * XXX move to trait
-	 *
 	 * @param $uuid
 	 */
 	public static function get_product_id_by_uuid( $uuid ) {
 		if ( strpos( $uuid, 'http' ) !== false ) {
 			$uuid = str_replace( 'https://online.moysklad.ru/api/remap/1.1/entity/product/', '', $uuid );
 			$uuid = str_replace( 'https://online.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid );
+			$uuid = str_replace( 'https://api.moysklad.ru/api/remap/1.1/entity/product/', '', $uuid );
 			$uuid = str_replace( 'https://api.moysklad.ru/api/remap/1.2/entity/product/', '', $uuid );
 		}
 

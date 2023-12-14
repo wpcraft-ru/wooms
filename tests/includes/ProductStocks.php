@@ -7,8 +7,10 @@ use function WooMS\Tests\{getProductsRows};
 use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
-test('остатки - должно указываться количество - не факт что работает', function(){
-	transaction_query('start');
+test('остатки - должно указываться количество - если выбран 1 склад', function(){
+	// transaction_query('start');
+
+	update_option('wooms_warehouse_count', true);
 
 	$data = \WooMS\Tests\get_assortment();
 
@@ -24,16 +26,27 @@ test('остатки - должно указываться количество 
 
 	$product = \WooMS\ProductStocks::update_stock($product, $row);
 
-	transaction_query('rollback');
+	// $product->get_manage_stock(true);
+	// $product->save();
+	// exit;
+	// $product->set_manage_stock(false);
+
+	// ddcli($product->get_title(), $product->get_stock_status(), $product->get_stock_quantity(), $product->get_manage_stock());
+
+	if( ! $product->get_manage_stock()){
+		throw new Error('get_manage_stock - not working');
+	}
 
 	if(empty($row['quantity'])){
 		throw new Error('$row[quantity] is empty');
 	}
-	if($row['quantity'] === $product->get_stock_quantity()){
-		return true;
+
+	if($row['quantity'] !== $product->get_stock_quantity()){
+		throw new Error('quantity not good');
+
 	}
 
-	return false;
+	return true;
 
  });
 

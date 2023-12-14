@@ -3,7 +3,7 @@ Contributors: casepress
 Donate link: https://wpcraft.ru/product/wooms-extra/
 Tags: moysklad, woocommerce, sync, integration
 Requires at least: 6.0
-Tested up to: 6.4
+Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -75,6 +75,9 @@ PHP 7.0
 3. Журнал обработки
 
 == Changelog ==
+
+= 9.9 =
+- Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
 
 = 9.8 =
 - Тест совместимости WooCommerce 8.3.1
