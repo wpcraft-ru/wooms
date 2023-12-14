@@ -77,7 +77,7 @@ PHP 7.0
 == Changelog ==
 
 = 9.9 =
-- Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
+- Исправление: Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
 - Тест совместимости WooCommerce 8.4.0
 
 = 9.8 =
