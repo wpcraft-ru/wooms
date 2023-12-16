@@ -17,7 +17,7 @@
  * WP requires at least: 5.0
  * Tested up to: 6.4.2
  * WC requires at least: 7.0
- * WC tested up to: 8.3.1
+ * WC tested up to: 8.4.0
  *
  * Version: 9.10
  */
