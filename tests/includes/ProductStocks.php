@@ -8,7 +8,7 @@ use function WooMS\Products\{get_product_id_by_uuid, process_rows};
 
 
 test('остатки - должно указываться количество - если выбран 1 склад', function(){
-	// transaction_query('start');
+	transaction_query('start');
 
 	update_option('wooms_warehouse_count', true);
 
@@ -26,12 +26,7 @@ test('остатки - должно указываться количество 
 
 	$product = \WooMS\ProductStocks::update_stock($product, $row);
 
-	// $product->get_manage_stock(true);
-	// $product->save();
-	// exit;
-	// $product->set_manage_stock(false);
-
-	// ddcli($product->get_title(), $product->get_stock_status(), $product->get_stock_quantity(), $product->get_manage_stock());
+	transaction_query('rollback');
 
 	if( ! $product->get_manage_stock()){
 		throw new Error('get_manage_stock - not working');
