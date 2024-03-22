@@ -78,7 +78,7 @@ PHP 7.0
 
 = 9.11 =
 - Тест совместимости WooCommerce 8.7.0
-- This plugin is incompatible with the enabled WooCommerce feature 'Высокопроизводительное хранилище заказов' https://github.com/wpcraft-ru/wooms/issues/539
+- Совместимость: 'Высокопроизводительное хранилище заказов' https://github.com/wpcraft-ru/wooms/issues/539
 
 = 9.10 =
 - Исправлена ошибка с версией
