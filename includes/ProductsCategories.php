@@ -162,7 +162,9 @@ class ProductsCategories {
 				}
 			}
 
-			$term_id = wp_insert_term($row['name'], 'product_cat', $term_new)['term_id'] ?? null;
+			// https://github.com/wpcraft-ru/wooms/issues/524#issuecomment-1860552168
+			$term    = wp_insert_term( $row['name'], 'product_cat', $term_new );
+			$term_id = ! is_wp_error( $term ) ? $term['term_id'] : null;
 
 			update_term_meta( $term_id, 'wooms_id', $row['id'] );
 
