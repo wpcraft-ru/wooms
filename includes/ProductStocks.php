@@ -38,7 +38,7 @@ class ProductStocks {
 		add_action( 'wooms_products_batch_end', [ __CLASS__, 'restart_after_batch' ] );
 		add_action( 'wooms_main_walker_started', [ __CLASS__, 'restart' ] );
 
-		add_action( 'admin_init', [__CLASS__, 'add_settings'], 30 );
+		add_action( 'admin_init', [ __CLASS__, 'add_settings' ], 30 );
 		add_action( 'wooms_tools_sections', array( __CLASS__, 'display_state' ), 17 );
 
 		add_filter( 'wooms_stock_type', array( __CLASS__, 'select_type_stock' ) );
@@ -50,8 +50,8 @@ class ProductStocks {
 	}
 
 
-	public static function batch_handler($state = []) {
-		if(empty($state)){
+	public static function batch_handler( $state = [] ) {
+		if ( empty( $state ) ) {
 			$state = [
 				'count' => 0
 			];
@@ -73,17 +73,21 @@ class ProductStocks {
 		);
 
 		$products = get_posts( $args );
-		if ( empty($products) ) {
+
+		if ( empty( $products ) ) {
 			self::set_state( 'finish_timestamp', time() );
 			return false;
 		}
 
-		$filters = [];
+		$filters_by_id = [];
 		foreach ( $products as $product ) {
-			$filters[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
-		}
 
-		// todo - переписать это как то лучше
+			$filters_by_id[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
+		}
+		$filters = [
+			implode( ';', $filters_by_id )
+		];
+
 		$url = 'https://api.moysklad.ru/api/remap/1.2/entity/assortment';
 
 		$filters = apply_filters( 'wooms_assortment_sync_filters', $filters );
@@ -104,19 +108,18 @@ class ProductStocks {
 			return false;
 		}
 
-
-		$ids = self::process_rows($data['rows']);
-		if($ids){
+		$ids = self::process_rows( $data['rows'] );
+		if ( $ids ) {
 			$state['last_ids'] = $ids;
 		}
 
-		$state['count'] += count($data['rows']);
+		$state['count'] += count( $data['rows'] );
 
-		return as_schedule_single_action( time(), self::$walker_hook_name, [$state], 'WooMS' );
+		return as_schedule_single_action( time(), self::$walker_hook_name, [ $state ], 'WooMS' );
 
 	}
 
-	public static function process_rows($rows){
+	public static function process_rows( $rows ) {
 
 		$ids = [];
 		foreach ( $rows as $row ) {
@@ -132,6 +135,7 @@ class ProductStocks {
 			$product = self::update_stock( $product, $row );
 
 			$product->update_meta_data( 'wooms_assortment_data', self::get_stock_data_log( $row, $product_id ) );
+
 			$product->delete_meta_data( self::$walker_hook_name );
 
 			/**
@@ -168,7 +172,6 @@ class ProductStocks {
 	}
 
 	public static function update_stock( $product, $data_api ) {
-		$product = wc_get_product( $product );
 
 		$product_id = $product->get_id();
 
@@ -205,10 +208,8 @@ class ProductStocks {
 		}
 
 		if ( $stock <= 0 ) {
-			if ( ! $product->is_type( 'variable' ) ) {
-				$product->set_stock_quantity( 0 );
-				$product->set_stock_status( 'outofstock' );
-			}
+			$product->set_stock_quantity( 0 );
+			$product->set_stock_status( 'outofstock' );
 		} else {
 			$product->set_stock_quantity( $stock );
 			$product->set_stock_status( 'instock' );
@@ -235,14 +236,12 @@ class ProductStocks {
 
 
 	public static function restart_after_batch() {
-		if(as_has_scheduled_action(self::$walker_hook_name)){
+		if ( as_has_scheduled_action( self::$walker_hook_name ) ) {
 			return;
 		}
 
 		as_schedule_single_action( time(), self::$walker_hook_name, [], 'WooMS' );
 	}
-
-
 
 
 	/**
@@ -481,7 +480,7 @@ class ProductStocks {
 
 				$url = 'entity/store';
 				$data = request( $url );
-				if ( empty( $data['rows'] ) ) {
+				if ( empty ( $data['rows'] ) ) {
 					echo 'Система не смогла получить список складов из МойСклад';
 					return;
 				}
@@ -601,11 +600,7 @@ class ProductStocks {
 		$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_assortment_sync&orderby=schedule&order=desc' ) );
 
 
-		if ( defined( 'WC_LOG_HANDLER' ) && 'WC_Log_Handler_DB' == WC_LOG_HANDLER ) {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductStocks' ) );
-		} else {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs' ) );
-		}
+		$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductStocks' ) );
 
 		?>
 		<h2>Остатки</h2>
