@@ -73,17 +73,21 @@ class ProductStocks {
 		);
 
 		$products = get_posts( $args );
+
 		if ( empty( $products ) ) {
 			self::set_state( 'finish_timestamp', time() );
 			return false;
 		}
 
-		$filters = [];
+		$filters_by_id = [];
 		foreach ( $products as $product ) {
-			$filters[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
-		}
 
-		// todo - переписать это как то лучше
+			$filters_by_id[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
+		}
+		$filters = [
+			implode( ';', $filters_by_id )
+		];
+
 		$url = 'https://api.moysklad.ru/api/remap/1.2/entity/assortment';
 
 		$filters = apply_filters( 'wooms_assortment_sync_filters', $filters );
@@ -103,7 +107,6 @@ class ProductStocks {
 		if ( empty( $data['rows'] ) ) {
 			return false;
 		}
-
 
 		$ids = self::process_rows( $data['rows'] );
 		if ( $ids ) {
@@ -132,11 +135,7 @@ class ProductStocks {
 			$product = self::update_stock( $product, $row );
 
 			$product->update_meta_data( 'wooms_assortment_data', self::get_stock_data_log( $row, $product_id ) );
-			do_action(
-				'wooms_logger',
-				__CLASS__,
-				sprintf( 'Сохранены остатки для продукта %s (%s): %s', $product->get_id(), $product->get_name(), self::get_stock_data_log( $row, $product_id ) )
-			);
+
 			$product->delete_meta_data( self::$walker_hook_name );
 
 			/**
@@ -173,7 +172,6 @@ class ProductStocks {
 	}
 
 	public static function update_stock( $product, $data_api ) {
-		$product = wc_get_product( $product );
 
 		$product_id = $product->get_id();
 
@@ -210,10 +208,8 @@ class ProductStocks {
 		}
 
 		if ( $stock <= 0 ) {
-			if ( ! $product->is_type( 'variable' ) ) {
-				$product->set_stock_quantity( 0 );
-				$product->set_stock_status( 'outofstock' );
-			}
+			$product->set_stock_quantity( 0 );
+			$product->set_stock_status( 'outofstock' );
 		} else {
 			$product->set_stock_quantity( $stock );
 			$product->set_stock_status( 'instock' );
@@ -246,8 +242,6 @@ class ProductStocks {
 
 		as_schedule_single_action( time(), self::$walker_hook_name, [], 'WooMS' );
 	}
-
-
 
 
 	/**
@@ -606,11 +600,7 @@ class ProductStocks {
 		$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_assortment_sync&orderby=schedule&order=desc' ) );
 
 
-		if ( defined( 'WC_LOG_HANDLER' ) && 'WC_Log_Handler_DB' == WC_LOG_HANDLER ) {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductStocks' ) );
-		} else {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs' ) );
-		}
+		$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductStocks' ) );
 
 		?>
 		<h2>Остатки</h2>
