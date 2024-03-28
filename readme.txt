@@ -78,6 +78,7 @@ PHP 7.0
 
 = 9.11 =
 - Тест совместимости WooCommerce 8.7.0
+- Улучшен логгер синхронизации остатков
 - Не обновляются остатки по товарам https://github.com/wpcraft-ru/wooms/issues/544 https://github.com/wpcraft-ru/wooms/issues/524
 - Совместимость: 'Высокопроизводительное хранилище заказов' https://github.com/wpcraft-ru/wooms/issues/539
 

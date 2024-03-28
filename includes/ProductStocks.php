@@ -38,7 +38,7 @@ class ProductStocks {
 		add_action( 'wooms_products_batch_end', [ __CLASS__, 'restart_after_batch' ] );
 		add_action( 'wooms_main_walker_started', [ __CLASS__, 'restart' ] );
 
-		add_action( 'admin_init', [__CLASS__, 'add_settings'], 30 );
+		add_action( 'admin_init', [ __CLASS__, 'add_settings' ], 30 );
 		add_action( 'wooms_tools_sections', array( __CLASS__, 'display_state' ), 17 );
 
 		add_filter( 'wooms_stock_type', array( __CLASS__, 'select_type_stock' ) );
@@ -50,8 +50,8 @@ class ProductStocks {
 	}
 
 
-	public static function batch_handler($state = []) {
-		if(empty($state)){
+	public static function batch_handler( $state = [] ) {
+		if ( empty( $state ) ) {
 			$state = [
 				'count' => 0
 			];
@@ -73,7 +73,7 @@ class ProductStocks {
 		);
 
 		$products = get_posts( $args );
-		if ( empty($products) ) {
+		if ( empty( $products ) ) {
 			self::set_state( 'finish_timestamp', time() );
 			return false;
 		}
@@ -105,18 +105,18 @@ class ProductStocks {
 		}
 
 
-		$ids = self::process_rows($data['rows']);
-		if($ids){
+		$ids = self::process_rows( $data['rows'] );
+		if ( $ids ) {
 			$state['last_ids'] = $ids;
 		}
 
-		$state['count'] += count($data['rows']);
+		$state['count'] += count( $data['rows'] );
 
-		return as_schedule_single_action( time(), self::$walker_hook_name, [$state], 'WooMS' );
+		return as_schedule_single_action( time(), self::$walker_hook_name, [ $state ], 'WooMS' );
 
 	}
 
-	public static function process_rows($rows){
+	public static function process_rows( $rows ) {
 
 		$ids = [];
 		foreach ( $rows as $row ) {
@@ -132,6 +132,11 @@ class ProductStocks {
 			$product = self::update_stock( $product, $row );
 
 			$product->update_meta_data( 'wooms_assortment_data', self::get_stock_data_log( $row, $product_id ) );
+			do_action(
+				'wooms_logger',
+				__CLASS__,
+				sprintf( 'Сохранены остатки для продукта %s (%s): %s', $product->get_id(), $product->get_name(), self::get_stock_data_log( $row, $product_id ) )
+			);
 			$product->delete_meta_data( self::$walker_hook_name );
 
 			/**
@@ -235,7 +240,7 @@ class ProductStocks {
 
 
 	public static function restart_after_batch() {
-		if(as_has_scheduled_action(self::$walker_hook_name)){
+		if ( as_has_scheduled_action( self::$walker_hook_name ) ) {
 			return;
 		}
 
@@ -481,7 +486,7 @@ class ProductStocks {
 
 				$url = 'entity/store';
 				$data = request( $url );
-				if ( empty( $data['rows'] ) ) {
+				if ( empty ( $data['rows'] ) ) {
 					echo 'Система не смогла получить список складов из МойСклад';
 					return;
 				}
