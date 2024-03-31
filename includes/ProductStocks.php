@@ -5,6 +5,8 @@ namespace WooMS;
 use WC_Product;
 use function WooMS\request;
 
+use function WooMS\get_config as get_config;
+use function WooMS\get_config_name as get_config_name;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 
@@ -27,18 +29,19 @@ class ProductStocks {
 
 	public static function init() {
 
-		add_action('init', function(){
-			if(!isset($_GET['test_ProductStocks'])){
+		add_action( 'init', function () {
+			if ( ! isset ( $_GET['test_ProductStocks'] ) ) {
 				return;
 			}
 
-			do_action('wooms_assortment_sync');
+			// do_action('wooms_assortment_sync');
 			// var_dump(1); exit;
 
-			$meta = get_post_meta( 67803 );
+			$meta = get_post_meta( 68934 );
 			echo '<pre>';
-			var_dump($meta); exit;
-		});
+			var_dump( $meta );
+			exit;
+		} );
 
 		add_filter( 'wooms_stock_product_save', [ __CLASS__, 'update_manage_stock' ], 10, 2 );
 
@@ -56,7 +59,7 @@ class ProductStocks {
 		add_action( 'admin_init', [ __CLASS__, 'add_settings' ], 30 );
 		add_action( 'wooms_tools_sections', array( __CLASS__, 'display_state' ), 17 );
 
-		add_filter( 'wooms_stock_type', array( __CLASS__, 'select_type_stock' ) );
+		// add_filter( 'wooms_stock_type', array( __CLASS__, 'select_type_stock' ) );
 
 	}
 
@@ -168,16 +171,24 @@ class ProductStocks {
 	}
 
 
-	public static function update_stock( WC_Product $product, $data_api ) : WC_Product {
+	public static function update_stock( WC_Product $product, $data_api ): WC_Product {
+
+		//если продукт вариативный, то его наличие определяется его вариациями и это отдельный поток хуков
+		if ( $product->get_type() === 'variable' ) {
+			return $product;
+		}
 
 		/**
 		 * Поле по которому берем остаток?
 		 * quantity = это доступные остатки за вычетом резервов
 		 * stock = это все остатки без уета резерва
 		 */
-		$stock_type = apply_filters( 'wooms_stock_type', 'quantity' );
+		if(get_config('stock_and_reserve')){
+			$stock = (int) $data_api['quantity'] ?? 0;
+		} else {
+			$stock = (int) $data_api['stock'] ?? 0;
+		}
 
-		$stock = (int) $data_api[ $stock_type ] ?? 0;
 		if ( $stock > 0 ) {
 			$product->set_stock_quantity( $stock );
 			$product->set_stock_status( 'instock' );
@@ -192,7 +203,7 @@ class ProductStocks {
 			'type' => $product->get_type(),
 		];
 
-		if($product->get_type() === 'variation') {
+		if ( $product->get_type() === 'variation' ) {
 			$log_data['product_parent'] = $product->get_parent_id();
 		}
 
@@ -211,7 +222,7 @@ class ProductStocks {
 	 *
 	 * @todo вероятно опция типа wooms_warehouse_count - более не нужна
 	 */
-	public static function update_manage_stock( WC_Product $product, $data_api ) : WC_Product {
+	public static function update_manage_stock( WC_Product $product, $data_api ): WC_Product {
 
 		if ( ! get_option( 'woocommerce_manage_stock' ) ) {
 			return $product;
@@ -410,16 +421,6 @@ class ProductStocks {
 		return $filter;
 	}
 
-	/**
-	 * Select type stock
-	 */
-	public static function select_type_stock( $type_stock ) {
-		if ( get_option( 'wooms_stocks_without_reserve' ) ) {
-			$type_stock = 'stock';
-		}
-
-		return $type_stock;
-	}
 
 	/**
 	 * Update stock for variation
@@ -475,13 +476,20 @@ class ProductStocks {
 			$section = 'woomss_section_warehouses'
 		);
 
-		register_setting( 'mss-settings', 'wooms_stocks_without_reserve' );
+
 		add_settings_field(
-			$id = 'wooms_stocks_without_reserve',
-			$title = 'Остатки без резерва',
-			$callback = array( __CLASS__, 'display_field_wooms_stocks_without_reserve' ),
+			$id = 'stock_and_reserve',
+			$title = 'Учитывать остатки с резервом',
+			$callback = function ($args) {
+				printf( '<input type="checkbox" name="%s" value="1" %s />', $args['name'], $args['value'] );
+
+			},
 			$page = 'mss-settings',
-			$section = 'woomss_section_warehouses'
+			$section,
+			$args = [
+				'name' => get_config_name( 'stock_and_reserve' ),
+				'value' => checked( 1, get_config( 'stock_and_reserve' ) ),
+			]
 		);
 
 		// register_setting( 'mss-settings', 'wooms_warehouse_count' );
@@ -584,14 +592,6 @@ class ProductStocks {
 		echo '<p><small>Если включить опцию то система будет разрешать предзаказ при 0 остатках</small></p>';
 	}
 
-	/**
-	 * display_field_wooms_stocks_without_reserve
-	 */
-	public static function display_field_wooms_stocks_without_reserve() {
-		$option = 'wooms_stocks_without_reserve';
-		printf( '<input type="checkbox" name="%s" value="1" %s />', $option, checked( 1, get_option( $option ), false ) );
-		echo '<p><small>Если включить опцию то на сайте будут учитываться остатки без учета резерва</small></p>';
-	}
 
 	/**
 	 * Display field

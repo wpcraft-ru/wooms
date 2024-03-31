@@ -17,6 +17,14 @@ function get_config( $key = null ) {
 	return $config[ $key ] ?? null;
 }
 
+/**
+ * Get name of form field by key
+ */
+function get_config_name( $key ) {
+
+	return OPTION_KEY . '[' . $key . ']';
+}
+
 function set_config( $key, $value ) {
 	$config = get_option( OPTION_KEY, [] );
 	$config[ $key ] = $value;
