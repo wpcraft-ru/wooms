@@ -614,7 +614,7 @@ class ProductVariable {
 			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'Выполняется очередями в фоне' );
 
 		} else {
-			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'в ожидании задач' );
+			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'Завершено' );
 			$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( self::$walker_hook_name ) ) ?? 'Нет данных';
 		}
 
