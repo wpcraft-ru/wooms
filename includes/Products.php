@@ -445,7 +445,7 @@ function walker_started() {
 
 
 function render_ui() {
-	printf( '<h2>%s</h2>', 'Каталог' );
+	printf( '<h2>%s</h2>', 'Каталог и базовые продукты' );
 
 	$strings = [];
 	if ( as_next_scheduled_action( HOOK_NAME ) ) {
