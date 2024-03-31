@@ -41,13 +41,28 @@ class Helper {
 		}
 	}
 
-	public static function log( string $message, $class, array $data = [] ) {
-		do_action(
-			'wooms_logger',
-			$class,
-			$message,
-			$data
-		);
+	public static function log( string $message, $class = 'WooMS', array $data = [] ) {
+		if ( ! Logger::is_enable() ) {
+			return;
+		}
+
+		if ( ! empty( $data ) ) {
+
+			if ( is_array( $data ) ) {
+				$data = json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+			} else {
+				$data = wc_print_r( $data, true );
+			}
+
+			$data = wp_trim_words( $data, 300 );
+			$message .= PHP_EOL . '-' . PHP_EOL . $data;
+		}
+
+		$source = str_replace( '\\', '-', $class );
+
+		$logger = wc_get_logger();
+		$context = array( 'source' => $source );
+		$logger->info( $message, $context );
 	}
 
 	public static function log_error( string $message, $class = 'WooMS', array $data = [] ) {
@@ -65,7 +80,7 @@ class Helper {
 			}
 
 			$data = wp_trim_words( $data, 300 );
-			$message .= ': ' . PHP_EOL . $data;
+			$message .= PHP_EOL . '-' . PHP_EOL . $data;
 		}
 
 		$source = str_replace( '\\', '-', $class );
