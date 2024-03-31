@@ -362,7 +362,7 @@ class ProductVariable {
 		$product_parent = wc_get_product( $product_id );
 
 		if(empty($product_parent)){
-			Helper::log(sprintf( 'Нет базового продукта для вариации. %s', json_encode( ['product_id' => $product_id, '$row id' => $row ] ) ), __CLASS__);
+			Helper::log('Нет базового продукта для вариации', __CLASS__, $row);
 			return;
 		}
 
@@ -617,7 +617,6 @@ class ProductVariable {
 			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'Завершено' );
 			$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( self::$walker_hook_name ) ) ?? 'Нет данных';
 		}
-
 
 		$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_variables_walker_batch&orderby=schedule&order=desc' ) );
 

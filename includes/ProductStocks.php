@@ -2,6 +2,7 @@
 
 namespace WooMS;
 
+use WC_Product;
 use function WooMS\request;
 
 
@@ -25,6 +26,19 @@ class ProductStocks {
 	public static $state_transient_key = 'wooms_assortmen_state';
 
 	public static function init() {
+
+		add_action('init', function(){
+			if(!isset($_GET['test_ProductStocks'])){
+				return;
+			}
+
+			do_action('wooms_assortment_sync');
+			// var_dump(1); exit;
+
+			$meta = get_post_meta( 67803 );
+			echo '<pre>';
+			var_dump($meta); exit;
+		});
 
 		add_filter( 'wooms_stock_product_save', [ __CLASS__, 'update_manage_stock' ], 10, 2 );
 
@@ -79,6 +93,7 @@ class ProductStocks {
 		$filters_by_id = [];
 		foreach ( $products as $product ) {
 			$filters_by_id[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
+			delete_post_meta( $product->ID, self::$walker_hook_name );
 		}
 
 		$filters = [
@@ -100,6 +115,8 @@ class ProductStocks {
 		);
 
 		$data = request( $url );
+
+		// var_dump($data); exit;
 
 		if ( empty( $data['rows'] ) ) {
 			return false;
@@ -127,12 +144,14 @@ class ProductStocks {
 			}
 
 			if ( ! $product = wc_get_product( $product_id ) ) {
+				Helper::log_error( 'Не нашли продукт по $product_id', __CLASS__, $row );
 				continue;
 			}
 
 			$product = self::update_stock( $product, $row );
 
 			$product->update_meta_data( 'wooms_assortment_data', self::get_stock_data_log( $row, $product_id ) );
+
 
 			/**
 			 * manage stock save
@@ -141,7 +160,6 @@ class ProductStocks {
 			 */
 			$product = apply_filters( 'wooms_stock_product_save', $product, $row );
 
-			$product->delete_meta_data( self::$walker_hook_name );
 
 			$ids[] = $product->save();
 		}
@@ -151,7 +169,7 @@ class ProductStocks {
 	}
 
 
-	public static function update_stock( \WC_Product $product, $data_api ) {
+	public static function update_stock( WC_Product $product, $data_api ) : WC_Product {
 
 		/**
 		 * Поле по которому берем остаток?
@@ -169,10 +187,20 @@ class ProductStocks {
 			$product->set_stock_status( 'outofstock' );
 		}
 
+		$log_data = [
+			'stock' => $data_api['stock'],
+			'quantity' => $data_api['quantity'],
+			'type' => $product->get_type(),
+		];
+
+		if($product->get_type() === 'variation') {
+			$log_data['product_parent'] = $product->get_parent_id();
+		}
+
 		Helper::log( sprintf(
 			'Остатки для продукта "%s" (ИД %s) = %s', $product->get_name(), $product->get_id(), $product->get_stock_quantity() ),
 			__CLASS__,
-			[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+			$log_data
 		);
 
 		return $product;
@@ -184,7 +212,7 @@ class ProductStocks {
 	 *
 	 * @todo вероятно опция типа wooms_warehouse_count - более не нужна
 	 */
-	public static function update_manage_stock( \WC_Product $product, $data_api ) {
+	public static function update_manage_stock( WC_Product $product, $data_api ) : WC_Product {
 
 		if ( ! get_option( 'woocommerce_manage_stock' ) ) {
 			return $product;
@@ -194,20 +222,18 @@ class ProductStocks {
 			$product->set_manage_stock( true );
 			Helper::log( sprintf(
 				'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
-				__CLASS__,
-				[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+				__CLASS__
 			);
 		}
 
 		//для вариативных товаров доступность определяется наличием вариаций
-		if ( $product->get_type() === 'product_variation' ) {
+		if ( $product->get_type() === 'variation' ) {
 
 			$parent_id = $product->get_parent_id();
 			$parent_product = wc_get_product( $parent_id );
 			if ( empty( $parent_product ) ) {
-				Helper::log_error( "Не нашли родительский продукт: {$parent_id}",
-					__CLASS__,
-					$data_api
+				Helper::log_error( "Не нашли родительский продукт: {$parent_id}, вариация: {$product->get_id()}",
+					__CLASS__
 				);
 				return $product;
 			}
@@ -215,8 +241,7 @@ class ProductStocks {
 
 				Helper::log( sprintf(
 					'У основного продукта отключили управление остатками: %s (ИД %s)', $parent_product->get_name(), $parent_id ),
-					__CLASS__,
-					[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+					__CLASS__
 				);
 				$parent_product->set_manage_stock( false );
 
