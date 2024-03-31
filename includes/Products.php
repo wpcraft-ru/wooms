@@ -4,7 +4,7 @@ namespace WooMS\Products;
 
 use function WooMS\request;
 use function Testeroid\ddcli;
-use Error, Throwable, WC_Product;
+use Error, Throwable, WC_Product, WooMS\Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -263,7 +263,6 @@ function product_update( array $row, array $data = [] ) {
 	 */
 	$data_api = $row;
 
-	$product->update_meta_data( 'wooms_id_' . $row['id'], 1 );
 
 	/**
 	 * Хук позволяет работать с методами WC_Product
@@ -289,9 +288,6 @@ function product_update( array $row, array $data = [] ) {
 	}
 
 	$product->update_meta_data( 'wooms_updated_timestamp', date( "Y-m-d H:i:s" ) );
-
-	$product->update_meta_data( 'wooms_id', $data_api['id'] );
-
 	$product->update_meta_data( 'wooms_updated_from_api', $data_api['updated'] );
 
 	//update title
@@ -336,14 +332,16 @@ function product_update( array $row, array $data = [] ) {
 		$product->set_regular_price( $price );
 	}
 
-	// issue https://github.com/wpcraft-ru/wooms/issues/302
-	$product->set_catalog_visibility( 'visible' );
+	$product->update_meta_data( 'wooms_id', $data_api['id'] );
+	$product->update_meta_data( 'wooms_id_' . $data_api['id'], 1 );
 
-	if ( apply_filters( 'wooms_reset_state_products', true ) ) {
-		$product->set_stock_status( 'instock' );
-		$product->set_manage_stock( false );
-		$product->set_status( 'publish' );
-	}
+	/**
+	 * reset state product
+	 *
+	 * @issue https://github.com/wpcraft-ru/wooms/issues/302
+	 */
+	$product->set_catalog_visibility( 'visible' );
+	$product->set_status( 'publish' );
 
 	$product = apply_filters( 'wooms_product_update', $product, $row, $data );
 
@@ -474,7 +472,6 @@ function walker_started() {
 		'session_id' => $now,
 		'timestamp' => $now,
 		'query_arg' => $query_arg_default,
-		'end_timestamp' => 0,
 	];
 
 	set_state( $state );
@@ -482,26 +479,6 @@ function walker_started() {
 	do_action( 'wooms_main_walker_started' );
 	do_action( 'wooms_logger', __NAMESPACE__, 'Старт основного волкера: ' . $now );
 }
-
-// function auto_start() {
-
-//   $end_timestamp = get_state( 'end_timestamp' );
-//   if( empty($end_timestamp)){
-//     return false;
-//   }
-
-//   if ( empty( get_option( 'woomss_pass' ) ) ) {
-// 		return false;
-// 	}
-
-// 	if ( as_next_scheduled_action( HOOK_NAME ) ) {
-// 		return;
-// 	}
-
-
-
-// 	return as_schedule_single_action( time(), HOOK_NAME, [], 'WooMS' );
-// }
 
 
 function render_ui() {
@@ -515,7 +492,7 @@ function render_ui() {
 
 	} else {
 		$strings[] = sprintf( 'Статус: %s', 'Завершено' );
-		$strings[] = sprintf( 'Время последнего завершения: %s', wooms_get_timestamp_last_job_by_hook( HOOK_NAME ) );
+		$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( HOOK_NAME ) ) ?? 'Нет данных';
 		printf(
 			'<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>',
 			add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) )
@@ -523,6 +500,7 @@ function render_ui() {
 
 	}
 	$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker&orderby=schedule&order=desc' ) );
+
 
 	foreach ( $strings as $string ) {
 		printf( '<p>%s</p>', $string );

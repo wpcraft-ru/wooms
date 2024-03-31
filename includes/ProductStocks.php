@@ -26,16 +26,7 @@ class ProductStocks {
 
 	public static function init() {
 
-		add_action('init', function(){
-			if(!isset($_GET['test_ProductStocks'])){
-				return;
-			}
-
-			$meta = get_post_meta( 50672 );
-			echo '<pre>';
-			var_dump($meta); exit;
-			// 2256
-		});
+		add_filter( 'wooms_stock_product_save', [ __CLASS__, 'update_manage_stock' ], 10, 2 );
 
 		add_action( 'wooms_assortment_sync', [ __CLASS__, 'batch_handler' ] );
 
@@ -47,17 +38,12 @@ class ProductStocks {
 
 		add_action( 'wooms_variations_batch_end', [ __CLASS__, 'restart_after_batch' ] );
 		add_action( 'wooms_products_batch_end', [ __CLASS__, 'restart_after_batch' ] );
-		add_action( 'wooms_main_walker_started', [ __CLASS__, 'restart' ] );
 
 		add_action( 'admin_init', [ __CLASS__, 'add_settings' ], 30 );
 		add_action( 'wooms_tools_sections', array( __CLASS__, 'display_state' ), 17 );
 
 		add_filter( 'wooms_stock_type', array( __CLASS__, 'select_type_stock' ) );
 
-		//need for disable reset state for base plugin
-		add_filter( 'wooms_reset_state_products', function ($reset) {
-			return false;
-		} );
 	}
 
 
@@ -86,15 +72,15 @@ class ProductStocks {
 		$products = get_posts( $args );
 
 		if ( empty( $products ) ) {
-			self::set_state( 'finish_timestamp', time() );
+
 			return false;
 		}
 
 		$filters_by_id = [];
 		foreach ( $products as $product ) {
-
 			$filters_by_id[] = 'id=' . get_post_meta( $product->ID, 'wooms_id', true );
 		}
+
 		$filters = [
 			implode( ';', $filters_by_id )
 		];
@@ -135,7 +121,8 @@ class ProductStocks {
 		$ids = [];
 		foreach ( $rows as $row ) {
 
-			if ( ! $product_id = self::get_product_id_by_uuid( $row['id'] ) ) {
+			if ( ! $product_id = Helper::get_product_id_by_uuid( $row['id'] ) ) {
+				Helper::log_error( 'Не нашли продукт по uuid', __CLASS__, $row );
 				continue;
 			}
 
@@ -163,7 +150,55 @@ class ProductStocks {
 
 	}
 
-	public static function update_stock( $product, $data_api ) {
+	/**
+	 * Если у товара активна опция управления запасами - то обновляем соответствующие данные
+	 *
+	 * @todo вероятно опция типа wooms_warehouse_count - более не нужна
+	 */
+	public static function update_manage_stock( \WC_Product $product, $data_api ) {
+
+		if ( ! $product->get_manage_stock() ) {
+			return $product;
+		}
+
+		//для вариативных товаров доступность определяется наличием вариаций
+		if ( $product->is_type( 'variable' ) ) {
+
+			$parent_id = $product->get_parent_id();
+			$parent_product = wc_get_product( $parent_id );
+			if ( $parent_product->get_manage_stock() ) {
+
+				Helper::log( sprintf(
+					'У основного продукта отключили управление остатками: %s (ИД %s)', $parent_product->get_name(), $parent_id ),
+					__CLASS__,
+					[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+				);
+				$product->set_manage_stock( false );
+
+				$product->save();
+			}
+
+		}
+
+		/**
+		 * это похоже надо выпилить
+		 *
+		 * потому что это не относится к синку МС и должно управляться как то иначе
+		 *
+		 * если это тут оставлять, то эта отметка должна быть на стороне МС
+		 */
+		// if ( get_option( 'wooms_stock_empty_backorder' ) ) {
+			// $product->set_backorders( 'notify' );
+		// } else {
+			// $product->set_backorders( 'no' );
+		// }
+
+
+		return $product;
+
+	}
+
+	public static function update_stock( \WC_Product $product, $data_api ) {
 
 		$product_id = $product->get_id();
 
@@ -174,44 +209,19 @@ class ProductStocks {
 		 */
 		$stock_type = apply_filters( 'wooms_stock_type', 'quantity' );
 
-		$stock = 0;
-
-		if ( empty( $data_api[ $stock_type ] ) ) {
-			$stock = 0;
-		} else {
-			$stock = (int) $data_api[ $stock_type ];
-		}
-
-		if ( get_option( 'wooms_stock_empty_backorder' ) ) {
-			$product->set_backorders( 'notify' );
-		} else {
-			$product->set_backorders( 'no' );
-		}
-
-		if ( empty( get_option( 'wooms_warehouse_count' ) ) ) {
-			$product->set_manage_stock( false );
-		} else {
-			if ( $product->is_type( 'variable' ) ) {
-				//для вариативных товаров доступность определяется наличием вариаций
-				$product->set_manage_stock( true );
-			} else {
-				$product->set_manage_stock( true );
-			}
-		}
-
-		if ( $stock <= 0 ) {
-			$product->set_stock_quantity( 0 );
-			$product->set_stock_status( 'outofstock' );
-		} else {
+		$stock = (int) $data_api[ $stock_type ] ?? 0;
+		if ( $stock > 0 ) {
 			$product->set_stock_quantity( $stock );
 			$product->set_stock_status( 'instock' );
+		} else {
+			$product->set_stock_quantity( 0 );
+			$product->set_stock_status( 'outofstock' );
 		}
 
-		do_action(
-			'wooms_logger',
+		Helper::log( sprintf(
+			'Остатки для продукта "%s" (ИД %s) = %s', $product->get_name(), $product_id, $product->get_stock_quantity() ),
 			__CLASS__,
-			sprintf( 'Остатки для продукта "%s" = %s (ИД %s)', $product->get_name(), $stock, $product_id ),
-			sprintf( 'stock %s, quantity %s', $data_api['stock'], $data_api['quantity'] )
+			[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
 		);
 
 		return $product;
@@ -237,34 +247,16 @@ class ProductStocks {
 	}
 
 
-	/**
-	 * restart walker after added tast to queue
-	 */
-	public static function restart() {
-		self::set_state( 'finish_timestamp', 0 );
-		self::set_state( 'count_all', 0 );
-		self::set_state( 'count_save', 0 );
-	}
-
-
 	public static function restart_after_batch() {
+		if( ! self::is_enable()) {
+			return;
+		}
+
 		if ( as_has_scheduled_action( self::$walker_hook_name ) ) {
 			return;
 		}
 
 		as_schedule_single_action( time(), self::$walker_hook_name, [], 'WooMS' );
-	}
-
-
-	/**
-	 * check is wait
-	 */
-	public static function is_wait() {
-		if ( self::get_state( 'finish_timestamp' ) ) {
-			return true;
-		}
-
-		return false;
 	}
 
 
@@ -289,11 +281,6 @@ class ProductStocks {
 	}
 
 
-
-
-	/**
-	 * set state data
-	 */
 	public static function set_state( $key, $value ) {
 
 		if ( ! $state = get_transient( self::$state_transient_key ) ) {
@@ -397,13 +384,13 @@ class ProductStocks {
 	/**
 	 * Update stock for variation
 	 */
-	public static function update_variation( $variation, $data_api ) {
+	public static function update_variation( \WC_Product_Variation $variation, $data_api ) {
 		if ( self::is_enable() ) {
 			$variation->update_meta_data( self::$walker_hook_name, 1 );
 		} else {
 			$variation->set_catalog_visibility( 'visible' );
 			$variation->set_stock_status( 'instock' );
-			$variation->set_manage_stock( 'no' );
+			$variation->set_manage_stock( false );
 			$variation->set_status( 'publish' );
 		}
 
@@ -466,14 +453,14 @@ class ProductStocks {
 			$section = 'woomss_section_warehouses'
 		);
 
-		register_setting( 'mss-settings', 'wooms_stock_empty_backorder' );
-		add_settings_field(
-			$id = 'wooms_stock_empty_backorder',
-			$title = 'Разрешать предзаказ при 0 остатке',
-			$callback = array( __CLASS__, 'display_wooms_stock_empty_backorder' ),
-			$page = 'mss-settings',
-			$section = 'woomss_section_warehouses'
-		);
+		// register_setting( 'mss-settings', 'wooms_stock_empty_backorder' );
+		// add_settings_field(
+		// 	$id = 'wooms_stock_empty_backorder',
+		// 	$title = 'Разрешать предзаказ при 0 остатке',
+		// 	$callback = array( __CLASS__, 'display_wooms_stock_empty_backorder' ),
+		// 	$page = 'mss-settings',
+		// 	$section = 'woomss_section_warehouses'
+		// );
 
 		self::add_setting_warehouse_id();
 	}
@@ -604,26 +591,23 @@ class ProductStocks {
 			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'в ожидании задач' );
 		}
 
-		if ( $end_timestamp = self::get_state( 'finish_timestamp' ) ) {
-			$end_timestamp = date( 'Y-m-d H:i:s', $end_timestamp );
-			$strings[] = sprintf( 'Последняя успешная синхронизация (отметка времени UTC): %s', $end_timestamp );
-		}
+
+		$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( self::$walker_hook_name ) ) ?? 'Нет данных';
 
 		$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_assortment_sync&orderby=schedule&order=desc' ) );
-
 
 		$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductStocks' ) );
 
 		?>
 		<h2>Остатки</h2>
 		<div class="wrap">
-			<div id="message" class="notice notice-warning">
-				<?php
-				foreach ( $strings as $string ) {
-					printf( '<p>%s</p>', $string );
-				}
-				?>
-			</div>
+
+			<?php
+			foreach ( $strings as $string ) {
+				printf( '<p>%s</p>', $string );
+			}
+			?>
+
 		</div>
 
 		<?php
