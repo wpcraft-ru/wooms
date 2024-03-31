@@ -26,6 +26,17 @@ class ProductStocks {
 
 	public static function init() {
 
+		add_action('init', function(){
+			if(!isset($_GET['test_ProductStocks'])){
+				return;
+			}
+
+			$meta = get_post_meta( 50672 );
+			echo '<pre>';
+			var_dump($meta); exit;
+			// 2256
+		});
+
 		add_action( 'wooms_assortment_sync', [ __CLASS__, 'batch_handler' ] );
 
 		add_filter( 'wooms_product_update', array( __CLASS__, 'update_product' ), 30, 2 );
@@ -152,25 +163,6 @@ class ProductStocks {
 
 	}
 
-	/**
-	 * get_stock_data_log
-	 * for save log data to product meta
-	 */
-	public static function get_stock_data_log( $row = [], $product_id = 0 ) {
-		$data = [
-			"stock" => $row['stock'],
-			"reserve" => $row['reserve'],
-			"inTransit" => $row['inTransit'],
-			"quantity" => $row['quantity'],
-		];
-
-		$data = apply_filters( 'wooms_stock_log_data', $data, $product_id, $row );
-
-		$data = json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
-
-		return $data;
-	}
-
 	public static function update_stock( $product, $data_api ) {
 
 		$product_id = $product->get_id();
@@ -201,7 +193,7 @@ class ProductStocks {
 		} else {
 			if ( $product->is_type( 'variable' ) ) {
 				//для вариативных товаров доступность определяется наличием вариаций
-				$product->set_manage_stock( false );
+				$product->set_manage_stock( true );
 			} else {
 				$product->set_manage_stock( true );
 			}
@@ -224,6 +216,26 @@ class ProductStocks {
 
 		return $product;
 	}
+
+	/**
+	 * get_stock_data_log
+	 * for save log data to product meta
+	 */
+	public static function get_stock_data_log( $row = [], $product_id = 0 ) {
+		$data = [
+			"stock" => $row['stock'],
+			"reserve" => $row['reserve'],
+			"inTransit" => $row['inTransit'],
+			"quantity" => $row['quantity'],
+		];
+
+		$data = apply_filters( 'wooms_stock_log_data', $data, $product_id, $row );
+
+		$data = json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+
+		return $data;
+	}
+
 
 	/**
 	 * restart walker after added tast to queue
