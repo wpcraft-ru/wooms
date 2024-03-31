@@ -134,14 +134,14 @@ class ProductStocks {
 
 			$product->update_meta_data( 'wooms_assortment_data', self::get_stock_data_log( $row, $product_id ) );
 
-			$product->delete_meta_data( self::$walker_hook_name );
-
 			/**
 			 * manage stock save
 			 *
 			 * issue https://github.com/wpcraft-ru/wooms/issues/287
 			 */
 			$product = apply_filters( 'wooms_stock_product_save', $product, $row );
+
+			$product->delete_meta_data( self::$walker_hook_name );
 
 			$ids[] = $product->save();
 		}
@@ -150,57 +150,8 @@ class ProductStocks {
 
 	}
 
-	/**
-	 * Если у товара активна опция управления запасами - то обновляем соответствующие данные
-	 *
-	 * @todo вероятно опция типа wooms_warehouse_count - более не нужна
-	 */
-	public static function update_manage_stock( \WC_Product $product, $data_api ) {
-
-		if ( ! $product->get_manage_stock() ) {
-			return $product;
-		}
-
-		//для вариативных товаров доступность определяется наличием вариаций
-		if ( $product->is_type( 'variable' ) ) {
-
-			$parent_id = $product->get_parent_id();
-			$parent_product = wc_get_product( $parent_id );
-			if ( $parent_product->get_manage_stock() ) {
-
-				Helper::log( sprintf(
-					'У основного продукта отключили управление остатками: %s (ИД %s)', $parent_product->get_name(), $parent_id ),
-					__CLASS__,
-					[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
-				);
-				$product->set_manage_stock( false );
-
-				$product->save();
-			}
-
-		}
-
-		/**
-		 * это похоже надо выпилить
-		 *
-		 * потому что это не относится к синку МС и должно управляться как то иначе
-		 *
-		 * если это тут оставлять, то эта отметка должна быть на стороне МС
-		 */
-		// if ( get_option( 'wooms_stock_empty_backorder' ) ) {
-			// $product->set_backorders( 'notify' );
-		// } else {
-			// $product->set_backorders( 'no' );
-		// }
-
-
-		return $product;
-
-	}
 
 	public static function update_stock( \WC_Product $product, $data_api ) {
-
-		$product_id = $product->get_id();
 
 		/**
 		 * Поле по которому берем остаток?
@@ -219,12 +170,77 @@ class ProductStocks {
 		}
 
 		Helper::log( sprintf(
-			'Остатки для продукта "%s" (ИД %s) = %s', $product->get_name(), $product_id, $product->get_stock_quantity() ),
+			'Остатки для продукта "%s" (ИД %s) = %s', $product->get_name(), $product->get_id(), $product->get_stock_quantity() ),
 			__CLASS__,
 			[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
 		);
 
 		return $product;
+	}
+
+
+	/**
+	 * Если у сайта включена опция управление остатками - установить остатки для товара
+	 *
+	 * @todo вероятно опция типа wooms_warehouse_count - более не нужна
+	 */
+	public static function update_manage_stock( \WC_Product $product, $data_api ) {
+
+		if ( ! get_option( 'woocommerce_manage_stock' ) ) {
+			return $product;
+		}
+
+		if ( ! $product->get_manage_stock() ) {
+			$product->set_manage_stock( true );
+			Helper::log( sprintf(
+				'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
+				__CLASS__,
+				[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+			);
+		}
+
+		//для вариативных товаров доступность определяется наличием вариаций
+		if ( $product->get_type() === 'product_variation' ) {
+
+			$parent_id = $product->get_parent_id();
+			$parent_product = wc_get_product( $parent_id );
+			if ( empty( $parent_product ) ) {
+				Helper::log_error( "Не нашли родительский продукт: {$parent_id}",
+					__CLASS__,
+					$data_api
+				);
+				return $product;
+			}
+			if ( $parent_product->get_manage_stock() ) {
+
+				Helper::log( sprintf(
+					'У основного продукта отключили управление остатками: %s (ИД %s)', $parent_product->get_name(), $parent_id ),
+					__CLASS__,
+					[ 'stock' => $data_api['stock'], 'quantity' => $data_api['quantity'] ]
+				);
+				$parent_product->set_manage_stock( false );
+
+				$parent_product->save();
+			}
+
+		}
+
+		/**
+		 * это похоже надо выпилить
+		 *
+		 * потому что это не относится к синку МС и должно управляться как то иначе
+		 *
+		 * если это тут оставлять, то эта отметка должна быть на стороне МС
+		 */
+		// if ( get_option( 'wooms_stock_empty_backorder' ) ) {
+		// $product->set_backorders( 'notify' );
+		// } else {
+		// $product->set_backorders( 'no' );
+		// }
+
+
+		return $product;
+
 	}
 
 	/**
@@ -248,7 +264,7 @@ class ProductStocks {
 
 
 	public static function restart_after_batch() {
-		if( ! self::is_enable()) {
+		if ( ! self::is_enable() ) {
 			return;
 		}
 
@@ -407,7 +423,7 @@ class ProductStocks {
 		} else {
 			$product->set_catalog_visibility( 'visible' );
 			$product->set_stock_status( 'instock' );
-			$product->set_manage_stock( 'no' );
+			$product->set_manage_stock( false );
 			$product->set_status( 'publish' );
 		}
 
@@ -444,14 +460,14 @@ class ProductStocks {
 			$section = 'woomss_section_warehouses'
 		);
 
-		register_setting( 'mss-settings', 'wooms_warehouse_count' );
-		add_settings_field(
-			$id = 'wooms_warehouse_count',
-			$title = 'Управление запасами на уровне товаров',
-			$callback = array( __CLASS__, 'display_wooms_warehouse_count' ),
-			$page = 'mss-settings',
-			$section = 'woomss_section_warehouses'
-		);
+		// register_setting( 'mss-settings', 'wooms_warehouse_count' );
+		// add_settings_field(
+		// 	$id = 'wooms_warehouse_count',
+		// 	$title = 'Управление запасами на уровне товаров',
+		// 	$callback = array( __CLASS__, 'display_wooms_warehouse_count' ),
+		// 	$page = 'mss-settings',
+		// 	$section = 'woomss_section_warehouses'
+		// );
 
 		// register_setting( 'mss-settings', 'wooms_stock_empty_backorder' );
 		// add_settings_field(
