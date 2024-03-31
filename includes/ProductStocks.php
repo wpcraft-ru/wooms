@@ -29,19 +29,19 @@ class ProductStocks {
 
 	public static function init() {
 
-		add_action( 'init', function () {
-			if ( ! isset ( $_GET['test_ProductStocks'] ) ) {
-				return;
-			}
+		// add_action( 'init', function () {
+		// 	if ( ! isset ( $_GET['test_ProductStocks'] ) ) {
+		// 		return;
+		// 	}
 
-			// do_action('wooms_assortment_sync');
-			// var_dump(1); exit;
+		// 	// do_action('wooms_assortment_sync');
+		// 	// var_dump(1); exit;
 
-			$meta = get_post_meta( 68934 );
-			echo '<pre>';
-			var_dump( $meta );
-			exit;
-		} );
+		// 	$meta = get_post_meta( 68934 );
+		// 	echo '<pre>';
+		// 	var_dump( $meta );
+		// 	exit;
+		// } );
 
 		add_filter( 'wooms_stock_product_save', [ __CLASS__, 'update_manage_stock' ], 10, 2 );
 
