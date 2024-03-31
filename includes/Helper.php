@@ -2,7 +2,7 @@
 
 namespace WooMS;
 
-trait Helper {
+class Helper {
 
 	public static function get_session_id() {
 		return \WooMS\Products\get_session_id();
