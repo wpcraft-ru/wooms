@@ -86,7 +86,6 @@ class ProductStocks {
 		$products = get_posts( $args );
 
 		if ( empty( $products ) ) {
-
 			return false;
 		}
 

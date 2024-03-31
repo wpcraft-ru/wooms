@@ -103,46 +103,26 @@ function walker( $args = [] ) {
 }
 
 function process_rows( $rows = [] ) {
+	$ids = [];
+	foreach ( $rows as $row ) {
+		$ids[] = $row['id'];
 
-	try {
-
-		if ( empty( $rows ) ) {
-			throw new Error('$rows is empty');
+		if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
+			continue;
 		}
 
-		$ids = [];
-		foreach ( $rows as $row ) {
-			$ids[] = $row['id'];
-
-			if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
-				continue;
-			}
-
-			/**
-			 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
-			 * птм нужна проверка что это точно продукт
-			 */
-			if ( 'variant' == $row["meta"]["type"] ) {
-				continue;
-			}
-
-			$data = apply_filters( 'wooms_product_data', [], $row );
-
-			product_update( $row, $data );
+		/**
+		 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+		 * птм нужна проверка что это точно продукт
+		 */
+		if ( 'variant' == $row["meta"]["type"] ) {
+			continue;
 		}
 
+		$data = apply_filters( 'wooms_product_data', [], $row );
 
-		return true;
-	} catch (Throwable $e) {
-
-		$message = sprintf("wooms process fails: %s, ids: %s, code: %s", $e->getMessage(), json_encode($ids), $e->getCode());
-		do_action( 'wooms_logger_error', __NAMESPACE__, $message );
-		error_log($message);
-
-		return false;
+		product_update( $row, $data );
 	}
-
-
 }
 
 
@@ -222,7 +202,7 @@ function product_update( array $row, array $data = [] ) {
 
 	$product_id = 0;
 
-	$product_id = get_product_id_by_uuid( $row['id'] );
+	$product_id = Helper::get_product_id_by_uuid( $row['id'] );
 
 	if ( ! empty( $row['archived'] ) ) {
 		if ( $product_id ) {
@@ -247,12 +227,8 @@ function product_update( array $row, array $data = [] ) {
 
 
 	if ( empty( intval( $product_id ) ) ) {
-		do_action(
-			'wooms_logger_error',
-			__NAMESPACE__,
-			'Ошибка определения и добавления ИД продукта',
-			$row
-		);
+		Helper::log_error('Ошибка определения и добавления ИД продукта', __NAMESPACE__, $row);
+
 		return false;
 	}
 
