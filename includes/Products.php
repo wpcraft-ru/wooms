@@ -60,7 +60,7 @@ function walker( $args = [] ) {
 	$url = apply_filters( 'wooms_url_get_products', $url );
 
 	$filters = [
-		// 'pathName~=Диваны',
+		'archived=false'
 	];
 
 	$filters = apply_filters( 'wooms_url_get_products_filters', $filters );
