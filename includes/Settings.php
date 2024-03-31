@@ -75,14 +75,24 @@ class Settings {
 	public static function render_nav_menu() {
 
 		$nav_items = [
-			'getting-started' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki/GettingStarted', 'С чего начать?' ),
-			'diagnostic' => sprintf( '<a href="%s">%s</a>', admin_url( 'site-health.php' ), 'Диагностика проблем' ),
+			'dev' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/', 'Разработка и решение проблем' ),
+			'docs' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki', 'Документация' ),
+
 			'ms' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://online.moysklad.ru/', 'Вход в МойСклад' ),
 		];
 
 		$nav_items = apply_filters( 'wooms_settings_nav_items', $nav_items );
 
-		echo implode( ' | ', $nav_items );
+		?>
+		<div>
+			<a href="https://wpcraft.ru/wooms/" class="button button-primary" target="_blank">Помощь с настройками</a>
+			<br/>
+			<br/>
+			<?= implode( ' | ', $nav_items ); ?>
+		</div>
+		<?php
+
+
 
 	}
 
@@ -242,10 +252,7 @@ class Settings {
 		<?php
 
 		printf( '<p><a href="%s">Управление синхронизацией</a></p>', admin_url( 'admin.php?page=moysklad' ) );
-		printf( '<p><a href="%s" target="_blank">Расширения и дополнения</a></p>', "https://github.com/topics/wooms" );
-		printf( '<p><a href="%s" target="_blank">Предложения по улучшению и запросы на доработку</a></p>', "https://github.com/wpcraft-ru/wooms/issues" );
-		printf( '<p><a href="%s" target="_blank">Рекомендуемые хостинги</a></p>', "https://wpcraft.ru/hosting-wordpress-woocommerce/" );
-		printf( '<p><a href="%s" target="_blank">Контакты</a></p>', "https://wpcraft.ru/wooms/" );
+		printf( '<p><a href="%s" target="_blank">Помощь с настройкой</a></p>', "https://wpcraft.ru/wooms/?utm_source=wooms_plugin_settings_page" );
 	}
 }
 
