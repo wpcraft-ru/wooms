@@ -2,6 +2,8 @@
 
 namespace WooMS\ProductsHider;
 
+use WooMS\Helper;
+
 const HOOK_NAME = 'wooms_schedule_clear_old_products_walker';
 
 add_action('init', function () {
@@ -42,18 +44,13 @@ function walker($state = [])
     $product = wc_get_product($product_id);
     $ids[] = $product_id;
 
-    if ($product->get_type() == 'variable') {
-      // $product->set_manage_stock('yes');
-    }
+    $product->set_status('draft');
 
     $product->set_catalog_visibility('hidden');
     $product->save();
 
-    do_action(
-      'wooms_logger',
-      __NAMESPACE__,
-      sprintf('Скрытие продукта: %s', $product_id)
-    );
+	Helper::log(sprintf('Скрытие продукта: %s', $product_id), __NAMESPACE__);
+
   }
 
   $state['ids'] = $ids;
@@ -101,10 +98,13 @@ function get_products_old_session()
     return false;
   }
 
+
   $args = array(
-    'post_type' => ['product', 'product_variation'],
+    'post_type' => ['product'],
+	'post_status' => 'publish',
     'numberposts' => 30,
     'fields' => 'ids',
+
     'tax_query' => array(
       array(
         'taxonomy' => 'product_visibility',
@@ -160,6 +160,8 @@ function display_state()
   }
 
   $strings[] = sprintf('Очередь задач: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=action-scheduler&s=wooms_schedule_clear_old_products_walker&orderby=schedule&order=desc'));
+
+  $strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductsHider' ) );
 
   echo '<h2>Скрытие продуктов</h2>';
   foreach ($strings as $string) {

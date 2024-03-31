@@ -2,39 +2,45 @@
 
 namespace WooMS;
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 const OPTION_KEY = 'wooms_config';
 const OPTIONS_PAGE = 'mss-settings';
 
-function get_config($key = null){
-  $config = get_option(OPTION_KEY, []);
-  if(empty($key)){
-    return $config;
-  }
-  return $config[$key] ?? null;
+function get_config( $key = null ) {
+	$config = get_option( OPTION_KEY, [] );
+	if ( empty( $key ) ) {
+		return $config;
+	}
+	return $config[ $key ] ?? null;
 }
 
-function set_config($key, $value){
-  $config = get_option(OPTION_KEY, []);
-  $config[$key] = $value;
-  return update_option(OPTION_KEY, $config, false);
+/**
+ * Get name of form field by key
+ */
+function get_config_name( $key ) {
+
+	return OPTION_KEY . '[' . $key . ']';
+}
+
+function set_config( $key, $value ) {
+	$config = get_option( OPTION_KEY, [] );
+	$config[ $key ] = $value;
+	return update_option( OPTION_KEY, $config, false );
 }
 
 
 /**
  * Settings
  */
-class Settings
-{
+class Settings {
 
 	/**
 	 * The Init
 	 */
-	public static function init()
-	{
+	public static function init() {
 
 		add_action(
 			'admin_menu',
@@ -53,30 +59,40 @@ class Settings
 					'Настройки',
 					'manage_options',
 					'mss-settings',
-					array(__CLASS__, 'display_settings')
+					array ( __CLASS__, 'display_settings' )
 				);
 			},
 			30
 		);
 
-		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 5, $accepted_args = 1);
-		add_action('admin_init', array(__CLASS__, 'settings_other'), $priority = 100, $accepted_args = 1);
+		add_action( 'admin_init', array( __CLASS__, 'settings_general' ), $priority = 5, $accepted_args = 1 );
+		add_action( 'admin_init', array( __CLASS__, 'settings_other' ), $priority = 100, $accepted_args = 1 );
 
-		add_action('wooms_settings_after_header', [__CLASS__, 'render_nav_menu']);
+		add_action( 'wooms_settings_after_header', [ __CLASS__, 'render_nav_menu' ] );
 	}
 
 
-	public static function render_nav_menu(){
+	public static function render_nav_menu() {
 
 		$nav_items = [
-			'getting-started' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki/GettingStarted', 'С чего начать?'),
-			'diagnostic' => sprintf('<a href="%s">%s</a>', admin_url('site-health.php'), 'Диагностика проблем'),
-			'ms' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://online.moysklad.ru/', 'Вход в МойСклад'),
+			'dev' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/', 'Разработка и решение проблем' ),
+			'docs' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki', 'Документация' ),
+
+			'ms' => sprintf( '<a href="%s" target="_blank">%s</a>', 'https://online.moysklad.ru/', 'Вход в МойСклад' ),
 		];
 
-		$nav_items = apply_filters('wooms_settings_nav_items', $nav_items);
+		$nav_items = apply_filters( 'wooms_settings_nav_items', $nav_items );
 
-		echo implode(' | ', $nav_items);
+		?>
+		<div>
+			<a href="https://wpcraft.ru/wooms/" class="button button-primary" target="_blank">Помощь с настройками</a>
+			<br/>
+			<br/>
+			<?= implode( ' | ', $nav_items ); ?>
+		</div>
+		<?php
+
+
 
 	}
 
@@ -84,27 +100,26 @@ class Settings
 
 
 
-	public static function settings_general()
-	{
+	public static function settings_general() {
 
-		add_settings_section('woomss_section_login', 'Данные для доступа МойСклад', null, 'mss-settings');
+		add_settings_section( 'woomss_section_login', 'Данные для доступа МойСклад', null, 'mss-settings' );
 
-    register_setting( 'mss-settings', 'wooms_config' );
+		register_setting( 'mss-settings', 'wooms_config' );
 
-		register_setting('mss-settings', 'woomss_login');
+		register_setting( 'mss-settings', 'woomss_login' );
 		add_settings_field(
 			$id = 'woomss_login',
 			$title = 'Логин (admin@...)',
-			$callback = array(__CLASS__, 'display_form_login',),
+			$callback = array( __CLASS__, 'display_form_login', ),
 			$page = 'mss-settings',
 			$section = 'woomss_section_login'
 		);
 
-		register_setting('mss-settings', 'woomss_pass');
+		register_setting( 'mss-settings', 'woomss_pass' );
 		add_settings_field(
 			$id = 'woomss_pass',
 			$title = 'Пароль',
-			$callback = array(__CLASS__, 'display_form_pass'),
+			$callback = array( __CLASS__, 'display_form_pass' ),
 			$page = 'mss-settings',
 			$section = 'woomss_section_login'
 		);
@@ -113,51 +128,48 @@ class Settings
 	/**
 	 * display_form_pass
 	 */
-	public static function display_form_pass()
-	{
-		printf('<input type="password" name="woomss_pass" value="%s"/>', get_option('woomss_pass'));
+	public static function display_form_pass() {
+		printf( '<input type="password" name="woomss_pass" value="%s"/>', get_option( 'woomss_pass' ) );
 	}
 
 	/**
 	 * display_form_login
 	 */
-	public static function display_form_login()
-	{
-		printf('<input type="text" name="woomss_login" value="%s"/>', get_option('woomss_login'));
+	public static function display_form_login() {
+		printf( '<input type="text" name="woomss_login" value="%s"/>', get_option( 'woomss_login' ) );
 
-		printf('<p>%s</p>', 'Вводить нужно только логин и пароль здесь. На стороне МойСклад ничего настраивать не нужно.');
+		printf( '<p>%s</p>', 'Вводить нужно только логин и пароль здесь. На стороне МойСклад ничего настраивать не нужно.' );
 	}
 
 	/**
 	 * Settings - Other
 	 */
-	public static function settings_other()
-	{
-		add_settings_section('woomss_section_other', 'Прочие настройки', null, 'mss-settings');
+	public static function settings_other() {
+		add_settings_section( 'woomss_section_other', 'Прочие настройки', null, 'mss-settings' );
 
-		register_setting('mss-settings', 'wooms_use_uuid');
+		register_setting( 'mss-settings', 'wooms_use_uuid' );
 		add_settings_field(
 			$id = 'wooms_use_uuid',
 			$title = 'Использование UUID',
-			$callback = array(__CLASS__, 'display_field_wooms_use_uuid'),
+			$callback = array( __CLASS__, 'display_field_wooms_use_uuid' ),
 			$page = 'mss-settings',
 			$section = 'woomss_section_other'
 		);
 
-		register_setting('mss-settings', 'wooms_replace_title');
+		register_setting( 'mss-settings', 'wooms_replace_title' );
 		add_settings_field(
 			$id = 'wooms_replace_title',
 			$title = 'Замена заголовка при обновлении',
-			$callback = array(__CLASS__, 'display_wooms_replace_title'),
+			$callback = array( __CLASS__, 'display_wooms_replace_title' ),
 			$page = 'mss-settings',
 			$section = 'woomss_section_other'
 		);
 
-		register_setting('mss-settings', 'wooms_replace_description');
+		register_setting( 'mss-settings', 'wooms_replace_description' );
 		add_settings_field(
 			$id = 'wooms_replace_description',
 			$title = 'Замена описания при обновлении',
-			$callback = array(__CLASS__, 'display_wooms_replace_desc'),
+			$callback = array( __CLASS__, 'display_wooms_replace_desc' ),
 			$page = 'mss-settings',
 			$section = 'woomss_section_other'
 		);
@@ -166,85 +178,81 @@ class Settings
 	/**
 	 * display_wooms_replace_desc
 	 */
-	public static function display_wooms_replace_desc()
-	{
+	public static function display_wooms_replace_desc() {
 
 		$option_name = 'wooms_replace_description';
-		printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked(1, get_option($option_name), false));
-?>
+		printf( '<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option( $option_name ), false ) );
+		?>
 		<p>
 			<small>Если включить опцию, то плагин будет обновлять описание продукта из МойСклад всегда.</small>
 		</p>
-	<?php
+		<?php
 
 	}
 
 	/**
 	 * display_wooms_replace_title
 	 */
-	public static function display_wooms_replace_title()
-	{
+	public static function display_wooms_replace_title() {
 
 		$option_name = 'wooms_replace_title';
-		printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked(1, get_option($option_name), false));
-	?>
+		printf( '<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option( $option_name ), false ) );
+		?>
 		<p>
-			<small>Если включить опцию, то плагин будет обновлять заголовки продукта из МойСклад. Иначе при наличии заголовока он не будет обновлен.</small>
+			<small>Если включить опцию, то плагин будет обновлять заголовки продукта из МойСклад. Иначе при наличии заголовока
+				он не будет обновлен.</small>
 		</p>
-	<?php
+		<?php
 
 	}
 
 	/**
 	 * display_field_wooms_use_uuid
 	 */
-	public static function display_field_wooms_use_uuid()
-	{
+	public static function display_field_wooms_use_uuid() {
 
 		$option_name = 'wooms_use_uuid';
-		printf('<input type="checkbox" name="%s" value="1" %s />', $option_name, checked(1, get_option($option_name), false));
-	?>
+		printf( '<input type="checkbox" name="%s" value="1" %s />', $option_name, checked( 1, get_option( $option_name ), false ) );
+		?>
 
 		<p><strong>Если товары не попадают из МойСклад на сайт - попробуйте включить эту опцию.</strong></p>
 		<p>
-			<small>По умолчанию используется связь продуктов по артикулу. Это позволяет обеспечить синхронизацию без удаления всех продуктов с сайта при их наличии. Но без артикула
-				товары не будут синхронизироваться. Если товаров на сайте нет, либо их можно удалить без вреда, то можно включить синхронизацию по UUID. В этом случае артикулы
+			<small>По умолчанию используется связь продуктов по артикулу. Это позволяет обеспечить синхронизацию без удаления
+				всех продуктов с сайта при их наличии. Но без артикула
+				товары не будут синхронизироваться. Если товаров на сайте нет, либо их можно удалить без вреда, то можно
+				включить синхронизацию по UUID. В этом случае артикулы
 				будут не нужны. <br />При создании записи о продукте произойдет связка по UUID (meta_key = wooms_id)
 			</small>
 		</p>
-	<?php
+		<?php
 
 	}
 
 	/**
 	 * display_settings
 	 */
-	public static function display_settings()
-	{
+	public static function display_settings() {
 
-	?>
+		?>
 		<form method="POST" action="options.php">
 
 			<h1>Настройки интеграции МойСклад</h1>
 
-			<?php do_action('wooms_settings_after_header') ?>
+			<?php do_action( 'wooms_settings_after_header' ) ?>
 
 			<?php
 
-			settings_fields('mss-settings');
-			do_settings_sections('mss-settings');
+			settings_fields( 'mss-settings' );
+			do_settings_sections( 'mss-settings' );
 			submit_button();
 			?>
 		</form>
 
 
-<?php
+		<?php
 
-		printf('<p><a href="%s">Управление синхронизацией</a></p>', admin_url('admin.php?page=moysklad'));
-		printf('<p><a href="%s" target="_blank">Расширения и дополнения</a></p>', "https://github.com/topics/wooms");
-		printf('<p><a href="%s" target="_blank">Предложения по улучшению и запросы на доработку</a></p>', "https://github.com/wpcraft-ru/wooms/issues");
-		printf('<p><a href="%s" target="_blank">Рекомендуемые хостинги</a></p>', "https://wpcraft.ru/hosting-wordpress-woocommerce/");
-		printf('<p><a href="%s" target="_blank">Контакты</a></p>', "https://wpcraft.ru/wooms/");
+		printf( '<p><a href="%s">Управление синхронизацией</a></p>', admin_url( 'admin.php?page=moysklad' ) );
+		printf( '<p><a href="%s" target="_blank">Помощь с настройкой</a></p>', "https://wpcraft.ru/wooms/?utm_source=wooms_plugin_settings_page" );
 	}
 }
 

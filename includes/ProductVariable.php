@@ -5,6 +5,7 @@ namespace WooMS;
 use function WooMS\request;
 
 
+
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
@@ -12,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
  * Import variants from MoySklad
  */
 class ProductVariable {
+
 	/**
 	 * Save state in DB
 	 *
@@ -26,13 +28,8 @@ class ProductVariable {
 	 */
 	public static $walker_hook_name = 'wooms_variables_walker_batch';
 
-
-	/**
-	 * The init
-	 */
 	public static function init() {
 
-		//walker
 		add_action( 'wooms_variables_walker_batch', [__CLASS__, 'walker'] );
 
 		add_filter( 'wooms_product_update', array( __CLASS__, 'update_product' ), 20, 2 );
@@ -70,7 +67,7 @@ class ProductVariable {
 				]
 			];
 
-			self::set_state( $state );
+
 		}
 
 		/**
@@ -80,7 +77,9 @@ class ProductVariable {
 
 		$url = add_query_arg( $state['query_arg'], $url );
 
-		$filters = [];
+		$filters = [
+			'archived=false'
+		];
 
 		$filters = apply_filters( 'wooms_url_get_variants_filter', $filters );
 
@@ -115,7 +114,7 @@ class ProductVariable {
 
 			$state['count'] += $i;
 			$state['query_arg']['offset'] += count( $data['rows'] );
-			self::set_state( $state );
+
 
 			do_action( 'wooms_variations_batch_end' );
 
@@ -123,12 +122,8 @@ class ProductVariable {
 
 			return true;
 		} catch (\Exception $e) {
-			self::set_state( 'lock', 0 );
-			do_action(
-				'wooms_logger_error',
-				__CLASS__,
-				$e->getMessage()
-			);
+
+			Helper::log_error( $e->getMessage(), __CLASS__  );
 			return false;
 		}
 	}
@@ -141,13 +136,19 @@ class ProductVariable {
 		$i = 0;
 		foreach ( $rows as $key => $row ) {
 
-			if ( $row["meta"]["type"] != 'variant' ) {
+			try {
+				if ( $row["meta"]["type"] != 'variant' ) {
+					continue;
+				}
+
+				$i++;
+
+				self::update_variation( $row );
+
+			} catch (\Exception $e) {
+				Helper::log_error( $e->getMessage(), __CLASS__  );
 				continue;
 			}
-
-			$i++;
-
-			self::update_variation( $row );
 
 		}
 
@@ -159,7 +160,7 @@ class ProductVariable {
 	 */
 	public static function set_wait() {
 		as_unschedule_all_actions( self::$walker_hook_name );
-		self::set_state( 'end_timestamp', time() );
+
 	}
 
 
@@ -329,12 +330,12 @@ class ProductVariable {
 
 		$variation->set_attributes( $attributes );
 
-		do_action(
-			'wooms_logger',
-			__CLASS__,
-			sprintf( 'Сохранены атрибуты для вариации %s (продукт: %s)', $variation_id, $product_id ),
-			wc_print_r( $attributes, true )
-		);
+		Helper::log('Сохранены атрибуты для вариации', __CLASS__, [
+			'name' => $variation->get_name(),
+			'variation_id' => $variation_id,
+			'product_id' => $product_id,
+			'attributes' => $attributes,
+		]);
 
 		return $variation;
 	}
@@ -349,7 +350,7 @@ class ProductVariable {
 		}
 
 		if ( ! empty( $row['archived'] ) ) {
-			return null;
+			return;
 		}
 
 		if(empty($row['product']['meta']['href'])){
@@ -357,29 +358,24 @@ class ProductVariable {
 		}
 
 		$product_href = $row['product']['meta']['href'];
-		$product_id = self::get_product_id_by_uuid( $product_href );
+		$product_id = Helper::get_product_id_by_uuid( $product_href );
 		$product_parent = wc_get_product( $product_id );
 
 		if(empty($product_parent)){
-			do_action(
-				'wooms_logger_error',
-				__CLASS__,
-				sprintf( 'Нет базового продукта для вариации. %s', json_encode( ['product_id' => $product_id, '$row id' => $row ] ) )
-			);
-
-			return null;
-
+			/**
+			 * так бывает
+			 * мы получаем вариации всей пачкой и для каких то может не быть базового продукта
+			 * чаще всего это не ошибка, но может быть и она
+			 */
+			Helper::log('Нет базового продукта для вариации', __CLASS__, $row);
+			return;
 		}
 
 		if ( ! $product_parent->is_type( 'variable' ) ) {
 			$product_parent = new \WC_Product_Variable( $product_parent );
 			$product_parent->save();
 
-			do_action(
-				'wooms_logger_error',
-				__CLASS__,
-				sprintf( 'Снова сохранили продукт как вариативный %s', $product_id )
-			);
+			Helper::log(sprintf( 'Снова сохранили продукт как вариативный %s', $product_id ), __CLASS__);
 		}
 
 		if ( empty( $product_id ) ) {
@@ -432,6 +428,7 @@ class ProductVariable {
 		}
 
 		$variation = apply_filters( 'wooms_variation_save', $variation, $row, $product_id );
+		$variation = apply_filters( 'wooms_variation_update', $variation, $row, $product_id );
 
 		$variation_id = $variation->save();
 
@@ -545,8 +542,7 @@ class ProductVariable {
 	 * Stopping walker imports from MoySklad
 	 */
 	public static function walker_finish() {
-		self::set_state( 'end_timestamp', time() );
-		self::set_state( 'lock', 0 );
+
 
 		do_action( 'wooms_wakler_variations_finish' );
 
@@ -597,26 +593,6 @@ class ProductVariable {
 		return false;
 	}
 
-
-	public static function is_wait() {
-		//check run main walker
-		if ( as_next_scheduled_action( 'wooms_products_walker_batch' ) ) {
-			return true;
-		}
-
-		//check end pause
-		if ( ! empty( self::get_state( 'end_timestamp' ) ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-
-
-	/**
-	 * display_state
-	 */
 	public static function display_state() {
 
 		if ( ! self::is_enable() ) {
@@ -643,19 +619,13 @@ class ProductVariable {
 			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'Выполняется очередями в фоне' );
 
 		} else {
-			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'в ожидании задач' );
-			$strings[] = sprintf( 'Последняя успешная синхронизация: %s', wooms_get_timestamp_last_job_by_hook( self::$walker_hook_name ) );
+			$strings[] = sprintf( '<strong>Статус:</strong> %s', 'Завершено' );
+			$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( self::$walker_hook_name ) ) ?? 'Нет данных';
 		}
-
 
 		$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_variables_walker_batch&orderby=schedule&order=desc' ) );
 
-
-		if ( defined( 'WC_LOG_HANDLER' ) && 'WC_Log_Handler_DB' == WC_LOG_HANDLER ) {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductVariable' ) );
-		} else {
-			$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs' ) );
-		}
+		$strings[] = sprintf( 'Журнал обработки: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=logs&source=WooMS-ProductVariable' ) );
 
 		?>
 		<div>
@@ -764,51 +734,6 @@ class ProductVariable {
 		}
 
 		return $product;
-	}
-
-
-
-	/**
-	 * get state data
-	 */
-	public static function get_state( $key = '' ) {
-		if ( ! $state = get_option( self::$state_transient_key ) ) {
-			$state = [];
-			update_option( self::$state_transient_key, $state );
-		}
-
-		if ( empty( $key ) ) {
-			return $state;
-		}
-
-		if ( empty( $state[ $key ] ) ) {
-			return null;
-		}
-
-		return $state[ $key ];
-	}
-
-	/**
-	 * set state data
-	 */
-	public static function set_state( $key, $value = null ) {
-		if ( $value === null && is_array( $key ) ) {
-			update_option( self::$state_transient_key, $key, false );
-			return;
-		}
-
-		if ( ! $state = get_option( self::$state_transient_key ) ) {
-			$state = [];
-		}
-
-		if ( is_array( $state ) ) {
-			$state[ $key ] = $value;
-		} else {
-			$state = [];
-			$state[ $key ] = $value;
-		}
-
-		update_option( self::$state_transient_key, $state, false );
 	}
 
 	/**

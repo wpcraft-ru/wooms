@@ -4,7 +4,7 @@ namespace WooMS\Products;
 
 use function WooMS\request;
 use function Testeroid\ddcli;
-use Error, Throwable, WC_Product;
+use Error, Throwable, WC_Product, WooMS\Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -60,7 +60,7 @@ function walker( $args = [] ) {
 	$url = apply_filters( 'wooms_url_get_products', $url );
 
 	$filters = [
-		// 'pathName~=Диваны',
+		'archived=false'
 	];
 
 	$filters = apply_filters( 'wooms_url_get_products_filters', $filters );
@@ -103,46 +103,26 @@ function walker( $args = [] ) {
 }
 
 function process_rows( $rows = [] ) {
+	$ids = [];
+	foreach ( $rows as $row ) {
+		$ids[] = $row['id'];
 
-	try {
-
-		if ( empty( $rows ) ) {
-			throw new Error('$rows is empty');
+		if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
+			continue;
 		}
 
-		$ids = [];
-		foreach ( $rows as $row ) {
-			$ids[] = $row['id'];
-
-			if ( apply_filters( 'wooms_skip_product_import', false, $row ) ) {
-				continue;
-			}
-
-			/**
-			 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
-			 * птм нужна проверка что это точно продукт
-			 */
-			if ( 'variant' == $row["meta"]["type"] ) {
-				continue;
-			}
-
-			$data = apply_filters( 'wooms_product_data', [], $row );
-
-			product_update( $row, $data );
+		/**
+		 * в выдаче могут быть не только товары, но и вариации и мб что-то еще
+		 * птм нужна проверка что это точно продукт
+		 */
+		if ( 'variant' == $row["meta"]["type"] ) {
+			continue;
 		}
 
+		$data = apply_filters( 'wooms_product_data', [], $row );
 
-		return true;
-	} catch (Throwable $e) {
-
-		$message = sprintf("wooms process fails: %s, ids: %s, code: %s", $e->getMessage(), json_encode($ids), $e->getCode());
-		do_action( 'wooms_logger_error', __NAMESPACE__, $message );
-		error_log($message);
-
-		return false;
+		product_update( $row, $data );
 	}
-
-
 }
 
 
@@ -222,7 +202,7 @@ function product_update( array $row, array $data = [] ) {
 
 	$product_id = 0;
 
-	$product_id = get_product_id_by_uuid( $row['id'] );
+	$product_id = Helper::get_product_id_by_uuid( $row['id'] );
 
 	if ( ! empty( $row['archived'] ) ) {
 		if ( $product_id ) {
@@ -247,12 +227,8 @@ function product_update( array $row, array $data = [] ) {
 
 
 	if ( empty( intval( $product_id ) ) ) {
-		do_action(
-			'wooms_logger_error',
-			__NAMESPACE__,
-			'Ошибка определения и добавления ИД продукта',
-			$row
-		);
+		Helper::log_error('Ошибка определения и добавления ИД продукта', __NAMESPACE__, $row);
+
 		return false;
 	}
 
@@ -263,16 +239,6 @@ function product_update( array $row, array $data = [] ) {
 	 */
 	$data_api = $row;
 
-	$product->update_meta_data( 'wooms_id_' . $row['id'], 1 );
-
-	/**
-	 * Хук позволяет работать с методами WC_Product
-	 * Сохраняет в БД все изменения за 1 раз
-	 * Снижает нагрузку на БД
-	 *
-	 * DEPRECATED
-	 */
-	$product = apply_filters( 'wooms_product_save', $product, $data_api, $product_id );
 
 	//save data of source
 	if ( apply_filters( 'wooms_logger_enable', false ) ) {
@@ -289,9 +255,6 @@ function product_update( array $row, array $data = [] ) {
 	}
 
 	$product->update_meta_data( 'wooms_updated_timestamp', date( "Y-m-d H:i:s" ) );
-
-	$product->update_meta_data( 'wooms_id', $data_api['id'] );
-
 	$product->update_meta_data( 'wooms_updated_from_api', $data_api['updated'] );
 
 	//update title
@@ -336,24 +299,22 @@ function product_update( array $row, array $data = [] ) {
 		$product->set_regular_price( $price );
 	}
 
-	// issue https://github.com/wpcraft-ru/wooms/issues/302
-	$product->set_catalog_visibility( 'visible' );
+	$product->update_meta_data( 'wooms_id', $data_api['id'] );
+	$product->update_meta_data( 'wooms_id_' . $data_api['id'], 1 );
 
-	if ( apply_filters( 'wooms_reset_state_products', true ) ) {
-		$product->set_stock_status( 'instock' );
-		$product->set_manage_stock( false );
-		$product->set_status( 'publish' );
-	}
+	/**
+	 * reset state product
+	 *
+	 * @issue https://github.com/wpcraft-ru/wooms/issues/302
+	 */
+	$product->set_catalog_visibility( 'visible' );
+	$product->set_status( 'publish' );
 
 	$product = apply_filters( 'wooms_product_update', $product, $row, $data );
 
 	$product_id = $product->save();
 
-	do_action(
-		'wooms_logger',
-		__NAMESPACE__,
-		sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id )
-	);
+	Helper::log(sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id ), __NAMESPACE__);
 
 	return $product_id;
 
@@ -474,7 +435,6 @@ function walker_started() {
 		'session_id' => $now,
 		'timestamp' => $now,
 		'query_arg' => $query_arg_default,
-		'end_timestamp' => 0,
 	];
 
 	set_state( $state );
@@ -483,29 +443,9 @@ function walker_started() {
 	do_action( 'wooms_logger', __NAMESPACE__, 'Старт основного волкера: ' . $now );
 }
 
-// function auto_start() {
-
-//   $end_timestamp = get_state( 'end_timestamp' );
-//   if( empty($end_timestamp)){
-//     return false;
-//   }
-
-//   if ( empty( get_option( 'woomss_pass' ) ) ) {
-// 		return false;
-// 	}
-
-// 	if ( as_next_scheduled_action( HOOK_NAME ) ) {
-// 		return;
-// 	}
-
-
-
-// 	return as_schedule_single_action( time(), HOOK_NAME, [], 'WooMS' );
-// }
-
 
 function render_ui() {
-	printf( '<h2>%s</h2>', 'Каталог' );
+	printf( '<h2>%s</h2>', 'Каталог и базовые продукты' );
 
 	$strings = [];
 	if ( as_next_scheduled_action( HOOK_NAME ) ) {
@@ -515,7 +455,7 @@ function render_ui() {
 
 	} else {
 		$strings[] = sprintf( 'Статус: %s', 'Завершено' );
-		$strings[] = sprintf( 'Время последнего завершения: %s', wooms_get_timestamp_last_job_by_hook( HOOK_NAME ) );
+		$strings[] = sprintf( 'Последняя успешная синхронизация: %s', Helper::get_timestamp_last_job_by_hook( HOOK_NAME ) ) ?? 'Нет данных';
 		printf(
 			'<a href="%s" class="button button-primary">Запустить синхронизацию продуктов вручную</a>',
 			add_query_arg( 'a', 'wooms_products_start_import', admin_url( 'admin.php?page=moysklad' ) )
@@ -523,6 +463,7 @@ function render_ui() {
 
 	}
 	$strings[] = sprintf( 'Очередь задач: <a href="%s">открыть</a>', admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wooms_products_walker&orderby=schedule&order=desc' ) );
+
 
 	foreach ( $strings as $string ) {
 		printf( '<p>%s</p>', $string );
@@ -568,6 +509,7 @@ function display_metabox_for_product() {
 	$data_id = get_post_meta( $post->ID, 'wooms_id', true );
 	$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
 	$data_updated = get_post_meta( $post->ID, 'wooms_updated', true );
+	$wooms_updated_timestamp = get_post_meta( $post->ID, 'wooms_updated_timestamp', true );
 	if ( $data_id ) {
 		printf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
 	} else {
@@ -580,6 +522,10 @@ function display_metabox_for_product() {
 
 	if ( $data_updated ) {
 		printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
+	}
+
+	if ( $data_updated ) {
+		printf( '<div>Дата последнего обновления из API МойСклад: <strong>%s</strong></div>', $wooms_updated_timestamp );
 	}
 
 	do_action( 'wooms_display_product_metabox', $post->ID );

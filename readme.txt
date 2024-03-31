@@ -1,6 +1,6 @@
 === WooMS ===
 Contributors: casepress
-Donate link: https://wpcraft.ru/product/wooms-extra/
+Donate link: https://wpcraft.ru/pay/
 Tags: moysklad, woocommerce, sync, integration
 Requires at least: 6.0
 Tested up to: 6.4.2
@@ -23,7 +23,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 *   Загрузка картинок
 *   Гибкие настройки
 
-[Руководство по быстрому началу работы](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
+[Руководство по быстрому началу работы](https://wpcraft.ru/wooms/)
 
 Исходники для желающих принять участие в разработке: [https://github.com/wpcraft-ru/wooms/](https://github.com/wpcraft-ru/wooms/)
 
@@ -76,9 +76,15 @@ PHP 7.0
 
 == Changelog ==
 
+= 9.11 =
+- Тест совместимости WooCommerce 8.7.0
+- Улучшена синхронизация остатков
+- Не обновляются остатки по товарам https://github.com/wpcraft-ru/wooms/issues/544 https://github.com/wpcraft-ru/wooms/issues/524
+- Совместимость: 'Высокопроизводительное хранилище заказов' https://github.com/wpcraft-ru/wooms/issues/539
+
 = 9.10 =
 - Исправлена ошибка с версией
-- Обновдены авто тесты
+- Обновлены авто тесты
 
 = 9.9 =
 - Исправление RC 2: Перестала работать синхронизация на версии 9.6 https://github.com/wpcraft-ru/wooms/issues/522
