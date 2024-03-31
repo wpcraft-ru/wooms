@@ -330,12 +330,12 @@ class ProductVariable {
 
 		$variation->set_attributes( $attributes );
 
-		do_action(
-			'wooms_logger',
-			__CLASS__,
-			sprintf( 'Сохранены атрибуты для вариации %s (продукт: %s)', $variation_id, $product_id ),
-			wc_print_r( $attributes, true )
-		);
+		Helper::log('Сохранены атрибуты для вариации', __CLASS__, [
+			'name' => $variation->get_name(),
+			'variation_id' => $variation_id,
+			'product_id' => $product_id,
+			'attributes' => $attributes,
+		]);
 
 		return $variation;
 	}
