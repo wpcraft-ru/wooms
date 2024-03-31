@@ -476,7 +476,6 @@ class ProductStocks {
 			$section = 'woomss_section_warehouses'
 		);
 
-
 		add_settings_field(
 			$id = 'stock_and_reserve',
 			$title = 'Учитывать остатки с резервом',
