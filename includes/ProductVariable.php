@@ -362,6 +362,11 @@ class ProductVariable {
 		$product_parent = wc_get_product( $product_id );
 
 		if(empty($product_parent)){
+			/**
+			 * так бывает
+			 * мы получаем вариации всей пачкой и для каких то может не быть базового продукта
+			 * чаще всего это не ошибка, но может быть и она
+			 */
 			Helper::log('Нет базового продукта для вариации', __CLASS__, $row);
 			return;
 		}
