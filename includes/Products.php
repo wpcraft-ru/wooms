@@ -240,15 +240,6 @@ function product_update( array $row, array $data = [] ) {
 	$data_api = $row;
 
 
-	/**
-	 * Хук позволяет работать с методами WC_Product
-	 * Сохраняет в БД все изменения за 1 раз
-	 * Снижает нагрузку на БД
-	 *
-	 * DEPRECATED
-	 */
-	$product = apply_filters( 'wooms_product_save', $product, $data_api, $product_id );
-
 	//save data of source
 	if ( apply_filters( 'wooms_logger_enable', false ) ) {
 		$product->update_meta_data( 'wooms_data_api', json_encode( $data_api, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
