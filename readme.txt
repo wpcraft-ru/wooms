@@ -23,7 +23,7 @@ Integration WooCommerce & MoySklad http://moysklad.ru (for Russia)
 *   Загрузка картинок
 *   Гибкие настройки
 
-[Руководство по быстрому началу работы](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
+[Руководство по быстрому началу работы](https://wpcraft.ru/wooms/)
 
 Исходники для желающих принять участие в разработке: [https://github.com/wpcraft-ru/wooms/](https://github.com/wpcraft-ru/wooms/)
 
