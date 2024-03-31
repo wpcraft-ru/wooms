@@ -546,6 +546,7 @@ function display_metabox_for_product() {
 	$data_id = get_post_meta( $post->ID, 'wooms_id', true );
 	$data_meta = get_post_meta( $post->ID, 'wooms_meta', true );
 	$data_updated = get_post_meta( $post->ID, 'wooms_updated', true );
+	$wooms_updated_timestamp = get_post_meta( $post->ID, 'wooms_updated_timestamp', true );
 	if ( $data_id ) {
 		printf( '<div>ID товара в МойСклад: <div><strong>%s</strong></div></div>', $data_id );
 	} else {
@@ -558,6 +559,10 @@ function display_metabox_for_product() {
 
 	if ( $data_updated ) {
 		printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
+	}
+
+	if ( $data_updated ) {
+		printf( '<div>Дата последнего обновления из API МойСклад: <strong>%s</strong></div>', $wooms_updated_timestamp );
 	}
 
 	do_action( 'wooms_display_product_metabox', $post->ID );
