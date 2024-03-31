@@ -314,11 +314,7 @@ function product_update( array $row, array $data = [] ) {
 
 	$product_id = $product->save();
 
-	do_action(
-		'wooms_logger',
-		__NAMESPACE__,
-		sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id )
-	);
+	Helper::log(sprintf( 'Продукт: %s (%s) сохранен', $product->get_title(), $product_id ), __NAMESPACE__);
 
 	return $product_id;
 
