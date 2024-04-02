@@ -25,6 +25,10 @@ WooMS - синхронизация, выгрузка, загрузка
 
 https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa
 
+## Где найти разработчиков?
+
+Тут общие инструкции и контакты проверенных и грамотных ребят https://github.com/wpcraft-ru/wooms/wiki/Hire-Developer
+
 
 ## Ссылки
 
