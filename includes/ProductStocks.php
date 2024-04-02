@@ -229,11 +229,20 @@ class ProductStocks {
 		}
 
 		if ( ! $product->get_manage_stock() ) {
-			$product->set_manage_stock( true );
-			Helper::log( sprintf(
-				'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
-				__CLASS__
-			);
+			if($product->get_type() === 'variable'){
+				$product->set_manage_stock( false );
+				Helper::log( sprintf(
+					'Выключили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
+					__CLASS__
+				);
+			} else {
+				$product->set_manage_stock( true );
+				Helper::log( sprintf(
+					'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
+					__CLASS__
+				);
+
+			}
 		}
 
 		//для вариативных товаров доступность определяется наличием вариаций
