@@ -14,7 +14,7 @@ WooMS - синхронизация, выгрузка, загрузка
 
 ## Инструкции и документация
 
-- [Список инструкци](https://github.com/wpcraft-ru/wooms/wiki)
+- [Список инструкций](https://github.com/wpcraft-ru/wooms/wiki)
 
 - [Первые шаги](https://github.com/wpcraft-ru/wooms/wiki/GettingStarted)
 
@@ -24,6 +24,10 @@ WooMS - синхронизация, выгрузка, загрузка
 ## Вопросы и ответы
 
 https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa
+
+## Где найти разработчиков?
+
+Тут общие инструкции и контакты проверенных и грамотных ребят https://github.com/wpcraft-ru/wooms/wiki/Hire-Developer
 
 
 ## Ссылки
