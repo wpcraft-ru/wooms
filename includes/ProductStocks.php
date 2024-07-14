@@ -496,7 +496,7 @@ class ProductStocks {
 			$section,
 			$args = [
 				'name' => get_config_name( 'stock_and_reserve' ),
-				'value' => checked( 1, get_config( 'stock_and_reserve' ) ),
+				'value' => checked( 1, get_config( 'stock_and_reserve' ), false ),
 			]
 		);
 
