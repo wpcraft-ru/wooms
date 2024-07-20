@@ -1,7 +1,5 @@
 <?php
 
-
-
 /**
  * General functions
  */
