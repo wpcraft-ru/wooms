@@ -29,17 +29,26 @@ class ProductStocks {
 
 	public static function init() {
 
+		/**
+		 * snippet for fast debugging
+		 */
 		// add_action( 'init', function () {
 		// 	if ( ! isset ( $_GET['test_ProductStocks'] ) ) {
 		// 		return;
 		// 	}
 
-		// 	// do_action('wooms_assortment_sync');
-		// 	// var_dump(1); exit;
+		// 	$product = wc_get_product( 11300 );
+		// 	$url = 'https://api.moysklad.ru/api/remap/1.2/entity/assortment';
+		// 	// $url = add_query_arg('filter', 'code=100001023', $url);
+		// 	$url = add_query_arg('filter', 'id=f44042f0-c027-11ee-0a80-ыавыа', $url);
 
-		// 	$meta = get_post_meta( 68934 );
+		// 	$data = request( $url );
+
+		// 	$meta = get_post_meta( 11300, 'wooms_id', true );
 		// 	echo '<pre>';
 		// 	var_dump( $meta );
+		// 	var_dump( $url );
+		// 	var_dump( $data );
 		// 	exit;
 		// } );
 
@@ -229,11 +238,20 @@ class ProductStocks {
 		}
 
 		if ( ! $product->get_manage_stock() ) {
-			$product->set_manage_stock( true );
-			Helper::log( sprintf(
-				'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
-				__CLASS__
-			);
+			if($product->get_type() === 'variable'){
+				$product->set_manage_stock( false );
+				Helper::log( sprintf(
+					'Выключили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
+					__CLASS__
+				);
+			} else {
+				$product->set_manage_stock( true );
+				Helper::log( sprintf(
+					'Включили управление запасами для продукта: %s (ИД %s)', $product->get_name(), $product->get_id() ),
+					__CLASS__
+				);
+
+			}
 		}
 
 		//для вариативных товаров доступность определяется наличием вариаций
@@ -487,7 +505,7 @@ class ProductStocks {
 			$section,
 			$args = [
 				'name' => get_config_name( 'stock_and_reserve' ),
-				'value' => checked( 1, get_config( 'stock_and_reserve' ) ),
+				'value' => checked( 1, get_config( 'stock_and_reserve' ), false ),
 			]
 		);
 

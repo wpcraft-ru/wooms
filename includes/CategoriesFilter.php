@@ -86,7 +86,7 @@ class CategoriesFilter {
 			$name = 'wooms_set_folders',
 			$title = 'Группы товаров для фильтрации',
 			$render = function ($args) {
-				printf( '<input type="text" name="%s" value="%s" size="50" />', $args['key'], $args['value'] );
+				printf( '<textarea name="%s" rows="5" cols="50">%s</textarea>', $args['key'], $args['value'] );
 				printf( '<p><small>%s</small></p>',
 					'Тут можно указать группы для фильтрации товаров через запятую. Например: "Мебель/Диваны,Пицца,Одежда/Обувь/Ботинки"'
 				);
