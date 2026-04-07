@@ -2,3 +2,4 @@
 vendor
 phpunit/data
 .phpunit.result.cache
+wp
