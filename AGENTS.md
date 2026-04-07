@@ -30,8 +30,6 @@ composer dev-start-docker   # Запуск (Docker)
 composer dev-stop           # Остановка
 composer dev-restart        # Перезапуск с обновлениями
 composer cli wp <command>   # WP-CLI команды
-composer test               # Запуск PHPUnit тестов
-composer lint               # Проверка кода (PHPCS)
 ```
 
 ---
