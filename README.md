@@ -40,3 +40,110 @@ https://github.com/wpcraft-ru/wooms/issues?q=label%3Aqa
 ## Изменения и улучшения - changelog
 
 https://github.com/wpcraft-ru/wooms/releases
+
+
+## 🛠 Локальная разработка
+
+### Требования
+
+- **Node.js** LTS (v20+)
+- **Composer**
+- **Docker Desktop** (для Docker-режима) или **PHP 8.1+** (для Playground-режима)
+
+### Быстрый старт
+
+```bash
+# Установка зависимостей
+composer install
+
+# Запуск локального окружения (Playground - без Docker)
+composer dev-start
+
+# ИЛИ запуск в Docker-режиме (полная функциональность)
+composer dev-start-docker
+```
+
+### Окружение
+
+После запуска WordPress доступен:
+- **Development:** http://localhost:8888
+- **Админка:** http://localhost:8888/wp-admin (логин: `admin`, пароль: `password`)
+
+WooCommerce и плагин WooMS устанавливаются и активируются автоматически.
+
+### Основные команды
+
+```bash
+# Запуск окружения
+composer dev-start          # Playground режим (быстро, без Docker)
+composer dev-start-docker   # Docker режим (полная функциональность)
+
+# Остановка
+composer dev-stop
+
+# Перезапуск с обновлениями
+composer dev-restart
+
+# WP-CLI команды
+composer cli wp plugin list
+composer cli wp user list
+composer cli wp cache flush
+
+# Тесты
+composer test
+
+# Линтинг кода
+composer lint
+```
+
+### Конфигурация
+
+Настройки окружения в файле `.wp-env.json`:
+- WordPress последней версии
+- PHP 8.3
+- WooCommerce как зависимость
+- Отладка включена (WP_DEBUG, SCRIPT_DEBUG)
+
+### Переключение giữa режимами
+
+**Playground** (рекомендуется для быстрой разработки):
+- Не требует Docker
+- Быстрый запуск
+- Использует SQLite
+- ⚠️ Не поддерживает `wp-env run` команды
+
+**Docker** (для тестов и полной функциональности):
+- Полноценная MySQL база
+- Поддержка WP-CLI команд
+- Запуск PHPUnit тестов
+- Требует Docker Desktop
+
+```bash
+# Переключиться на Docker
+composer dev-stop
+composer dev-start-docker
+```
+
+### Отладка
+
+Логи WordPress:
+- `wp-content/debug.log` (внутри контейнера/окружения)
+- Доступны через `composer cli wp config get WP_DEBUG_LOG`
+
+Для Xdebug отладки в Docker режиме:
+```bash
+wp-env start --xdebug
+```
+
+### Сброс окружения
+
+```bash
+composer dev-stop
+composer dev-restart
+```
+
+Или полное удаление:
+```bash
+wp-env destroy
+composer dev-start
+```

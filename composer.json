@@ -1,9 +1,9 @@
 {
-    "name": "uptimizt/wooms",
+    "name": "wpcraft-ru/wooms",
     "authors": [
         {
-            "name": "r2 d2",
-            "email": "uptimizt@gmail.com"
+            "name": "ai",
+            "email": "m@wpcraft.ru"
         }
     ],
     "require": {},
@@ -13,8 +13,12 @@
         "yoast/phpunit-polyfills": "^1.0"
     },
     "scripts": {
-        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --testsuite tdd",
-        "tests": "@php ./vendor/phpunit/phpunit/phpunit --testsuite full",
-        "temp": "@php ./vendor/phpunit/phpunit/phpunit tests/tdd/TempTest.php"
+        "dev-start": "wp-env start --runtime=playground",
+        "dev-start-docker": "npx wp-env start",
+        "dev-stop": "wp-env stop",
+        "dev-restart": "wp-env start --update",
+        "cli": "wp-env run cli",
+        "test": "wp-env run cli --env-cwd=wp-content/plugins/wooms phpunit",
+        "lint": "wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs"
     }
 }
