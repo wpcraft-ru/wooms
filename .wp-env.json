@@ -6,8 +6,10 @@
     ".",
     "https://downloads.wordpress.org/plugin/woocommerce.zip"
   ],
-
-  "port": 8899,
+  "themes": [
+    "https://downloads.wordpress.org/theme/kiosko.zip"
+  ],
+  "autoPort": true,
   "testsEnvironment": false,
   "config": {
     "WP_DEBUG": true,

@@ -61,7 +61,7 @@ composer cli wp <command>   # WP-CLI команды
     ".",                     // Текущий плагин (wooms)
     "https://downloads.wordpress.org/plugin/woocommerce.zip"
   ],
-  "port": 8888,              // Портdevelopment-сайта
+  "port": 8888,              // Порт development-сайта
   "config": {                // WP-константы
     "WP_DEBUG": true,
     "WP_DEBUG_LOG": true,
@@ -87,23 +87,6 @@ composer cli wp <command>   # WP-CLI команды
 .wp-env.override.json
 ```
 
----
-
-## 🧪 Тестирование
-
-```bash
-# Запуск тестов
-composer test
-
-# Интерактивная WP-CLI сессия
-composer cli bash
-
-# Примеры WP-CLI команд
-composer cli wp plugin list
-composer cli wp user list
-composer cli wp cache flush
-composer cli wp post create --post_title="Test"
-```
 
 ---
 

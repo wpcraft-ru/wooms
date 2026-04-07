@@ -14,6 +14,7 @@
     },
     "scripts": {
         "dev-start": "wp-env start --runtime=playground",
+        "dev-start-update": "wp-env start --runtime=playground --update",
         "dev-start-docker": "npx wp-env start",
         "dev-stop": "wp-env stop",
         "dev-restart": "wp-env start --update",
