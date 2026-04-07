@@ -50,10 +50,8 @@ composer lint               # Проверка кода (PHPCS)
 
 **Полезные ссылки:**
 
-- [Полная схема .wp-env.json](../../.openclaw/workspace/skills/wp-env/references/config.md)
-- [Справочник команд wp-env](../../.openclaw/workspace/skills/wp-env/references/commands.md)
-- [Решение проблем (troubleshooting)](../../.openclaw/workspace/skills/wp-env/references/troubleshooting.md)
 - [Официальная документация @wordpress/env](https://developer.wordpress.org/block-editor/packages/packages-env/)
+- [GitHub @wordpress/env](https://github.com/WordPress/gutenberg/tree/trunk/packages/env)
 
 ### Структура .wp-env.json
 
