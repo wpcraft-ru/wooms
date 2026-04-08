@@ -1,25 +1,36 @@
 # Makefile для управления окружением разработки и инструментами
 
-start: ## Запуск (Playground — быстрый режим)
-	composer dev-start
+start: ## Запуск
+	npx wp-env start
 	echo "login: admin:password"
 
 start-update: ## Запуск с обновлением плагинов (Playground)
-	composer dev-stop
-	composer dev-start-update
+	npx wp-env stop
+	npx wp-env start --update
 
 start-docker: ## Запуск через Docker (полная функциональность)
-	composer dev-start-docker
+	npx wp-env start
 
 stop: ## Остановка окружения
-	composer dev-stop
+	npx wp-env stop
+
+status:
+	npx wp-env status
 
 restart: ## Перезапуск с обновлением (Docker)
-	composer dev-restart
+	npx wp-env start --update
 
+destroy: ## Полное удаление окружения
+	npx wp-env destroy
 # -----------------------------------------------------------------------------
 # Инструменты
 # -----------------------------------------------------------------------------
 
 cli: ## WP-CLI: make cli wp <command>
-	composer cli wp $(filter-out $@,$(MAKECMDGOALS))
+	npx wp-env run cli wp $(filter-out $@,$(MAKECMDGOALS))
+
+test: ## Запуск PHPUnit в окружении wp-env
+	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpunit
+
+lint: ## Запуск PHPCS в окружении wp-env
+	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs
