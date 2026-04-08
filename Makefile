@@ -5,6 +5,7 @@ start: ## Запуск (Playground — быстрый режим)
 	echo "login: admin:password"
 
 start-update: ## Запуск с обновлением плагинов (Playground)
+	composer dev-stop
 	composer dev-start-update
 
 start-docker: ## Запуск через Docker (полная функциональность)
