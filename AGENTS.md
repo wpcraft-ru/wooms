@@ -3,13 +3,19 @@
 ## 🚀 Быстрый старт
 
 ```bash
-composer install
-composer dev-start
+make start
 ```
 
 WordPress доступен на http://localhost:8888
 
----
+## API and Code References
+
+### MoySklad REST API
+- общее https://dev.moysklad.ru/doc/api/remap/1.2/#/general%232-obshie-svedeniya
+- Товары и Продукты  https://dev.moysklad.ru/doc/api/remap/1.2/#/dictionaries/product%233-tovary
+
+### WooCommerce
+- classes https://woocommerce.github.io/code-reference/packages/WooCommerce-Classes.html
 
 ## 📦 Окружение
 
