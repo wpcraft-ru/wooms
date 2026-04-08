@@ -9,7 +9,7 @@
   "themes": [
     "https://downloads.wordpress.org/theme/kiosko.zip"
   ],
-  "autoPort": true,
+  "port": 8888,
   "testsEnvironment": false,
   "config": {
     "WP_DEBUG": true,
