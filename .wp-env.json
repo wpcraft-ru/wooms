@@ -1,7 +1,5 @@
 {
-  "core": "./wp",
   "phpVersion": "8.1",
-  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
   "plugins": [
     ".",
     "https://github.com/aiiddqd/testeroid/releases/download/0.9.251009.6/testeroid-0.9.251009.6.zip",

@@ -1,7 +1,7 @@
 # Makefile для управления окружением разработки и инструментами
 
 start: ## Запуск
-	npx wp-env start
+	wp-env start
 	echo "login: admin:password"
 
 start-update: ## Запуск с обновлением плагинов (Playground)
@@ -26,11 +26,11 @@ destroy: ## Полное удаление окружения
 # Инструменты
 # -----------------------------------------------------------------------------
 
-cli: ## WP-CLI: make cli wp <command>
-	npx wp-env run cli wp $(filter-out $@,$(MAKECMDGOALS))
+cli: ## Запуск PHPUnit в окружении wp-env
+	npx wp-env run cli sh
 
-test: ## Запуск PHPUnit в окружении wp-env
-	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpunit
+wp: ## WP-CLI: make cli wp <command>
+	npx wp-env run cli wp $(filter-out $@,$(MAKECMDGOALS))
 
 lint: ## Запуск PHPCS в окружении wp-env
 	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs
