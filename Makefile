@@ -4,15 +4,15 @@ start: ## Запуск
 	wp-env start
 	echo "login: admin:password"
 
+stop: ## Остановка окружения
+	npx wp-env stop
+
+
+## additional commands
+
 start-update: ## Запуск с обновлением плагинов (Playground)
 	npx wp-env stop
 	npx wp-env start --update
-
-start-docker: ## Запуск через Docker (полная функциональность)
-	npx wp-env start
-
-stop: ## Остановка окружения
-	npx wp-env stop
 
 status:
 	npx wp-env status
@@ -20,9 +20,11 @@ status:
 restart: ## Перезапуск с обновлением (Docker)
 	npx wp-env start --update
 
+
+## danger commands
+
 destroy: ## Полное удаление окружения
 	npx wp-env destroy
-
 
 
 # Инструменты
