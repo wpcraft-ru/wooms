@@ -249,7 +249,7 @@ class ProductAttributes
 	{
 		add_settings_field(
 			$id = 'wooms_attr_enabled',
-			$title = 'Включить синхронизацию доп. полей как атрибутов',
+			$title = 'Синхронизация доп. полей как атрибутов',
 			$callback = [self::class, 'render_settings_fields'],
 			$page = 'mss-settings',
 			$section = 'wooms_products_and_attributes'
@@ -264,7 +264,6 @@ class ProductAttributes
 		$sync_as_taxonomy = Settings::getValue('wooms_attributes_sync_as_taxonomy');
 		$sync_as_taxonomy_field_name = Settings::getFieldName('wooms_attributes_sync_as_taxonomy');
 
-		echo '<hr/>';
 		printf('<input id="wooms_attributes_sync_enabled" type="checkbox" name="%s" value="1" %s />', $enable_field_name, checked(1, $enable, false));
 		printf('<label for="wooms_attributes_sync_enabled">%s</label>', 'Включить синхронизацию доп. полей как атрибутов');
 
