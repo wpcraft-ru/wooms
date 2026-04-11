@@ -31,10 +31,9 @@ class ProductAttributes
 				$row = $data['rows'][0] ?? null;
 				$product_id = \WooMS\Products\product_update($row);
 				$product = wc_get_product($product_id);
-				dd($product);
-				exit;
-				$x = 1;
-				return false;
+				// dd($product);
+				// exit;
+				return true;
 			};
 
 			return $tests;
@@ -59,7 +58,7 @@ class ProductAttributes
 	 */
 	public static function update_product($product, $item)
 	{
-		if (empty(get_option('wooms_attr_enabled'))) {
+		if (! self::is_enabled()) {
 			return $product;
 		}
 		$product_id = $product->get_id();
@@ -248,18 +247,12 @@ class ProductAttributes
 	 */
 	public static function add_settings()
 	{
-		$option_name = 'wooms_attr_enabled';
-		register_setting('mss-settings', $option_name);
 		add_settings_field(
-			$id = $option_name,
+			$id = 'wooms_attr_enabled',
 			$title = 'Включить синхронизацию доп. полей как атрибутов',
 			$callback = [self::class, 'render_settings_fields'],
 			$page = 'mss-settings',
-			$section = 'wooms_products_and_attributes',
-			$args = [
-				'name' => $option_name,
-				'value' => get_option($option_name),
-			]
+			$section = 'wooms_products_and_attributes'
 		);
 	}
 
@@ -275,15 +268,25 @@ class ProductAttributes
 		printf('<input id="wooms_attributes_sync_enabled" type="checkbox" name="%s" value="1" %s />', $enable_field_name, checked(1, $enable, false));
 		printf('<label for="wooms_attributes_sync_enabled">%s</label>', 'Включить синхронизацию доп. полей как атрибутов');
 
-		echo '<hr/>';
-		printf('<input id="wooms_attributes_sync_as_taxonomy" type="checkbox" name="%s" value="1" %s />', $sync_as_taxonomy_field_name, checked(1, $sync_as_taxonomy, false));
-		printf('<label for="wooms_attributes_sync_as_taxonomy">%s</label>', 'Синхронизировать доп. поля как общие атрибуты через таксономии');
+		// echo '<hr/>';
+		// printf('<input id="wooms_attributes_sync_as_taxonomy" type="checkbox" name="%s" value="1" %s />', $sync_as_taxonomy_field_name, checked(1, $sync_as_taxonomy, false));
+		// printf('<label for="wooms_attributes_sync_as_taxonomy">%s</label>', 'Синхронизировать доп. поля как общие атрибуты через таксономии');
 
 		echo '<hr/>';
 		printf('<p>%s</p>', 'Вес, Длина, Ширина, Высота - сохраняются в базовые поля продукта, остальные поля как индивидуальные атрибуты.');
 
+		printf('<p>По умолчанию атрибуты сохраняются как индивидуальные, но если добавить атрибут с таким же названием в общие, то он будет сохраняться как общий. <a href="%s">Редактировать общие атрибуты</a></p>',  admin_url('edit.php?post_type=product&page=product_attributes'));
+
 		printf('<p><strong>%s</strong></p>', 'Тестовый режим. Не включайте эту функцию на реальном сайте, пока не проверите ее на тестовой копии сайта.');
 
+	}
+
+	/**
+	 * check if enabled
+	 */
+	public static function is_enabled()
+	{
+		return (bool) Settings::getValue('wooms_attributes_sync_enabled');
 	}
 
 	// check option wooms_attr_enabled and if exist - delete - like migration 260311

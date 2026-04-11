@@ -55,8 +55,6 @@ class MenuTools {
 		];
 		?>
 		<div>
-			<a href="https://wpcraft.ru/wooms/" class="button button-primary" target="_blank">Решаем проблемы</a>
-			<br />
 			<?= sprintf( '<p>%s</p>', implode( '<span> | </span>', $items ) ); ?>
 		</div>
 		<?php
