@@ -23,15 +23,16 @@ class ProductAttributes
 		add_filter('wooms_allow_data_types_for_attributes', [self::class, 'add_text'], 10, 1);
 		add_action('admin_init', [self::class, 'add_settings'], 150);
 
-		add_filter('testeroid_tests', function($tests){
+		add_filter('testeroid_tests', function ($tests) {
 
-			$tests['ProductAttributes'] = function(){
+			$tests['ProductAttributes'] = function () {
 				$path = 'entity/product?filter=code=12300001182351';
-				$data = request( $path );
+				$data = request($path);
 				$row = $data['rows'][0] ?? null;
 				$product_id = \WooMS\Products\product_update($row);
 				$product = wc_get_product($product_id);
-				dd($product); exit;
+				dd($product);
+				exit;
 				$x = 1;
 				return false;
 			};
@@ -62,7 +63,6 @@ class ProductAttributes
 			return $product;
 		}
 		$product_id = $product->get_id();
-
 
 		if (! empty($item['weight'])) {
 			$product->set_weight($item['weight']);
@@ -253,11 +253,7 @@ class ProductAttributes
 		add_settings_field(
 			$id = $option_name,
 			$title = 'Включить синхронизацию доп. полей как атрибутов',
-			$callback = function ($args) {
-				printf('<input type="checkbox" name="%s" value="1" %s />', $args['name'], checked(1, $args['value'], false));
-				printf('<p>%s</p>', 'Позволяет синхронизировать доп поля МойСклад как атрибуты продукта. Вес, ДВШ - сохраняются в базовые поля продукта, остальные поля как индивидуальные атрибуты.');
-				printf('<p><strong>%s</strong></p>', 'Тестовый режим. Не включайте эту функцию на реальном сайте, пока не проверите ее на тестовой копии сайта.');
-			},
+			$callback = [self::class, 'render_settings_fields'],
 			$page = 'mss-settings',
 			$section = 'wooms_products_and_attributes',
 			$args = [
@@ -265,6 +261,40 @@ class ProductAttributes
 				'value' => get_option($option_name),
 			]
 		);
+	}
+
+	public static function render_settings_fields()
+	{
+		self::check_option_and_delete();
+		$enable = Settings::getValue('wooms_attributes_sync_enabled');
+		$enable_field_name = Settings::getFieldName('wooms_attributes_sync_enabled');
+		$sync_as_taxonomy = Settings::getValue('wooms_attributes_sync_as_taxonomy');
+		$sync_as_taxonomy_field_name = Settings::getFieldName('wooms_attributes_sync_as_taxonomy');
+
+		echo '<hr/>';
+		printf('<input id="wooms_attributes_sync_enabled" type="checkbox" name="%s" value="1" %s />', $enable_field_name, checked(1, $enable, false));
+		printf('<label for="wooms_attributes_sync_enabled">%s</label>', 'Включить синхронизацию доп. полей как атрибутов');
+
+		echo '<hr/>';
+		printf('<input id="wooms_attributes_sync_as_taxonomy" type="checkbox" name="%s" value="1" %s />', $sync_as_taxonomy_field_name, checked(1, $sync_as_taxonomy, false));
+		printf('<label for="wooms_attributes_sync_as_taxonomy">%s</label>', 'Синхронизировать доп. поля как общие атрибуты через таксономии');
+
+		echo '<hr/>';
+		printf('<p>%s</p>', 'Вес, Длина, Ширина, Высота - сохраняются в базовые поля продукта, остальные поля как индивидуальные атрибуты.');
+
+		printf('<p><strong>%s</strong></p>', 'Тестовый режим. Не включайте эту функцию на реальном сайте, пока не проверите ее на тестовой копии сайта.');
+
+	}
+
+	// check option wooms_attr_enabled and if exist - delete - like migration 260311
+	public static function check_option_and_delete()
+	{
+		$value = get_option('wooms_attr_enabled');
+		if (empty($value)) {
+			return;
+		}
+		Settings::setValue('wooms_attributes_sync_enabled', $value);
+		delete_option('wooms_attr_enabled');
 	}
 }
 
