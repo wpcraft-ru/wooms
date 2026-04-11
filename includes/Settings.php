@@ -91,18 +91,11 @@ class Settings {
 			<?= implode( ' | ', $nav_items ); ?>
 		</div>
 		<?php
-
-
-
 	}
-
-
-
-
 
 	public static function settings_general() {
 
-		add_settings_section( 'woomss_section_login', 'Данные для доступа МойСклад', null, 'mss-settings' );
+		add_settings_section( 'woomss_section_login', 'Данные для доступа МойСклад', '__return_false', 'mss-settings' );
 
 		register_setting( 'mss-settings', 'wooms_config' );
 
@@ -153,7 +146,7 @@ class Settings {
 			$title = 'Использование UUID',
 			$callback = array( __CLASS__, 'display_field_wooms_use_uuid' ),
 			$page = 'mss-settings',
-			$section = 'woomss_section_other'
+			$section = 'wooms_products_and_attributes',
 		);
 
 		register_setting( 'mss-settings', 'wooms_replace_title' );
@@ -162,7 +155,7 @@ class Settings {
 			$title = 'Замена заголовка при обновлении',
 			$callback = array( __CLASS__, 'display_wooms_replace_title' ),
 			$page = 'mss-settings',
-			$section = 'woomss_section_other'
+			$section = 'wooms_products_and_attributes'
 		);
 
 		register_setting( 'mss-settings', 'wooms_replace_description' );
@@ -171,7 +164,7 @@ class Settings {
 			$title = 'Замена описания при обновлении',
 			$callback = array( __CLASS__, 'display_wooms_replace_desc' ),
 			$page = 'mss-settings',
-			$section = 'woomss_section_other'
+			$section = 'wooms_products_and_attributes'
 		);
 	}
 

@@ -181,7 +181,7 @@ function add_settings()
       printf('<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.');
     },
     $page = 'mss-settings',
-    $section = 'woomss_section_other',
+    $section = 'wooms_products_and_attributes',
     $args = [
       'name' => $option_name,
       'value' => get_option($option_name),

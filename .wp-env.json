@@ -3,6 +3,7 @@
   "plugins": [
     ".",
     "https://github.com/aiiddqd/testeroid/releases/download/0.9.251009.6/testeroid-0.9.251009.6.zip",
+    "https://downloads.wordpress.org/plugin/cyr2lat.zip",
     "https://downloads.wordpress.org/plugin/woocommerce.zip"
   ],
   "themes": [

@@ -39,7 +39,7 @@ function add_settings()
       printf('<p>%s</p>', 'Если опция активна, то плагин будет пропускать синхронизацию продуктов без артикула: https://github.com/wpcraft-ru/wooms/issues/461');
     },
     $page = 'mss-settings',
-    $section = 'woomss_section_other',
+    $section = 'wooms_products_and_attributes',
     $args = [
       'key' => sprintf("wooms_config[%s]", CONFIG_KEY),
       'value' => get_option('wooms_config')[CONFIG_KEY] ?? false,

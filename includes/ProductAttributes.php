@@ -259,7 +259,7 @@ class ProductAttributes
 				printf('<p><strong>%s</strong></p>', 'Тестовый режим. Не включайте эту функцию на реальном сайте, пока не проверите ее на тестовой копии сайта.');
 			},
 			$page = 'mss-settings',
-			$section = 'woomss_section_other',
+			$section = 'wooms_products_and_attributes',
 			$args = [
 				'name' => $option_name,
 				'value' => get_option($option_name),
