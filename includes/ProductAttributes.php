@@ -149,7 +149,7 @@ class ProductAttributes
 					continue;
 				}
 
-				if (in_array($attribute['name'], array('Ширина', 'Высота', 'Длина', 'Страна'))) {
+				if (in_array($attribute['name'], ['Ширина', 'Высота', 'Длина', 'Страна'])) {
 					continue;
 				}
 
@@ -232,7 +232,7 @@ class ProductAttributes
 
 			$attribute_object = new \WC_Product_Attribute();
 			$attribute_object->set_name("Страна");
-			$attribute_object->set_options(array($country));
+			$attribute_object->set_options([$country]);
 			$attribute_object->set_position('0');
 			$attribute_object->set_visible(1);
 			$attribute_object->set_variation(0);
