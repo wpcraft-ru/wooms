@@ -53,15 +53,25 @@ https://github.com/wpcraft-ru/wooms/releases
 ### Быстрый старт
 
 ```bash
-# Установка зависимостей
+
+# Запуск локального окружения
+make start
+
+# вход в CLI
+make cli
+
+# Установка зависимостей для тестов
+cd /var/www/html/wp-content/plugins/wooms
 composer install
 
-# Запуск локального окружения (Playground - без Docker)
-composer dev-start
-
-# ИЛИ запуск в Docker-режиме (полная функциональность)
-composer dev-start-docker
 ```
+### Тестирование
+
+Используется PestPHP.
+
+С хоста: `make test`.
+Из CLI Docker: `wp test:wooms`.
+
 
 ### Окружение
 
@@ -70,31 +80,6 @@ composer dev-start-docker
 - **Админка:** http://localhost:8888/wp-admin (логин: `admin`, пароль: `password`)
 
 WooCommerce и плагин WooMS устанавливаются и активируются автоматически.
-
-### Основные команды
-
-```bash
-# Запуск окружения
-composer dev-start          # Playground режим (быстро, без Docker)
-composer dev-start-docker   # Docker режим (полная функциональность)
-
-# Остановка
-composer dev-stop
-
-# Перезапуск с обновлениями
-composer dev-restart
-
-# WP-CLI команды
-composer cli wp plugin list
-composer cli wp user list
-composer cli wp cache flush
-
-# Тесты
-composer test
-
-# Линтинг кода
-composer lint
-```
 
 ### Конфигурация
 
@@ -129,25 +114,6 @@ composer lint
 Если используется кастомный конфиг через `--config`, override-файл ищется по тому же имени.
 Например, для `.wp-env.test.json` будет использован `.wp-env.test.override.json`.
 
-### Переключение giữa режимами
-
-**Playground** (рекомендуется для быстрой разработки):
-- Не требует Docker
-- Быстрый запуск
-- Использует SQLite
-- ⚠️ Не поддерживает `wp-env run` команды
-
-**Docker** (для тестов и полной функциональности):
-- Полноценная MySQL база
-- Поддержка WP-CLI команд
-- Запуск PHPUnit тестов
-- Требует Docker Desktop
-
-```bash
-# Переключиться на Docker
-composer dev-stop
-composer dev-start-docker
-```
 
 ### Отладка
 
@@ -160,15 +126,3 @@ composer dev-start-docker
 wp-env start --xdebug
 ```
 
-### Сброс окружения
-
-```bash
-composer dev-stop
-composer dev-restart
-```
-
-Или полное удаление:
-```bash
-wp-env destroy
-composer dev-start
-```

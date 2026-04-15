@@ -1,5 +1,7 @@
 {
   "name": "wpcraft-ru/wooms",
+  "version": "dev-main",
+  "type": "wordpress-plugin",
   "authors": [
     {
       "name": "ai",
