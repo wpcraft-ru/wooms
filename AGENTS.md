@@ -124,18 +124,6 @@ VS Code `launch.json`:
 
 ---
 
-## ⚠️ Важно
-
-- **Playground режим** использует SQLite вместо MySQL — некоторые функции могут работать иначе
-- **Docker режим** требуется для:
-  - Запуска PHPUnit тестов
-  - Использования `wp-env run` команд
-  - Полной совместимости с WooCommerce
-- Не коммить `.wp-env.override.json` в репозиторий
-- При проблемах: `composer dev-stop` → `composer dev-restart`
-
----
-
 ## 🔗 Дополнительные ресурсы
 
 - [Инструкции WooMS Wiki](https://github.com/wpcraft-ru/wooms/wiki)
