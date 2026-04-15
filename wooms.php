@@ -39,6 +39,7 @@ register_deactivation_hook( __FILE__, function () {
 
 
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/tests/add-wp-cli.php';
 
 add_action( 'plugins_loaded', function () {
 	if ( ! wooms_can_start() ) {
@@ -103,7 +104,6 @@ function add_wooms_plugin_row_meta( $links, $file ) {
 	return $links;
 }
 
-
 /**
  * Styles for Dashboard
  *
@@ -114,8 +114,6 @@ function admin_styles() {
 
 	wp_enqueue_style( 'wooms_styles', $admin_style, array() );
 }
-
-
 
 function get_api_url( $path ) {
 	return $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;

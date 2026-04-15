@@ -1,15 +1,24 @@
 {
-    "name": "wpcraft-ru/wooms",
-    "authors": [
-        {
-            "name": "ai",
-            "email": "m@wpcraft.ru"
-        }
-    ],
-    "require": {},
-    "require-dev": {
-        "brain/monkey": "^2.4",
-        "phpunit/phpunit": "^9.0",
-        "yoast/phpunit-polyfills": "^1.0"
+  "name": "wpcraft-ru/wooms",
+  "authors": [
+    {
+      "name": "ai",
+      "email": "m@wpcraft.ru"
     }
+  ],
+  "require-dev": {
+    "brain/monkey": "^2.4",
+    "pestphp/pest": "^4.0",
+    "roots/wordpress": "^6.7",
+    "symfony/var-dumper": "^7.4"
+  },
+  "extra": {
+    "wordpress-install-dir": "vendor/wordpress"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "roots/wordpress-core-installer": true
+    }
+  }
 }

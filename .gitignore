@@ -4,3 +4,4 @@ phpunit/data
 .phpunit.result.cache
 wp
 .wp-env.override.json
+.phpunit.cache

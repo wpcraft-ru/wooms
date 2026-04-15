@@ -53,8 +53,8 @@ destroy: ## Полное удаление окружения
 cli: ## Запуск PHPUnit в окружении wp-env
 	npx wp-env run cli sh
 
-wp: ## WP-CLI: make cli wp <command>
-	npx wp-env run cli wp $(filter-out $@,$(MAKECMDGOALS))
+test: ## Запуск PHPUnit в окружении wp-env
+	npx wp-env run cli wp test:wooms
 
 lint: ## Запуск PHPCS в окружении wp-env
 	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs

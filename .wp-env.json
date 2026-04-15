@@ -1,8 +1,7 @@
 {
-  "phpVersion": "8.1",
+  "phpVersion": "8.3",
   "plugins": [
     ".",
-    "https://github.com/aiiddqd/testeroid/releases/download/0.9.251009.6/testeroid-0.9.251009.6.zip",
     "https://downloads.wordpress.org/plugin/cyr2lat.zip",
     "https://downloads.wordpress.org/plugin/woocommerce.zip"
   ],
@@ -10,12 +9,12 @@
     "https://downloads.wordpress.org/theme/kiosko.zip"
   ],
   "port": 8888,
-  "testsEnvironment": false,
   "config": {
     "WP_DEBUG": true,
     "WP_DEBUG_LOG": true,
     "WP_DEBUG_DISPLAY": false,
     "SCRIPT_DEBUG": false,
     "WP_ENVIRONMENT_TYPE": "local"
-  }
+  },
+  "testsEnvironment": false
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace WooMS\Tests;
+declare(strict_types=1);
 
-use function Testeroid\{test, transaction_query, ddcli};
+$wpLoadPath = '/var/www/html/wp-load.php';
 
-require_once __DIR__ . '/functions.php';
-
-foreach(glob(__DIR__ . '/includes/*.php') as $php_include) {
-  require_once($php_include);
+if (! file_exists($wpLoadPath)) {
+    throw new RuntimeException("WordPress bootstrap file not found at: {$wpLoadPath}");
 }
+
+require_once $wpLoadPath;
