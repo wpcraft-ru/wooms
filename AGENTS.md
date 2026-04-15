@@ -77,22 +77,35 @@ composer cli wp <command>   # WP-CLI команды
 }
 ```
 
-### .wp-env.override.json
+---
 
-Локальные переопределения (не коммитить в git):
+## ✅ Авто-тесты
 
-```json
-{
-  "port": 9000,
-  "phpVersion": "8.2"
-}
+Используется **PestPHP**.
+
+- `npx wp-env run cli wp test:wooms` запускает тесты внутри `wp-env`
+- команда `wp test:wooms` зарегистрирована в `tests/add-wp-cli.php` и вызывает `vendor/bin/pest`
+- конфигурация берется из `phpunit.xml`
+- `tests/bootstrap.php` подключает WordPress через `wp-load.php`
+
+Ссылки:
+- [PestPHP: Introduction](https://pestphp.com/docs/introduction)
+- [PestPHP: Expectations](https://pestphp.com/docs/expectations)
+- [PestPHP: Filtering Tests](https://pestphp.com/docs/filtering-tests)
+
+Запуск:
+
+```bash
+npx wp-env run cli wp test:wooms
+npx wp-env run cli wp test:wooms --filter="adds numbers correctly"
+npx wp-env run cli wp test:wooms tests/tdd/test.php
 ```
 
-Добавить в `.gitignore`:
-```
-.wp-env.override.json
-```
+Зависимости:
 
+```bash
+npx wp-env run cli --env-cwd=wp-content/plugins/wooms composer install
+```
 
 ---
 
