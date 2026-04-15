@@ -70,7 +70,18 @@ composer install
 Используется PestPHP.
 
 С хоста: `make test`.
-Из CLI Docker: `wp test:wooms`.
+
+Из CLI Docker:
+```
+# вход в режим CLI Docker
+make cli
+
+# все тесты
+wp test:wooms
+
+# только тест с определенным описанием
+wp test:wooms --filter="test description"
+```
 
 
 ### Окружение

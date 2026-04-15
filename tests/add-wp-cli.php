@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * wp test:wooms
+ */
 if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
 
 	WP_CLI::add_command('test:wooms', function ($args, $assoc_args) {
