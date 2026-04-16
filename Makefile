@@ -51,7 +51,7 @@ destroy: ## Полное удаление окружения
 # Инструменты
 
 cli: ## Запуск PHPUnit в окружении wp-env
-	npx wp-env run cli sh
+	npx wp-env run cli --env-cwd=wp-content/plugins/wooms sh
 
 test: ## Запуск PHPUnit в окружении wp-env
 	npx wp-env run cli wp test:wooms

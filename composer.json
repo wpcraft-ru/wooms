@@ -12,15 +12,29 @@
     "brain/monkey": "^2.4",
     "pestphp/pest": "^4.0",
     "roots/wordpress": "^6.7",
+    "wp-plugin/woocommerce": "*",
     "symfony/var-dumper": "^7.4"
   },
   "extra": {
+    "installer-paths": {
+      "wp/plugins/{$name}/": ["type:wordpress-plugin"],
+      "wp/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "wp/themes/{$name}/": ["type:wordpress-theme"]
+    },
     "wordpress-install-dir": "vendor/wordpress"
   },
+  "repositories": [
+    {
+      "name": "wp-packages",
+      "type": "composer",
+      "url": "https://repo.wp-packages.org"
+    }
+  ],
   "config": {
     "allow-plugins": {
       "pestphp/pest-plugin": true,
-      "roots/wordpress-core-installer": true
+      "roots/wordpress-core-installer": true,
+      "composer/installers": true
     }
   }
 }
