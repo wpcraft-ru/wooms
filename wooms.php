@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WooMS
- * Plugin URI: https://wpcraft.ru/product/wooms/
+ * Plugin URI: https://github.com/wpcraft-ru/wooms
  * Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
  * Author: WPCraft
  * Author URI: https://wpcraft.ru/
