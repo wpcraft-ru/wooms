@@ -9,17 +9,22 @@
     }
   ],
   "require-dev": {
+    "wp-plugin/woocommerce": "*",
+    "wp-plugin/cyr2lat": "*",
+    "wp-theme/twentytwentyfive": "*",
+    "wp-theme/kiosko": "*",
+    "wp-theme/storefront": "*",
+    "wp-theme/blocksy": "*",
     "brain/monkey": "^2.4",
     "pestphp/pest": "^4.0",
     "roots/wordpress": "^6.7",
-    "wp-plugin/woocommerce": "*",
     "symfony/var-dumper": "^7.4"
   },
   "extra": {
     "installer-paths": {
-      "wp/plugins/{$name}/": ["type:wordpress-plugin"],
-      "wp/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-      "wp/themes/{$name}/": ["type:wordpress-theme"]
+      "vendor/wordpress/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+      "vendor/wordpress/wp-content/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "vendor/wordpress/wp-content/themes/{$name}/": ["type:wordpress-theme"]
     },
     "wordpress-install-dir": "vendor/wordpress"
   },

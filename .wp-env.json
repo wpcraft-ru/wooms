@@ -1,13 +1,15 @@
 {
   "phpVersion": "8.3",
   "plugins": [
-    ".",
-    "https://downloads.wordpress.org/plugin/cyr2lat.zip",
-    "https://downloads.wordpress.org/plugin/woocommerce.zip"
+    "./vendor/wordpress/wp-content/plugins/woocommerce",
+    "./vendor/wordpress/wp-content/plugins/cyr2lat",
+    "."
   ],
-  "themes": [
-    "https://downloads.wordpress.org/theme/kiosko.zip"
-  ],
+  "mappings": {
+    "wp-content/plugins": "./vendor/wordpress/wp-content/plugins",
+    "wp-content/themes": "./vendor/wordpress/wp-content/themes",
+    "wp-content/mu-plugins": "./vendor/wordpress/wp-content/mu-plugins"
+  },
   "port": 8888,
   "config": {
     "WP_DEBUG": true,

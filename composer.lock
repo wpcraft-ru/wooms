@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c43ae622ad696d9b8a743723e1dab0ea",
+    "content-hash": "78b59601f7f594850be05e6d299a723f",
     "packages": [],
     "packages-dev": [
         {
@@ -4558,6 +4558,37 @@
             "time": "2026-04-11T10:33:05+00:00"
         },
         {
+            "name": "wp-plugin/cyr2lat",
+            "version": "6.7.0",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/cyr2lat/",
+                "reference": "tags/6.7.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/cyr2lat.6.7.0.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-plugin",
+            "notification-url": "https://wp-packages.org/downloads",
+            "authors": [
+                {
+                    "name": "Sergey Biryukov"
+                }
+            ],
+            "description": "Convert Non-Latin characters in post, page and term slugs to Latin characters.",
+            "homepage": "https://kagg.eu/cyr-to-lat/",
+            "support": {
+                "changelog": "https://wordpress.org/plugins/cyr2lat/#developers",
+                "issues": "https://wordpress.org/support/plugin/cyr2lat",
+                "source": "https://plugins.svn.wordpress.org/cyr2lat"
+            },
+            "time": "2026-04-01T21:11:07+00:00"
+        },
+        {
             "name": "wp-plugin/woocommerce",
             "version": "10.7.0",
             "source": {
@@ -4587,6 +4618,110 @@
                 "source": "https://plugins.svn.wordpress.org/woocommerce"
             },
             "time": "2026-04-14T14:56:01+00:00"
+        },
+        {
+            "name": "wp-theme/blocksy",
+            "version": "2.1.38",
+            "source": {
+                "type": "svn",
+                "url": "https://themes.svn.wordpress.org/blocksy/",
+                "reference": "2.1.38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/theme/blocksy.2.1.38.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-theme",
+            "notification-url": "https://wp-packages.org/downloads",
+            "description": "Blocksy is a fast, modern WordPress theme with advanced WooCommerce support and full compatibility with the block editor.",
+            "homepage": "https://wordpress.org/themes/blocksy/",
+            "support": {
+                "changelog": "https://wordpress.org/themes/blocksy/#developers",
+                "issues": "https://wordpress.org/support/theme/blocksy",
+                "source": "https://themes.svn.wordpress.org/blocksy"
+            },
+            "time": "2026-04-09T16:55:54+00:00"
+        },
+        {
+            "name": "wp-theme/kiosko",
+            "version": "1.0",
+            "source": {
+                "type": "svn",
+                "url": "https://themes.svn.wordpress.org/kiosko/",
+                "reference": "1.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/theme/kiosko.1.0.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-theme",
+            "notification-url": "https://wp-packages.org/downloads",
+            "description": "Kiosko is a store theme for WooCommerce.",
+            "homepage": "https://wordpress.org/themes/kiosko/",
+            "support": {
+                "changelog": "https://wordpress.org/themes/kiosko/#developers",
+                "issues": "https://wordpress.org/support/theme/kiosko",
+                "source": "https://themes.svn.wordpress.org/kiosko"
+            },
+            "time": "2026-03-23T19:23:21+00:00"
+        },
+        {
+            "name": "wp-theme/storefront",
+            "version": "4.6.2",
+            "source": {
+                "type": "svn",
+                "url": "https://themes.svn.wordpress.org/storefront/",
+                "reference": "4.6.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/theme/storefront.4.6.2.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-theme",
+            "notification-url": "https://wp-packages.org/downloads",
+            "description": "Storefront is the perfect theme for your next WooCommerce project. Designed and developed by WooCommerce Core developers, it features a bespoke integration with WooCommerce itself plus many of the most popular customer facing WooCommerce extensions. There are several layout & color options to personalise your shop, multiple widget regions, a responsive design and much more. Developers will love its lean and extensible codebase making it a joy to customize and extend. Looking for a WooCommerce theme? Look no further!",
+            "homepage": "https://wordpress.org/themes/storefront/",
+            "support": {
+                "changelog": "https://wordpress.org/themes/storefront/#developers",
+                "issues": "https://wordpress.org/support/theme/storefront",
+                "source": "https://themes.svn.wordpress.org/storefront"
+            },
+            "time": "2026-03-23T19:23:21+00:00"
+        },
+        {
+            "name": "wp-theme/twentytwentyfive",
+            "version": "1.4",
+            "source": {
+                "type": "svn",
+                "url": "https://themes.svn.wordpress.org/twentytwentyfive/",
+                "reference": "1.4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/theme/twentytwentyfive.1.4.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0|~2.0"
+            },
+            "type": "wordpress-theme",
+            "notification-url": "https://wp-packages.org/downloads",
+            "description": "Twenty Twenty-Five emphasizes simplicity and adaptability. It offers flexible design options, supported by a variety of patterns for different page types, such as services and landing pages, making it ideal for building personal blogs, professional portfolios, online magazines, or business websites. Its templates cater to various blog styles, from text-focused to image-heavy layouts. Additionally, it supports international typography and diverse color palettes, ensuring accessibility and customization for users worldwide.",
+            "homepage": "https://wordpress.org/themes/twentytwentyfive/",
+            "support": {
+                "changelog": "https://wordpress.org/themes/twentytwentyfive/#developers",
+                "issues": "https://wordpress.org/support/theme/twentytwentyfive",
+                "source": "https://themes.svn.wordpress.org/twentytwentyfive"
+            },
+            "time": "2026-03-23T19:23:21+00:00"
         }
     ],
     "aliases": [],
