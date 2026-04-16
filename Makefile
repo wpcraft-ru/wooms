@@ -1,8 +1,12 @@
 # Makefile для управления окружением разработки и инструментами
 
-start: ## Запуск
+up: ## Запуск
 	wp-env start
 	echo "login: admin:password"
+
+update: ## Запуск с обновлением плагинов (Playground)
+	npx wp-env stop
+	npx wp-env start --update
 
 stop: ## Остановка окружения
 	npx wp-env stop
@@ -10,17 +14,11 @@ stop: ## Остановка окружения
 
 ## additional commands
 
-start-update: ## Запуск с обновлением плагинов (Playground)
-	npx wp-env stop
-	npx wp-env start --update
-
 status:
 	npx wp-env status
 
 restart: ## Перезапуск с обновлением (Docker)
 	npx wp-env start --update
-
-
 
 # Action Scheduler в фоне (каждую минуту, без логов)
 as-daemon:
