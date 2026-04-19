@@ -214,12 +214,12 @@ class ProductSingleSync
    */
   public static function product_save($product_id)
   {
-    if (!isset($_REQUEST['wooms_product_sinle_sync'])) {
+    if (!isset($_REQUEST['wooms_product_single_sync'])) {
       return;
     }
 
 
-    if (!empty($_REQUEST['wooms_product_sinle_sync'])) {
+    if (!empty($_REQUEST['wooms_product_single_sync'])) {
 
       remove_action('woocommerce_update_product', array(__CLASS__, 'product_save'), 100);
 
@@ -246,6 +246,11 @@ class ProductSingleSync
     }
 
     $url = 'entity/assortment?filter=id=' . $uuid;
+
+    // Расширяем атрибуты для получения имен справочников
+    if ( get_option( 'wooms_attr_enabled' ) ) {
+      $url = add_query_arg( 'expand', 'attributes', $url );
+    }
 
     $data = request($url);
 
@@ -281,7 +286,7 @@ class ProductSingleSync
     echo '<hr/>';
     if (empty($need_update_variations)) {
       printf(
-        '<input id="wooms-product-single-sync" type="checkbox" name="wooms_product_sinle_sync"> <label for="wooms-product-single-sync">%s</label>',
+        '<input id="wooms-product-single-sync" type="checkbox" name="wooms_product_single_sync"> <label for="wooms-product-single-sync">%s</label>',
         'Синхронизировать отдельно'
       );
     } else {

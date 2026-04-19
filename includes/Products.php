@@ -57,6 +57,11 @@ function walker( $args = [] ) {
 
 	$url = add_query_arg( $args['query_arg'], $url );
 
+	// Expand attributes to get names for customentity types
+	if ( get_option( 'wooms_attr_enabled' ) ) {
+		$url = add_query_arg( 'expand', 'attributes', $url );
+	}
+
 	$url = apply_filters( 'wooms_url_get_products', $url );
 
 	$filters = [

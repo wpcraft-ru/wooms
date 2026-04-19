@@ -34,7 +34,7 @@ function walker($state = [])
     do_action(
       'wooms_logger',
       __NAMESPACE__,
-      sprintf('Финишь скрытия продуктов: %s', date("Y-m-d H:i:s"))
+      sprintf('Финиш скрытия продуктов: %s', date("Y-m-d H:i:s"))
     );
     return;
   }

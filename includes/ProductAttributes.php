@@ -99,9 +99,15 @@ class ProductAttributes
 
 		$product_attributes = apply_filters('wooms_attributes', $product_attributes, $product_id, $item);
 
+		// Подготовка данных для логов, так как объекты WC_Product_Attribute не сериализуются в JSON
+		$attributes_log = [];
+		foreach ( $product_attributes as $key => $attr_obj ) {
+			$attributes_log[$key] = $attr_obj->get_data();
+		}
+
 		do_action('wooms_logger', __CLASS__,
-			sprintf('Артибуты Продукта: %s (%s) сохранены', $product->get_title(), $product->get_id()),
-			$product_attributes
+			sprintf('Атрибуты Продукта: %s (%s) сохранены', $product->get_title(), $product->get_id()),
+			$attributes_log
 		);
 
 		$product->set_attributes($product_attributes);
@@ -138,7 +144,7 @@ class ProductAttributes
 	}
 
 	/**
-	 * Сохраняем прочие атрибуты, не попавшивае под базовые условия
+	 * Сохраняем прочие атрибуты, не попавшие под базовые условия
 	 */
 	public static function save_other_attributes($product_attributes, $product_id, $value)
 	{
@@ -153,23 +159,29 @@ class ProductAttributes
 				}
 
 				//Если это не число и не строка - пропуск, тк другие типы надо обрабатывать иначе
-				$allow_data_type_for_attribures = array('string', 'number', 'customentity');
+				$allow_data_type_for_attributes = array('string', 'number', 'customentity');
 
 				/**
 				 * add new type for attributes
 				 *
 				 * @issue https://github.com/wpcraft-ru/wooms/issues/184
 				 */
-				$allow_data_type_for_attribures = apply_filters('wooms_allow_data_types_for_attributes', $allow_data_type_for_attribures);
-				if (! in_array($attribute['type'], $allow_data_type_for_attribures)) {
+				$allow_data_type_for_attributes = apply_filters('wooms_allow_data_types_for_attributes', $allow_data_type_for_attributes);
+				if (! in_array($attribute['type'], $allow_data_type_for_attributes)) {
 					continue;
 				}
 
-				if (! empty($attribute['value']['name'])) {
-					$value = $attribute['value']['name'];
+				// Извлекаем значение (название справочника или строку)
+				if ( isset($attribute['value']['name']) ) {
+					$attr_value = $attribute['value']['name'];
+				} elseif ( is_string($attribute['value']) || is_numeric($attribute['value']) ) {
+					$attr_value = $attribute['value'];
 				} else {
-					$value = $attribute['value'];
+					// Если в расширении (expand) нет имени, пропускаем
+					continue;
 				}
+
+				$attr_value = (string) $attr_value;
 
 				$attribute_name = $attribute['name'];
 
@@ -184,7 +196,7 @@ class ProductAttributes
 
 					$attribute_object = new \WC_Product_Attribute();
 					$attribute_object->set_name($attribute_name);
-					$attribute_object->set_options(array($value));
+					$attribute_object->set_options(array($attr_value));
 					$attribute_object->set_position(0);
 					$attribute_object->set_visible(1);
 					$product_attributes[$attribute_slug] = $attribute_object;
@@ -199,7 +211,7 @@ class ProductAttributes
 					$attribute_object = new \WC_Product_Attribute();
 					$attribute_object->set_id($attribute_taxonomy_id);
 					$attribute_object->set_name($taxonomy_slug);
-					$attribute_object->set_options(array($value));
+					$attribute_object->set_options(array($attr_value));
 					$attribute_object->set_position(0);
 					$attribute_object->set_visible(1);
 					$product_attributes[$taxonomy_slug] = $attribute_object;
