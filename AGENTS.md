@@ -11,11 +11,13 @@ WordPress доступен на http://localhost:8888
 ## API and Code References
 
 ### MoySklad REST API
-- общее https://dev.moysklad.ru/doc/api/remap/1.2/#/general%232-obshie-svedeniya
-- Товары и Продукты  https://dev.moysklad.ru/doc/api/remap/1.2/#/dictionaries/product%233-tovary
+
+> **Skill:** При работе с MoySklad API используй скилл `moysklad-rest-api` (`.agents/skills/moysklad-rest-api/SKILL.md`).
 
 ### WooCommerce
-- classes https://woocommerce.github.io/code-reference/packages/WooCommerce-Classes.html
+
+> **Skill:** При работе с WooCommerce backend используй скилл `woocommerce-backend-dev` (`.agents/skills/woocommerce-backend-dev/SKILL.md`).
+
 
 ## 📦 Окружение
 

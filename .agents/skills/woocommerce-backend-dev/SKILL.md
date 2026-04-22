@@ -46,3 +46,7 @@ To determine the next WooCommerce version number for `@since` annotations:
 - Remove the `-dev` suffix if present
 - Example: If trunk shows `10.4.0-dev`, use `@since 10.4.0`
 - Note: When reviewing PRs against trunk, the version in trunk is correct even if it seems "future" relative to released versions
+
+# classes
+
+references  https://woocommerce.github.io/code-reference/packages/WooCommerce-Classes.html
