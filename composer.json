@@ -16,6 +16,7 @@
     "wp-theme/storefront": "*",
     "wp-theme/blocksy": "*",
     "brain/monkey": "^2.4",
+    "wp-cli/wp-cli": "*",
     "pestphp/pest": "^4.0",
     "roots/wordpress": "^6.7",
     "symfony/var-dumper": "^7.4"

@@ -46,6 +46,12 @@ class WarehouseSeedCommand
 		WP_CLI::log('🚀 Preparing environment...');
 		$hasProducts = $this->hasProducts();
 
+		if ($clean) {
+			WP_CLI::warning('Cleaning database...');
+			$this->cleanDatabase();
+			$hasProducts = false;
+		}
+
 		if ($hasProducts && ! $force) {
 			WP_CLI::warning('Products already exist, seeding is not required.');
 			WP_CLI::log('If you need to run seeding anyway, use: wp test:wooms:data-seeding --force');
@@ -54,11 +60,6 @@ class WarehouseSeedCommand
 
 		if ($hasProducts && $force) {
 			WP_CLI::warning('Products already exist, continuing due to --force flag.');
-		}
-
-		if ($clean) {
-			WP_CLI::warning('Cleaning database...');
-			$this->cleanDatabase();
 		}
 
 		WP_CLI::log('📦 Applying base WooCommerce settings...');
@@ -88,13 +89,13 @@ class WarehouseSeedCommand
 	}
 
 	/**
-	 * Removes WooCommerce service entities but does not touch products.
-	 *
 	 * @return void
 	 */
 	protected function cleanDatabase()
 	{
 		$postTypesToDelete = [
+			'product',
+			'product_variation',
 			'shop_order',
 			'shop_order_refund',
 			'shop_coupon',
