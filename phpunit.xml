@@ -2,7 +2,7 @@
 <phpunit bootstrap="tests/bootstrap.php" backupGlobals="false" colors="true" cacheDirectory=".phpunit.cache">
   <testsuites>
     <testsuite name="tdd">
-      <directory suffix=".php">./tests/tdd/</directory>
+      <directory suffix=".php">./tests/includes/</directory>
     </testsuite>
   </testsuites>
   <php>

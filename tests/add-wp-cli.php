@@ -4,9 +4,304 @@
  * wp test:wooms
  */
 if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
+	WP_CLI::add_command('test:wooms', RunWoomsTestsCommand::class, [
+		'shortdesc' => 'Run plugin tests using Pest.',
+	]);
 
-	WP_CLI::add_command('test:wooms', function ($args, $assoc_args) {
-		$plugin_path = dirname(__DIR__ . '..');
+	WP_CLI::add_command('test:wooms:data-seeding', WarehouseSeedCommand::class);
+}
+
+
+/**
+ * Database setup: base WooCommerce config + initial warehouse sync
+ *
+ * ## OPTIONS
+ * [--clean]
+ * : Full database cleanup before seeding
+ * [--force]
+ * : Force seeding even if products already exist
+ * [--fixtures=<file>]
+ * : JSON file with products (default: tests/fixtures/products.json)
+ *
+ * ## EXAMPLES
+ *   wp test:wooms:data-seeding
+ *   wp test:wooms:data-seeding --force
+ *   wp test:wooms:data-seeding --clean
+ */
+class WarehouseSeedCommand
+{
+
+
+	public function __invoke($args, $assoc_args)
+	{
+		$clean = WP_CLI\Utils\get_flag_value($assoc_args, 'clean', false);
+		$force = WP_CLI\Utils\get_flag_value($assoc_args, 'force', false);
+		$fixtures = WP_CLI\Utils\get_flag_value($assoc_args, 'fixtures', null);
+		unset($fixtures);
+
+		if (! class_exists('WooCommerce')) {
+			WP_CLI::error('WooCommerce was not found. Make sure the plugin is installed and active.');
+		}
+
+		WP_CLI::log('🚀 Preparing environment...');
+		$hasProducts = $this->hasProducts();
+
+		if ($hasProducts && ! $force) {
+			WP_CLI::warning('Products already exist, seeding is not required.');
+			WP_CLI::log('If you need to run seeding anyway, use: wp test:wooms:data-seeding --force');
+			return;
+		}
+
+		if ($hasProducts && $force) {
+			WP_CLI::warning('Products already exist, continuing due to --force flag.');
+		}
+
+		if ($clean) {
+			WP_CLI::warning('Cleaning database...');
+			$this->cleanDatabase();
+		}
+
+		WP_CLI::log('📦 Applying base WooCommerce settings...');
+		$this->seedWooCommerceBase();
+
+		WP_CLI::log('🔗 Warehouse sync (without products)...');
+		$this->syncFromWarehouse();
+
+		WP_CLI::success('✅ Done. You can run tests now.');
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasProducts()
+	{
+		$query = new WP_Query([
+			'post_type' => 'product',
+			'post_status' => 'any',
+			'fields' => 'ids',
+			'posts_per_page' => 1,
+			'no_found_rows' => true,
+			'suppress_filters' => true,
+		]);
+
+		return $query->have_posts();
+	}
+
+	/**
+	 * Removes WooCommerce service entities but does not touch products.
+	 *
+	 * @return void
+	 */
+	protected function cleanDatabase()
+	{
+		$postTypesToDelete = [
+			'shop_order',
+			'shop_order_refund',
+			'shop_coupon',
+		];
+
+		foreach ($postTypesToDelete as $postType) {
+			$ids = get_posts([
+				'post_type' => $postType,
+				'post_status' => 'any',
+				'fields' => 'ids',
+				'posts_per_page' => -1,
+				'suppress_filters' => true,
+			]);
+
+			foreach ($ids as $id) {
+				wp_delete_post((int) $id, true);
+			}
+		}
+
+		if (function_exists('wc_delete_shop_order_transients')) {
+			wc_delete_shop_order_transients();
+		}
+
+		if (function_exists('wc_delete_product_transients')) {
+			wc_delete_product_transients();
+		}
+
+		if (class_exists('WC_Cache_Helper')) {
+			WC_Cache_Helper::incr_cache_prefix('orders');
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function seedWooCommerceBase()
+	{
+		$this->seedPages();
+		$this->seedOptions();
+		$this->seedPayments();
+		$this->seedShipping();
+
+		if (function_exists('wc_delete_product_transients')) {
+			wc_delete_product_transients();
+		}
+
+		if (function_exists('wc_delete_shop_order_transients')) {
+			wc_delete_shop_order_transients();
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function seedPages()
+	{
+		if (! function_exists('wc_create_page')) {
+			return;
+		}
+
+		wc_create_page(wc_get_page_id('shop'), 'woocommerce_shop_page_id', __('Shop', 'woocommerce'), '[products]');
+		wc_create_page(wc_get_page_id('cart'), 'woocommerce_cart_page_id', __('Cart', 'woocommerce'), '[woocommerce_cart]');
+		wc_create_page(wc_get_page_id('checkout'), 'woocommerce_checkout_page_id', __('Checkout', 'woocommerce'), '[woocommerce_checkout]');
+		wc_create_page(wc_get_page_id('myaccount'), 'woocommerce_myaccount_page_id', __('My account', 'woocommerce'), '[woocommerce_my_account]');
+		wc_create_page(wc_get_page_id('terms'), 'woocommerce_terms_page_id', __('Terms and conditions', 'woocommerce'), '[terms]');
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function seedOptions()
+	{
+		$options = [
+			'blogname' => 'WooMS Test Store',
+			'blogdescription' => 'Seeded test environment',
+			'woocommerce_currency' => 'RUB',
+			'woocommerce_default_country' => 'RU',
+			'woocommerce_allowed_countries' => 'all',
+			'woocommerce_all_except_countries' => [],
+			'woocommerce_specific_allowed_countries' => [],
+			'woocommerce_weight_unit' => 'kg',
+			'woocommerce_dimension_unit' => 'cm',
+			'woocommerce_store_city' => 'Moscow',
+			'woocommerce_store_address' => 'Test Street 1',
+			'woocommerce_store_postcode' => '101000',
+			'woocommerce_store_state' => '',
+			'woocommerce_price_thousand_sep' => ' ',
+			'woocommerce_price_decimal_sep' => '.',
+			'woocommerce_price_num_decimals' => '2',
+			'woocommerce_calc_taxes' => 'yes',
+			'woocommerce_prices_include_tax' => 'no',
+			'woocommerce_tax_based_on' => 'shipping',
+			'woocommerce_tax_round_at_subtotal' => 'no',
+			'woocommerce_shipping_cost_requires_address' => 'no',
+			'woocommerce_enable_guest_checkout' => 'yes',
+			'woocommerce_enable_signup_and_login_from_checkout' => 'yes',
+			'woocommerce_registration_generate_password' => 'yes',
+			'woocommerce_registration_generate_username' => 'yes',
+			'woocommerce_manage_stock' => 'yes',
+			'woocommerce_hold_stock_minutes' => '60',
+			'woocommerce_notify_low_stock' => 'no',
+			'woocommerce_notify_no_stock' => 'no',
+		];
+
+		foreach ($options as $key => $value) {
+			update_option($key, $value);
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function seedPayments()
+	{
+		update_option('woocommerce_bacs_settings', [
+			'enabled' => 'yes',
+			'title' => 'Bank transfer',
+			'description' => 'Pay via bank transfer.',
+			'instructions' => '',
+			'account_details' => [],
+		]);
+
+		update_option('woocommerce_cod_settings', [
+			'enabled' => 'yes',
+			'title' => 'Cash on delivery',
+			'description' => 'Pay with cash upon delivery.',
+			'instructions' => '',
+			'enable_for_methods' => '',
+			'enable_for_virtual' => 'yes',
+		]);
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function seedShipping()
+	{
+		if (! class_exists('WC_Shipping_Zones')) {
+			return;
+		}
+
+		$zoneName = 'RU Test Zone';
+		$existingZone = null;
+
+		foreach (WC_Shipping_Zones::get_zones() as $zoneData) {
+			if (isset($zoneData['zone_name']) && $zoneData['zone_name'] === $zoneName) {
+				$existingZone = new WC_Shipping_Zone((int) $zoneData['zone_id']);
+				break;
+			}
+		}
+
+		$zone = $existingZone instanceof WC_Shipping_Zone ? $existingZone : new WC_Shipping_Zone();
+
+		if (! ($existingZone instanceof WC_Shipping_Zone)) {
+			$zone->set_zone_name($zoneName);
+			$zone->set_zone_locations([
+				[
+					'code' => 'RU',
+					'type' => 'country',
+				],
+			]);
+			$zone->save();
+		}
+
+		$methods = $zone->get_shipping_methods(true, 'values');
+		$flatRateExists = false;
+		$freeShippingExists = false;
+
+		foreach ($methods as $method) {
+			if (isset($method->id) && $method->id === 'flat_rate') {
+				$flatRateExists = true;
+			}
+
+			if (isset($method->id) && $method->id === 'free_shipping') {
+				$freeShippingExists = true;
+			}
+		}
+
+		if (! $flatRateExists) {
+			$zone->add_shipping_method('flat_rate');
+		}
+
+		if (! $freeShippingExists) {
+			$zone->add_shipping_method('free_shipping');
+		}
+	}
+
+	/**
+	 * Product seeding from the external warehouse is intentionally skipped for now.
+	 *
+	 * @return void
+	 */
+	protected function syncFromWarehouse()
+	{
+		WP_CLI::log('Skipping product seeding: warehouse product sync will be added later.');
+	}
+}
+
+
+/**
+ * Run Pest via WP-CLI command: wp test:wooms
+ */
+class RunWoomsTestsCommand
+{
+	public function __invoke($args, $assoc_args)
+	{
+		$plugin_path = dirname(__DIR__.'..');
 		$pest_binary = $plugin_path.'/vendor/bin/pest';
 
 		if (! file_exists($pest_binary)) {
@@ -40,7 +335,5 @@ if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
 		passthru($command, $exit_code);
 
 		WP_CLI::halt($exit_code);
-	}, [
-		'shortdesc' => 'Run plugin tests using Pest.',
-	]);
+	}
 }
