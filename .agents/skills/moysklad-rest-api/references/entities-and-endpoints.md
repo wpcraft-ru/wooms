@@ -72,3 +72,19 @@ Use this map to quickly choose the right resource in Remap 1.2.
 - For shipment sync from ERP to shop, track `entity/demand` status/updates.
 - Use `expand=positions` carefully; keep `limit` moderate.
 - For strict links in filters, pass full `meta.href` URLs.
+
+## Product additional fields (`attributes`) reference
+
+- In MoySklad UI: additional fields (`dop. polya`).
+- In API product payload: key `attributes`.
+- Read metadata: `GET /entity/product/metadata/attributes`.
+- Read values on products: request with `expand=attributes`.
+- Filter by attribute value using full metadata attribute URL in `filter`.
+
+Observed attribute `type` values in repository fixtures (`tests/data/fixtures-v2/**/*.json`):
+
+- `customentity`
+- `long`
+- `double`
+- `string`
+- `text`
