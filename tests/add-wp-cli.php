@@ -30,8 +30,6 @@ if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
  */
 class WarehouseSeedCommand
 {
-
-
 	public function __invoke($args, $assoc_args)
 	{
 		$clean = WP_CLI\Utils\get_flag_value($assoc_args, 'clean', false);
