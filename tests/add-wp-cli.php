@@ -4,11 +4,63 @@
  * wp test:wooms
  */
 if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
+
 	WP_CLI::add_command('test:wooms', RunWoomsTestsCommand::class, [
 		'shortdesc' => 'Run plugin tests using Pest.',
 	]);
 
-	WP_CLI::add_command('test:wooms:data-seeding', WarehouseSeedCommand::class);
+	WP_CLI::add_command('test:wooms:data-seeding', WarehouseSeedCommand::class, [
+		'shortdesc' => 'Seed database with base WooCommerce config and initial warehouse sync.',
+	]);
+
+	WP_CLI::add_command('test:wooms:fixtures-prepare', FixturePrepare::class, [
+		'shortdesc' => 'Prepare fixtures in tests/data/fixtures-v2.',
+	]);
+}
+
+
+/**
+ * Run Pest via WP-CLI command: wp test:wooms
+ */
+class RunWoomsTestsCommand
+{
+	public function __invoke($args, $assoc_args)
+	{
+		$plugin_path = dirname(__DIR__.'..');
+		$pest_binary = $plugin_path.'/vendor/bin/pest';
+
+		if (! file_exists($pest_binary)) {
+			WP_CLI::error(sprintf('Pest binary was not found at %s.', $pest_binary));
+		}
+
+		$php_binary = defined('PHP_BINARY') ? PHP_BINARY : 'php';
+		$forwarded_args = $args;
+
+		foreach ($assoc_args as $key => $value) {
+			$forwarded_args[] = true === $value
+				? sprintf('--%s', $key)
+				: sprintf('--%s=%s', $key, (string) $value);
+		}
+
+		$command_parts = array_merge(
+			array(
+				escapeshellarg($php_binary),
+				escapeshellarg($pest_binary),
+				'--colors=always',
+			),
+			array_map('escapeshellarg', $forwarded_args)
+		);
+
+		$command = sprintf(
+			'cd %s && %s',
+			escapeshellarg($plugin_path),
+			implode(' ', $command_parts)
+		);
+
+		passthru($command, $exit_code);
+
+		WP_CLI::halt($exit_code);
+	}
 }
 
 
@@ -294,45 +346,187 @@ class WarehouseSeedCommand
 
 
 /**
- * Run Pest via WP-CLI command: wp test:wooms
+ * Prepare local fixtures in tests/data/fixtures-v2.
+ *
+ * ## OPTIONS
+ * [--product-limit=<n>]
+ * : Number of products to export (default: 100).
+ *
+ * ## EXAMPLES
+ *   wp test:wooms:fixtures-prepare
+ *   wp test:wooms:fixtures-prepare --product-limit=100
  */
-class RunWoomsTestsCommand
+class FixturePrepare
 {
 	public function __invoke($args, $assoc_args)
 	{
-		$plugin_path = dirname(__DIR__.'..');
-		$pest_binary = $plugin_path.'/vendor/bin/pest';
+		unset($args);
 
-		if (! file_exists($pest_binary)) {
-			WP_CLI::error(sprintf('Pest binary was not found at %s.', $pest_binary));
+		$pluginPath = dirname(__DIR__);
+		$fixturesDir = $pluginPath.'/tests/data/fixtures-v2';
+		$productLimit = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'product-limit', 100);
+
+		if ($productLimit < 1) {
+			WP_CLI::error('Option --product-limit must be greater than 0.');
 		}
 
-		$php_binary = defined('PHP_BINARY') ? PHP_BINARY : 'php';
-		$forwarded_args = $args;
-
-		foreach ($assoc_args as $key => $value) {
-			$forwarded_args[] = true === $value
-				? sprintf('--%s', $key)
-				: sprintf('--%s=%s', $key, (string) $value);
+		if (! is_dir($fixturesDir)) {
+			wp_mkdir_p($fixturesDir);
 		}
 
-		$command_parts = array_merge(
-			array(
-				escapeshellarg($php_binary),
-				escapeshellarg($pest_binary),
-				'--colors=always',
-			),
-			array_map('escapeshellarg', $forwarded_args)
-		);
+		$directories = [
+			'categories' => $fixturesDir.'/categories',
+			'products' => $fixturesDir.'/products',
+			'variants' => $fixturesDir.'/variants',
+		];
 
-		$command = sprintf(
-			'cd %s && %s',
-			escapeshellarg($plugin_path),
-			implode(' ', $command_parts)
-		);
+		foreach ($directories as $directory) {
+			if (! is_dir($directory)) {
+				wp_mkdir_p($directory);
+			}
+		}
 
-		passthru($command, $exit_code);
+		WP_CLI::log('Loading categories from MoySklad...');
+		$categoriesRows = $this->fetchRowsPaged('entity/productfolder', 1000);
+		$this->writeJsonFile($directories['categories'].'/all.json', [
+			'rows' => $categoriesRows,
+			'meta' => [
+				'exported_at_utc' => gmdate('c'),
+				'count' => count($categoriesRows),
+			],
+		]);
 
-		WP_CLI::halt($exit_code);
+		WP_CLI::log(sprintf('Loading first %d products from MoySklad...', $productLimit));
+		$productsResponse = \WooMS\request(sprintf('entity/product?limit=%d&offset=0', min($productLimit, 1000)));
+
+		if (false === $productsResponse || empty($productsResponse['rows']) || ! is_array($productsResponse['rows'])) {
+			WP_CLI::error('Could not load products from MoySklad.');
+		}
+
+		$productsRows = array_slice($productsResponse['rows'], 0, $productLimit);
+		$this->writeJsonFile($directories['products'].'/first-'.$productLimit.'.json', [
+			'rows' => $productsRows,
+			'meta' => [
+				'exported_at_utc' => gmdate('c'),
+				'count' => count($productsRows),
+				'limit' => $productLimit,
+			],
+		]);
+
+		$productIds = [];
+		foreach ($productsRows as $productRow) {
+			if (empty($productRow['id'])) {
+				continue;
+			}
+
+			$productIds[$productRow['id']] = true;
+		}
+
+		WP_CLI::log('Loading variants from MoySklad and filtering by selected products...');
+		$variantsRowsAll = $this->fetchRowsPaged('entity/variant', 1000);
+		$variantsRows = [];
+
+		foreach ($variantsRowsAll as $variantRow) {
+			$productHref = $variantRow['product']['meta']['href'] ?? '';
+			if (empty($productHref)) {
+				continue;
+			}
+
+			$productId = $this->extractIdFromHref($productHref);
+			if (isset($productIds[$productId])) {
+				$variantsRows[] = $variantRow;
+			}
+		}
+
+		$this->writeJsonFile($directories['variants'].'/by-products-first-'.$productLimit.'.json', [
+			'rows' => $variantsRows,
+			'meta' => [
+				'exported_at_utc' => gmdate('c'),
+				'count' => count($variantsRows),
+				'source_variants_total' => count($variantsRowsAll),
+				'product_limit' => $productLimit,
+			],
+		]);
+
+		$manifest = [
+			'prepared_at_utc' => gmdate('c'),
+			'wordpress_version' => function_exists('get_bloginfo') ? get_bloginfo('version') : null,
+			'woocommerce_version' => defined('WC_VERSION') ? WC_VERSION : null,
+			'generated_by' => 'wp test:wooms:fixtures-prepare',
+			'export' => [
+				'categories' => count($categoriesRows),
+				'products' => count($productsRows),
+				'variants' => count($variantsRows),
+			],
+		];
+
+		$manifestPath = $fixturesDir.'/manifest.json';
+		$manifestJson = wp_json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+		if (false === file_put_contents($manifestPath, $manifestJson.PHP_EOL)) {
+			WP_CLI::error(sprintf('Could not write fixtures manifest to %s.', $manifestPath));
+		}
+
+		WP_CLI::success(sprintf('Fixtures prepared in: %s', $fixturesDir));
+	}
+
+	/**
+	 * @param string $entityPath
+	 * @param int $limit
+	 *
+	 * @return array
+	 */
+	protected function fetchRowsPaged($entityPath, $limit = 1000)
+	{
+		$rows = [];
+		$offset = 0;
+
+		while (true) {
+			$path = sprintf('%s?limit=%d&offset=%d', $entityPath, $limit, $offset);
+			$response = \WooMS\request($path);
+
+			if (false === $response || ! isset($response['rows']) || ! is_array($response['rows'])) {
+				WP_CLI::error(sprintf('Could not load data from endpoint: %s', $entityPath));
+			}
+
+			$pageRows = $response['rows'];
+			$rows = array_merge($rows, $pageRows);
+
+			if (count($pageRows) < $limit) {
+				break;
+			}
+
+			$offset += $limit;
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * @param string $path
+	 * @param array $payload
+	 *
+	 * @return void
+	 */
+	protected function writeJsonFile($path, $payload)
+	{
+		$json = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+		if (false === file_put_contents($path, $json.PHP_EOL)) {
+			WP_CLI::error(sprintf('Could not write fixtures file to %s.', $path));
+		}
+	}
+
+	/**
+	 * @param string $href
+	 *
+	 * @return string
+	 */
+	protected function extractIdFromHref($href)
+	{
+		$parts = explode('/', trim($href));
+
+		return (string) end($parts);
 	}
 }
+
