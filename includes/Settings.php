@@ -119,7 +119,7 @@ class Settings
 
 		?>
 		<div>
-			<a href="https://wpcraft.ru/wooms/" class="button button-primary" target="_blank">Помощь с настройками</a>
+			<a href="https://wpcraft.ru/projects/wooms?utm_source=wp-admin" class="button button-primary" target="_blank">Помощь с настройками</a>
 			<br />
 			<br />
 			<?= implode(' | ', $nav_items); ?>
