@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "pest-testing": {
+      "source": "spatie/freek.dev",
+      "sourceType": "github",
+      "computedHash": "16b9ee01b7eb3f527cd0c1cb3ec4ea22099211f6529534ba7b8b646cfec38d5b"
+    }
+  }
+}
