@@ -1,20 +1,46 @@
 {
-    "name": "uptimizt/wooms",
-    "authors": [
-        {
-            "name": "r2 d2",
-            "email": "uptimizt@gmail.com"
-        }
-    ],
-    "require": {},
-    "require-dev": {
-        "brain/monkey": "^2.4",
-        "phpunit/phpunit": "^9.0",
-        "yoast/phpunit-polyfills": "^1.0"
-    },
-    "scripts": {
-        "tdd": "@php ./vendor/phpunit/phpunit/phpunit --testsuite tdd",
-        "tests": "@php ./vendor/phpunit/phpunit/phpunit --testsuite full",
-        "temp": "@php ./vendor/phpunit/phpunit/phpunit tests/tdd/TempTest.php"
+  "name": "wpcraft-ru/wooms",
+  "version": "dev-main",
+  "type": "wordpress-plugin",
+  "authors": [
+    {
+      "name": "ai",
+      "email": "m@wpcraft.ru"
     }
+  ],
+  "require-dev": {
+    "wp-plugin/woocommerce": "*",
+    "wp-plugin/cyr2lat": "*",
+    "wp-theme/twentytwentyfive": "*",
+    "wp-theme/kiosko": "*",
+    "wp-theme/storefront": "*",
+    "wp-theme/blocksy": "*",
+    "brain/monkey": "^2.4",
+    "wp-cli/wp-cli": "*",
+    "pestphp/pest": "^4.0",
+    "roots/wordpress": "^6.7",
+    "symfony/var-dumper": "^7.4"
+  },
+  "extra": {
+    "installer-paths": {
+      "vendor/wordpress/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+      "vendor/wordpress/wp-content/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "vendor/wordpress/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+    },
+    "wordpress-install-dir": "vendor/wordpress"
+  },
+  "repositories": [
+    {
+      "name": "wp-packages",
+      "type": "composer",
+      "url": "https://repo.wp-packages.org"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "roots/wordpress-core-installer": true,
+      "composer/installers": true
+    }
+  }
 }

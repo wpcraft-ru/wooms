@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "pest-testing": {
+      "source": "spatie/freek.dev",
+      "sourceType": "github",
+      "computedHash": "16b9ee01b7eb3f527cd0c1cb3ec4ea22099211f6529534ba7b8b646cfec38d5b"
+    },
+    "woocommerce-backend-dev": {
+      "source": "woocommerce/woocommerce",
+      "sourceType": "github",
+      "computedHash": "e5e63ec34c015e10820f92cb723f79af99b9c9907d28e054990a2bdc04f54dee"
+    },
+    "wp-plugin-development": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "3c13a9d2e6e346c9f933918fdf4d191cdba9f2cfe24f87cbcd763d090bbd8014"
+    },
+    "wp-wpcli-and-ops": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "b04471067f1577112c37870ee564cd06f0787487dc764edf4229f73e3b5981ca"
+    }
+  }
+}

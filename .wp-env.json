@@ -1,0 +1,23 @@
+{
+  "core": "WordPress/WordPress#6.9.4",
+  "phpVersion": "8.3",
+  "plugins": [
+    "./vendor/wordpress/wp-content/plugins/woocommerce",
+    "./vendor/wordpress/wp-content/plugins/cyr2lat",
+    "."
+  ],
+  "mappings": {
+    "wp-content/plugins": "./vendor/wordpress/wp-content/plugins",
+    "wp-content/themes": "./vendor/wordpress/wp-content/themes",
+    "wp-content/mu-plugins": "./vendor/wordpress/wp-content/mu-plugins"
+  },
+  "port": 8888,
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "WP_DEBUG_DISPLAY": false,
+    "SCRIPT_DEBUG": false,
+    "WP_ENVIRONMENT_TYPE": "local"
+  },
+  "testsEnvironment": false
+}

@@ -10,6 +10,12 @@ defined( 'ABSPATH' ) || exit;
 
 const HOOK_NAME = 'wooms_products_walker';
 
+/**
+ * Привязываем ручную синхронизацию к основному движку обновления
+ * @todo - это под вопросом - надо ли? возможно лучше перенести в класс ProductSingleSync, чтобы не перегружать основной процесс синхронизации продуктов
+ */
+add_action( 'wooms_product_data_item', __NAMESPACE__ . '\\product_update' );
+
 add_action( HOOK_NAME, __NAMESPACE__ . '\\walker' );
 
 add_action( 'admin_init', __NAMESPACE__ . '\\add_settings', 50 );
@@ -56,6 +62,11 @@ function walker( $args = [] ) {
 	$url = 'entity/product';
 
 	$url = add_query_arg( $args['query_arg'], $url );
+
+	// Expand attributes to get names for customentity types
+	if ( \WooMS\ProductAttributes::is_enabled() ) {
+		$url = add_query_arg( 'expand', 'attributes', $url );
+	}
 
 	$url = apply_filters( 'wooms_url_get_products', $url );
 
@@ -524,7 +535,7 @@ function display_metabox_for_product() {
 		printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
 	}
 
-	if ( $data_updated ) {
+	if ( $wooms_updated_timestamp ) {
 		printf( '<div>Дата последнего обновления из API МойСклад: <strong>%s</strong></div>', $wooms_updated_timestamp );
 	}
 

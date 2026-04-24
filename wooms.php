@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WooMS
- * Plugin URI: https://wpcraft.ru/product/wooms/
+ * Plugin URI: https://github.com/wpcraft-ru/wooms
  * Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
  * Author: WPCraft
  * Author URI: https://wpcraft.ru/
@@ -11,7 +11,6 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Requires Plugins: woocommerce
  *
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
@@ -19,59 +18,66 @@
  * WC requires at least: 7.0
  * WC tested up to: 8.4.0
  *
- * Version: 9.12
+ * Version: 9.14
  */
 
 namespace WooMS;
 
 // Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
  * Add hook for activate plugin
  */
-register_activation_hook( __FILE__, function () {
-	do_action( 'wooms_activate' );
-} );
+register_activation_hook(__FILE__, function () {
+	do_action('wooms_activate');
+});
 
-register_deactivation_hook( __FILE__, function () {
-	do_action( 'wooms_deactivate' );
-} );
+register_deactivation_hook(__FILE__, function () {
+	do_action('wooms_deactivate');
+});
 
 
-require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__.'/includes/functions.php';
 
-add_action( 'plugins_loaded', function () {
-	if ( ! wooms_can_start() ) {
+if (defined('WP_CLI') && WP_CLI) {
+	$wp_cli_commands_file = __DIR__.'/tests/add-wp-cli.php';
+	if (file_exists($wp_cli_commands_file)) {
+		require_once $wp_cli_commands_file;
+	}
+}
+
+add_action('plugins_loaded', function () {
+	if (! wooms_can_start()) {
 		return;
 	}
 
-	$files = glob( __DIR__ . '/includes/*.php' );
-	foreach ( $files as $file ) {
+	$files = glob(__DIR__.'/includes/*.php');
+	foreach ($files as $file) {
 		require_once $file;
 	}
-	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\' . 'admin_styles' );
-	add_action( 'save_post', 'wooms_id_check_if_unique', 10, 3 );
-} );
+	add_action('admin_enqueue_scripts', __NAMESPACE__.'\\'.'admin_styles');
+	add_action('save_post', 'wooms_id_check_if_unique', 10, 3);
+});
 
-add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\add_wooms_plugin_row_meta', 10, 2 );
+add_filter('plugin_row_meta', __NAMESPACE__.'\\add_wooms_plugin_row_meta', 10, 2);
 
 
-add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), function ($links) {
+add_filter("plugin_action_links_".plugin_basename(__FILE__), function ($links) {
 	$mng_link = '<a href="admin.php?page=moysklad">Управление</a>';
 	$settings_link = '<a href="admin.php?page=mss-settings">Настройки</a>';
-	array_unshift( $links, $mng_link );
-	array_unshift( $links, $settings_link );
+	array_unshift($links, $mng_link);
+	array_unshift($links, $settings_link);
 	return $links;
-} );
+});
 
 
 /**
  * сообщяем про то что Extra плагин более не актуален
  */
-add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', function ($data, $response) {
+add_action('after_plugin_row_wooms-extra/wooms-extra.php', function ($data, $response) {
 
-	$wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
+	$wp_list_table = _get_list_table('WP_Plugins_List_Table');
 
 	printf(
 		'<tr class="plugin-update-tr">
@@ -83,75 +89,76 @@ add_action( 'after_plugin_row_wooms-extra/wooms-extra.php', function ($data, $re
 		</tr>',
 		$wp_list_table->get_column_count()
 	);
-}, 10, 2 );
-add_filter( 'wooms_xt_load', '__return_false' );
+}, 10, 2);
+add_filter('wooms_xt_load', '__return_false');
 
 
 /**
  * Add GettingStarted link in row meta at pligins list
  */
-function add_wooms_plugin_row_meta( $links, $file ) {
-	if ( strpos( $file, 'wooms.php' ) !== false ) {
+function add_wooms_plugin_row_meta($links, $file)
+{
+	if (strpos($file, 'wooms.php') !== false) {
 		$new_links = array(
 			'<a href="https://github.com/wpcraft-ru/wooms/wiki/GettingStarted" target="_blank"><strong>Руководство по началу работы</strong></a>',
 			'<a href="https://wpcraft.ru/wooms/?utm_source=plugin" target="_blank"><strong>Консультации</strong></a>',
 			'<a href="https://github.com/orgs/wpcraft-ru/projects/2" target="_blank"><strong>Задачи</strong></a>',
 		);
 
-		$links = array_merge( $links, $new_links );
+		$links = array_merge($links, $new_links);
 	}
 
 	return $links;
 }
-
 
 /**
  * Styles for Dashboard
  *
  * @return void
  */
-function admin_styles() {
-	$admin_style = plugin_dir_url( __FILE__ ) . 'css/admin.css';
+function admin_styles()
+{
+	$admin_style = plugin_dir_url(__FILE__).'css/admin.css';
 
-	wp_enqueue_style( 'wooms_styles', $admin_style, array() );
+	wp_enqueue_style('wooms_styles', $admin_style, array());
 }
 
-
-
-function get_api_url( $path ) {
-	return $url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+function get_api_url($path)
+{
+	return $url = 'https://api.moysklad.ru/api/remap/1.2/'.$path;
 }
 
-function request( $path = '', $data = array(), $type = 'GET' ) {
+function request($path = '', $data = array(), $type = 'GET')
+{
 	// https://api.moysklad.ru/api/remap/1.2/
 
 
-	if ( empty ( $path ) ) {
+	if (empty($path)) {
 		return false;
 	}
 
-	if ( str_contains( $path, 'https://api.moysklad.ru/api/remap/1.2/' ) ) {
+	if (str_contains($path, 'https://api.moysklad.ru/api/remap/1.2/')) {
 		$url = $path;
 	} else {
-		$url = 'https://api.moysklad.ru/api/remap/1.2/' . $path;
+		$url = 'https://api.moysklad.ru/api/remap/1.2/'.$path;
 	}
 
 
 
 	//@link https://github.com/wpcraft-ru/wooms/issues/177
-	$url = str_replace( 'product_id', 'product.id', $url );
-	$url = str_replace( 'store_id', 'store.id', $url );
-	$url = str_replace( 'consignment_id', 'consignment.id', $url );
-	$url = str_replace( 'variant_id', 'variant.id', $url );
-	$url = str_replace( 'productFolder_id', 'productFolder.id', $url );
+	$url = str_replace('product_id', 'product.id', $url);
+	$url = str_replace('store_id', 'store.id', $url);
+	$url = str_replace('consignment_id', 'consignment.id', $url);
+	$url = str_replace('variant_id', 'variant.id', $url);
+	$url = str_replace('productFolder_id', 'productFolder.id', $url);
 
-	if ( ! empty ( $data ) && 'GET' == $type ) {
+	if (! empty($data) && 'GET' == $type) {
 		$type = 'POST';
 	}
-	if ( 'GET' == $type ) {
+	if ('GET' == $type) {
 		$data = null;
 	} else {
-		$data = json_encode( $data );
+		$data = json_encode($data);
 	}
 
 	$args = array(
@@ -159,16 +166,16 @@ function request( $path = '', $data = array(), $type = 'GET' ) {
 		'timeout' => 45,
 		'redirection' => 5,
 		'headers' => array(
-				"Content-Type" => 'application/json;charset=utf-8',
-				"Accept-Encoding" => "gzip",
-				'Authorization' => 'Basic ' .
-					base64_encode( get_option( 'woomss_login' ) . ':' . get_option( 'woomss_pass' ) ),
-			),
+			"Content-Type" => 'application/json;charset=utf-8',
+			"Accept-Encoding" => "gzip",
+			'Authorization' => 'Basic '.
+				base64_encode(get_option('woomss_login').':'.get_option('woomss_pass')),
+		),
 		'body' => $data,
 	);
 
-	$request = wp_remote_request( $url, $args );
-	if ( is_wp_error( $request ) ) {
+	$request = wp_remote_request($url, $args);
+	if (is_wp_error($request)) {
 		do_action(
 			'wooms_logger_error',
 			$type = 'WooMS-Request',
@@ -179,7 +186,7 @@ function request( $path = '', $data = array(), $type = 'GET' ) {
 		return false;
 	}
 
-	if ( empty ( $request['body'] ) ) {
+	if (empty($request['body'])) {
 		do_action(
 			'wooms_logger_error',
 			$type = 'WooMS-Request',
@@ -189,10 +196,10 @@ function request( $path = '', $data = array(), $type = 'GET' ) {
 		return false;
 	}
 
-	$response = json_decode( $request['body'], true );
+	$response = json_decode($request['body'], true);
 
-	if ( ! empty ( $response["errors"] ) and is_array( $response["errors"] ) ) {
-		foreach ( $response["errors"] as $error ) {
+	if (! empty($response["errors"]) and is_array($response["errors"])) {
+		foreach ($response["errors"] as $error) {
 			do_action(
 				'wooms_logger_error',
 				$type = 'WooMS-Request',
@@ -206,7 +213,8 @@ function request( $path = '', $data = array(), $type = 'GET' ) {
 }
 
 
-function get_session_id() {
+function get_session_id()
+{
 	return \WooMS\Products\get_session_id();
 }
 
@@ -215,8 +223,8 @@ function get_session_id() {
  * doc https://woo.com/document/high-performance-order-storage/
  * issue https://github.com/wpcraft-ru/wooms/issues/539
  */
-add_action( 'before_woocommerce_init', function () {
-	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class) ) {
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+add_action('before_woocommerce_init', function () {
+	if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
 	}
-} );
+});

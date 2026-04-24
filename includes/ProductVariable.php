@@ -4,8 +4,6 @@ namespace WooMS;
 
 use function WooMS\request;
 
-
-
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 

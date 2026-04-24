@@ -214,12 +214,12 @@ class ProductSingleSync
    */
   public static function product_save($product_id)
   {
-    if (!isset($_REQUEST['wooms_product_sinle_sync'])) {
+    if (!isset($_REQUEST['wooms_product_single_sync'])) {
       return;
     }
 
 
-    if (!empty($_REQUEST['wooms_product_sinle_sync'])) {
+    if (!empty($_REQUEST['wooms_product_single_sync'])) {
 
       remove_action('woocommerce_update_product', array(__CLASS__, 'product_save'), 100);
 
@@ -240,12 +240,22 @@ class ProductSingleSync
     }
 
     $product = wc_get_product($product_id);
+    if ( ! $product ) {
+      return false;
+    }
+
     $uuid = $product->get_meta('wooms_id', true);
     if (empty($uuid)) {
+      do_action('wooms_logger', __CLASS__, 'Ошибка: UUID не найден для товара ' . $product_id);
       return false;
     }
 
     $url = 'entity/assortment?filter=id=' . $uuid;
+
+    // Расширяем атрибуты для получения имен справочников
+    if ( \WooMS\ProductAttributes::is_enabled() ) {
+      $url = add_query_arg( 'expand', 'attributes', $url );
+    }
 
     $data = request($url);
 
@@ -257,12 +267,13 @@ class ProductSingleSync
 
     do_action('wooms_product_data_item', $row);
 
-    if (empty($data['variantsCount'])) {
+    if (empty($row['variantsCount'])) {
       return false;
     }
 
+    // Пересоздаем объект, чтобы подтянуть изменения, сделанные в do_action (например, даты)
+    $product = wc_get_product($product_id);
     $product->update_meta_data('wooms_need_update_variations', 1);
-
 
     $product->save();
 
@@ -281,7 +292,7 @@ class ProductSingleSync
     echo '<hr/>';
     if (empty($need_update_variations)) {
       printf(
-        '<input id="wooms-product-single-sync" type="checkbox" name="wooms_product_sinle_sync"> <label for="wooms-product-single-sync">%s</label>',
+        '<input id="wooms-product-single-sync" type="checkbox" name="wooms_product_single_sync"> <label for="wooms-product-single-sync">%s</label>',
         'Синхронизировать отдельно'
       );
     } else {

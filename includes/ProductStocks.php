@@ -190,7 +190,7 @@ class ProductStocks {
 		/**
 		 * Поле по которому берем остаток?
 		 * quantity = это доступные остатки за вычетом резервов
-		 * stock = это все остатки без уета резерва
+		 * stock = это все остатки без учёта резерва
 		 */
 		if(get_config('stock_and_reserve')){
 			$stock = (int) $data_api['quantity'] ?? 0;
@@ -499,7 +499,11 @@ class ProductStocks {
 			$title = 'Учитывать остатки с резервом',
 			$callback = function ($args) {
 				printf( '<input type="checkbox" name="%s" value="1" %s />', $args['name'], $args['value'] );
-
+				echo '<p class="description">'
+					. '⚠️ Внимание: название настройки может вводить в заблуждение.<br>'
+					. '<strong>Включено</strong> — используется поле <code>quantity</code> (доступные остатки <em>за вычетом</em> резервов).<br>'
+					. '<strong>Выключено</strong> — используется поле <code>stock</code> (все остатки <em>включая</em> резервы).'
+					. '</p>';
 			},
 			$page = 'mss-settings',
 			$section,

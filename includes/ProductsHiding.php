@@ -34,7 +34,7 @@ function walker($state = [])
     do_action(
       'wooms_logger',
       __NAMESPACE__,
-      sprintf('Финишь скрытия продуктов: %s', date("Y-m-d H:i:s"))
+      sprintf('Финиш скрытия продуктов: %s', date("Y-m-d H:i:s"))
     );
     return;
   }
@@ -181,7 +181,7 @@ function add_settings()
       printf('<p><small>%s</small></p>', 'Если включить опцию, то обработчик скрытия продуктов из каталога будет отключен. Иногда это бывает полезно.');
     },
     $page = 'mss-settings',
-    $section = 'woomss_section_other',
+    $section = 'wooms_products_and_attributes',
     $args = [
       'name' => $option_name,
       'value' => get_option($option_name),
