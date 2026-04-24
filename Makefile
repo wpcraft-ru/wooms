@@ -1,8 +1,8 @@
 # Makefile для управления окружением разработки и инструментами
 
 ## Запуск окружения
-up:
-	wp-env start
+start:
+	npx wp-env start
 	echo "login: admin:password"
 
 ## Запуск с обновлением плагинов (Playground)
