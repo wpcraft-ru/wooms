@@ -357,7 +357,7 @@ class ProductsCategories {
 			$title = 'Отключить синхронизацию категорий',
 			$callback = function ($args) {
 				printf( '<input type="checkbox" name="%s" value="1" %s />', $args['key'], checked( 1, $args['value'], false ) );
-				printf( '<small>%s</small>', 'Если включить опцию, то при обновлении продуктов категории не будут учтываться в соответствии с группами МойСклад.' );
+				printf( '<small>%s</small>', 'Если включить опцию, то при обновлении продуктов категории не будут учитываться в соответствии с группами МойСклад.' );
 			},
 			$page = 'mss-settings',
 			$section = 'wooms_product_cat',

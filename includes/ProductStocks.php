@@ -190,7 +190,7 @@ class ProductStocks {
 		/**
 		 * Поле по которому берем остаток?
 		 * quantity = это доступные остатки за вычетом резервов
-		 * stock = это все остатки без уета резерва
+		 * stock = это все остатки без учёта резерва
 		 */
 		if(get_config('stock_and_reserve')){
 			$stock = (int) $data_api['quantity'] ?? 0;
