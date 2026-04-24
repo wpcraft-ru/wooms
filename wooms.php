@@ -40,8 +40,11 @@ register_deactivation_hook(__FILE__, function () {
 
 require_once __DIR__.'/includes/functions.php';
 
-if (class_exists('WP_CLI')) {
-	require_once __DIR__.'/tests/add-wp-cli.php';
+if (defined('WP_CLI') && WP_CLI) {
+	$wp_cli_commands_file = __DIR__.'/tests/add-wp-cli.php';
+	if (file_exists($wp_cli_commands_file)) {
+		require_once $wp_cli_commands_file;
+	}
 }
 
 add_action('plugins_loaded', function () {
