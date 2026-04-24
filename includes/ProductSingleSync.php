@@ -262,12 +262,11 @@ class ProductSingleSync
 
     do_action('wooms_product_data_item', $row);
 
-    if (empty($data['variantsCount'])) {
+    if (empty($row['variantsCount'])) {
       return false;
     }
 
     $product->update_meta_data('wooms_need_update_variations', 1);
-
 
     $product->save();
 
