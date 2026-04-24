@@ -240,8 +240,13 @@ class ProductSingleSync
     }
 
     $product = wc_get_product($product_id);
+    if ( ! $product ) {
+      return false;
+    }
+
     $uuid = $product->get_meta('wooms_id', true);
     if (empty($uuid)) {
+      do_action('wooms_logger', __CLASS__, 'Ошибка: UUID не найден для товара ' . $product_id);
       return false;
     }
 
@@ -266,6 +271,8 @@ class ProductSingleSync
       return false;
     }
 
+    // Пересоздаем объект, чтобы подтянуть изменения, сделанные в do_action (например, даты)
+    $product = wc_get_product($product_id);
     $product->update_meta_data('wooms_need_update_variations', 1);
 
     $product->save();
