@@ -221,6 +221,11 @@ class WarehouseSeedCommand
 		$options = [
 			'blogname' => 'WooMS Test Store',
 			'blogdescription' => 'Seeded test environment',
+			'WPLANG' => 'ru_RU',
+			'timezone_string' => 'Europe/Moscow',
+			'date_format' => 'Y-m-d',
+			'time_format' => 'H:i',
+			'start_of_week' => '1',
 			'woocommerce_currency' => 'RUB',
 			'woocommerce_default_country' => 'RU',
 			'woocommerce_allowed_countries' => 'all',
