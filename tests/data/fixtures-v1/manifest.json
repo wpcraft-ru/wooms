@@ -1,0 +1,11 @@
+{
+    "prepared_at_utc": "2026-04-24T04:08:57+00:00",
+    "wordpress_version": "6.9.4",
+    "woocommerce_version": "10.7.0",
+    "generated_by": "wp test:wooms:fixtures-prepare",
+    "export": {
+        "categories": 19,
+        "products": 35,
+        "variants": 60
+    }
+}

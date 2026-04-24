@@ -1,6 +1,6 @@
 # Makefile для управления окружением разработки и инструментами
 
-up: ## Запуск
+up: ## Запуск окружения
 	wp-env start
 	echo "login: admin:password"
 
@@ -14,14 +14,14 @@ stop: ## Остановка окружения
 
 ## additional commands
 
-status:
+status: ## Показать статус wp-env окружения
 	npx wp-env status
 
-restart: ## Перезапуск с обновлением (Docker)
+restart: ## Перезапуск окружения с обновлением
 	npx wp-env start --update
 
 # Action Scheduler в фоне (каждую минуту, без логов)
-as-daemon:
+as-daemon: ## Запустить Action Scheduler в фоне (каждые 60 сек)
 	@echo "🚀 Запускаем Action Scheduler как daemon (каждые 60 сек, без логов)..."
 	@nohup bash -c 'while true; do \
 		wp-env run cli -- wp action-scheduler run \
@@ -36,7 +36,7 @@ as-daemon:
 	@echo "   Чтобы остановить: make as-stop"
 
 # Остановить Action Scheduler daemon
-as-stop:
+as-stop: ## Остановить фоновый Action Scheduler
 	@pkill -f "action-scheduler run" || echo "ℹ️  Процессы Action Scheduler не найдены"
 	@echo "✅ Action Scheduler остановлен"
 
@@ -48,16 +48,24 @@ destroy: ## Полное удаление окружения
 
 # Инструменты
 
-cli: ## Запуск PHPUnit в окружении wp-env
+cli: ## Открыть shell в контейнере CLI (wp-content/plugins/wooms)
 	npx wp-env run cli --env-cwd=wp-content/plugins/wooms sh
 
-test: ## Запуск тестов в окружении wp-env
+tdd: ## Запуск отладочного TDD-теста
+	npx wp-env run cli wp test:wooms tests/tdd/debug.php
+
+test: ## Запуск только тестов (wp test:wooms)
+	npx wp-env run cli wp test:wooms
+
+test-with-seeding: ## Запуск тестов в окружении wp-env
 	npx wp-env run cli wp test:wooms:data-seeding
 	npx wp-env run cli wp test:wooms
 
-tdd: ## debug via test driven development
-	npx wp-env run cli wp test:wooms tests/tdd/debug.php
+test-data-seeding: ## Подготовка данных (wp test:wooms:data-seeding)
+	npx wp-env run cli wp test:wooms:data-seeding
 
+test-fixtures-prepare: ## Подготовка фикстур (wp test:wooms:fixtures-prepare)
+	npx wp-env run cli wp test:wooms:fixtures-prepare
 
 lint: ## Запуск PHPCS в окружении wp-env
 	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs

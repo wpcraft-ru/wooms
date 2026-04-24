@@ -14,7 +14,7 @@ if (defined('WP_CLI') && WP_CLI && class_exists('WP_CLI')) {
 	]);
 
 	WP_CLI::add_command('test:wooms:fixtures-prepare', FixturePrepare::class, [
-		'shortdesc' => 'Prepare fixtures in tests/data/fixtures-v2.',
+		'shortdesc' => 'Prepare fixtures in tests/data/...',
 	]);
 }
 
@@ -346,7 +346,7 @@ class WarehouseSeedCommand
 
 
 /**
- * Prepare local fixtures in tests/data/fixtures-v2.
+ * Prepare local fixtures in tests/data/...
  *
  * ## OPTIONS
  * [--product-limit=<n>]
@@ -363,7 +363,7 @@ class FixturePrepare
 		unset($args);
 
 		$pluginPath = dirname(__DIR__);
-		$fixturesDir = $pluginPath.'/tests/data/fixtures-v2';
+		$fixturesDir = $pluginPath.'/tests/data/fixtures-v1';
 		$productLimit = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'product-limit', 100);
 
 		if ($productLimit < 1) {
@@ -386,9 +386,26 @@ class FixturePrepare
 			}
 		}
 
+		$categoriesRows = $this->prepareCategories($directories['categories']);
+		$productsRows = $this->prepareProducts($directories['products'], $productLimit);
+		$productIds = $this->collectProductIds($productsRows);
+		$variantsRows = $this->prepareVariants($directories['variants'], $productIds, $productLimit);
+		$this->prepareManifest($fixturesDir, $categoriesRows, $productsRows, $variantsRows);
+
+		WP_CLI::success(sprintf('Fixtures prepared in: %s', $fixturesDir));
+	}
+
+	/**
+	 * @param string $categoriesDir
+	 *
+	 * @return array
+	 */
+	protected function prepareCategories($categoriesDir)
+	{
 		WP_CLI::log('Loading categories from MoySklad...');
+
 		$categoriesRows = $this->fetchRowsPaged('entity/productfolder', 1000);
-		$this->writeJsonFile($directories['categories'].'/all.json', [
+		$this->writeJsonFile($categoriesDir.'/all.json', [
 			'rows' => $categoriesRows,
 			'meta' => [
 				'exported_at_utc' => gmdate('c'),
@@ -396,7 +413,19 @@ class FixturePrepare
 			],
 		]);
 
+		return $categoriesRows;
+	}
+
+	/**
+	 * @param string $productsDir
+	 * @param int $productLimit
+	 *
+	 * @return array
+	 */
+	protected function prepareProducts($productsDir, $productLimit)
+	{
 		WP_CLI::log(sprintf('Loading first %d products from MoySklad...', $productLimit));
+
 		$productsResponse = \WooMS\request(sprintf('entity/product?limit=%d&offset=0', min($productLimit, 1000)));
 
 		if (false === $productsResponse || empty($productsResponse['rows']) || ! is_array($productsResponse['rows'])) {
@@ -404,7 +433,7 @@ class FixturePrepare
 		}
 
 		$productsRows = array_slice($productsResponse['rows'], 0, $productLimit);
-		$this->writeJsonFile($directories['products'].'/first-'.$productLimit.'.json', [
+		$this->writeJsonFile($productsDir.'/first-'.$productLimit.'.json', [
 			'rows' => $productsRows,
 			'meta' => [
 				'exported_at_utc' => gmdate('c'),
@@ -413,7 +442,18 @@ class FixturePrepare
 			],
 		]);
 
+		return $productsRows;
+	}
+
+	/**
+	 * @param array $productsRows
+	 *
+	 * @return array<string, bool>
+	 */
+	protected function collectProductIds($productsRows)
+	{
 		$productIds = [];
+
 		foreach ($productsRows as $productRow) {
 			if (empty($productRow['id'])) {
 				continue;
@@ -422,7 +462,20 @@ class FixturePrepare
 			$productIds[$productRow['id']] = true;
 		}
 
+		return $productIds;
+	}
+
+	/**
+	 * @param string $variantsDir
+	 * @param array<string, bool> $productIds
+	 * @param int $productLimit
+	 *
+	 * @return array
+	 */
+	protected function prepareVariants($variantsDir, $productIds, $productLimit)
+	{
 		WP_CLI::log('Loading variants from MoySklad and filtering by selected products...');
+
 		$variantsRowsAll = $this->fetchRowsPaged('entity/variant', 1000);
 		$variantsRows = [];
 
@@ -438,7 +491,7 @@ class FixturePrepare
 			}
 		}
 
-		$this->writeJsonFile($directories['variants'].'/by-products-first-'.$productLimit.'.json', [
+		$this->writeJsonFile($variantsDir.'/by-products-first-'.$productLimit.'.json', [
 			'rows' => $variantsRows,
 			'meta' => [
 				'exported_at_utc' => gmdate('c'),
@@ -448,6 +501,19 @@ class FixturePrepare
 			],
 		]);
 
+		return $variantsRows;
+	}
+
+	/**
+	 * @param string $fixturesDir
+	 * @param array $categoriesRows
+	 * @param array $productsRows
+	 * @param array $variantsRows
+	 *
+	 * @return void
+	 */
+	protected function prepareManifest($fixturesDir, $categoriesRows, $productsRows, $variantsRows)
+	{
 		$manifest = [
 			'prepared_at_utc' => gmdate('c'),
 			'wordpress_version' => function_exists('get_bloginfo') ? get_bloginfo('version') : null,
@@ -466,8 +532,6 @@ class FixturePrepare
 		if (false === file_put_contents($manifestPath, $manifestJson.PHP_EOL)) {
 			WP_CLI::error(sprintf('Could not write fixtures manifest to %s.', $manifestPath));
 		}
-
-		WP_CLI::success(sprintf('Fixtures prepared in: %s', $fixturesDir));
 	}
 
 	/**
