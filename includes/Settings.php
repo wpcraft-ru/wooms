@@ -73,7 +73,7 @@ class Settings
 		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 5, $accepted_args = 1);
 		add_action('admin_init', array(__CLASS__, 'settings_other'), $priority = 100, $accepted_args = 1);
 
-		add_action('wooms_settings_after_header', callback: [__CLASS__, 'render_nav_menu']);
+		add_action('wooms_settings_after_header', array(__CLASS__, 'render_nav_menu'));
 	}
 
 	/**
