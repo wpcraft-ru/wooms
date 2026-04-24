@@ -10,6 +10,11 @@ defined( 'ABSPATH' ) || exit;
 
 const HOOK_NAME = 'wooms_products_walker';
 
+/**
+ * Привязываем ручную синхронизацию к основному движку обновления
+ */
+add_action( 'wooms_product_data_item', __NAMESPACE__ . '\\product_update' );
+
 add_action( HOOK_NAME, __NAMESPACE__ . '\\walker' );
 
 add_action( 'admin_init', __NAMESPACE__ . '\\add_settings', 50 );
@@ -399,7 +404,7 @@ function add_settings() {
 			);
 		},
 		$page = 'mss-settings',
-		$section = 'wooms_products_and_attributes',
+		$section = 'woomss_section_other',
 		$args = [
 			'key' => $option_name,
 			'value' => get_option( $option_name, 20 ),
@@ -529,7 +534,7 @@ function display_metabox_for_product() {
 		printf( '<div>Дата последнего обновления товара в МойСклад: <strong>%s</strong></div>', $data_updated );
 	}
 
-	if ( $data_updated ) {
+	if ( $wooms_updated_timestamp ) {
 		printf( '<div>Дата последнего обновления из API МойСклад: <strong>%s</strong></div>', $wooms_updated_timestamp );
 	}
 
