@@ -248,7 +248,7 @@ class ProductSingleSync
     $url = 'entity/assortment?filter=id=' . $uuid;
 
     // Расширяем атрибуты для получения имен справочников
-    if ( get_option( 'wooms_attr_enabled' ) ) {
+    if ( \WooMS\ProductAttributes::is_enabled() ) {
       $url = add_query_arg( 'expand', 'attributes', $url );
     }
 
