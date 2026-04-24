@@ -12,6 +12,7 @@ const HOOK_NAME = 'wooms_products_walker';
 
 /**
  * Привязываем ручную синхронизацию к основному движку обновления
+ * @todo - это под вопросом - надо ли? возможно лучше перенести в класс ProductSingleSync, чтобы не перегружать основной процесс синхронизации продуктов
  */
 add_action( 'wooms_product_data_item', __NAMESPACE__ . '\\product_update' );
 
