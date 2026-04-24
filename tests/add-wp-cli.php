@@ -115,7 +115,7 @@ class WarehouseSeedCommand
 		WP_CLI::log('📦 Applying base WooCommerce settings...');
 		$this->seedWooCommerceBase();
 
-		WP_CLI::log('🔗 Warehouse sync (without products)...');
+		WP_CLI::log('🔗 Seeding products from local fixtures...');
 		$this->syncFromWarehouse();
 
 		WP_CLI::success('✅ Done. You can run tests now.');
@@ -334,13 +334,85 @@ class WarehouseSeedCommand
 	}
 
 	/**
-	 * Product seeding from the external warehouse is intentionally skipped for now.
+	 * Seed products from local fixtures so test runs can rely on imported catalog data.
 	 *
 	 * @return void
 	 */
 	protected function syncFromWarehouse()
 	{
-		WP_CLI::log('Skipping product seeding: warehouse product sync will be added later.');
+		$rows = $this->getProductsFixtureRows();
+		$expectedIds = [];
+
+		foreach ($rows as $row) {
+			if (($row['meta']['type'] ?? '') !== 'product') {
+				continue;
+			}
+
+			$expectedIds[] = (string) $row['id'];
+		}
+
+		if ([] === $expectedIds) {
+			WP_CLI::error('Product fixtures do not contain product rows.');
+		}
+
+		\WooMS\Products\process_rows($rows);
+		$this->assertImportedProducts($expectedIds);
+
+		// Run the import twice to keep seeding idempotent in the same way the removed test verified it.
+		\WooMS\Products\process_rows($rows);
+		$this->assertImportedProducts($expectedIds);
+
+		WP_CLI::log(sprintf('Seeded %d products from fixtures.', count($expectedIds)));
+	}
+
+	/**
+	 * @return array<int, array<string, mixed>>
+	 */
+	protected function getProductsFixtureRows()
+	{
+		$fixtureFile = dirname(__DIR__).'/tests/data/fixtures-v1/products/first-100.json';
+
+		if (! file_exists($fixtureFile)) {
+			WP_CLI::error(sprintf('Products fixture was not found at %s.', $fixtureFile));
+		}
+
+		$payload = json_decode((string) file_get_contents($fixtureFile), true);
+
+		if (! is_array($payload) || ! isset($payload['rows']) || ! is_array($payload['rows']) || [] === $payload['rows']) {
+			WP_CLI::error('Products fixture is invalid or contains no rows.');
+		}
+
+		return $payload['rows'];
+	}
+
+	/**
+	 * @param array<int, string> $expectedIds
+	 *
+	 * @return void
+	 */
+	protected function assertImportedProducts($expectedIds)
+	{
+		$importedProductIds = [];
+
+		foreach ($expectedIds as $expectedId) {
+			$productId = \WooMS\Helper::get_product_id_by_uuid($expectedId);
+
+			if (! is_int($productId) || $productId <= 0) {
+				WP_CLI::error(sprintf('Fixture product %s was not imported.', $expectedId));
+			}
+
+			$product = wc_get_product($productId);
+
+			if (false === $product) {
+				WP_CLI::error(sprintf('Fixture product %s was imported with invalid WooCommerce product ID %d.', $expectedId, $productId));
+			}
+
+			$importedProductIds[] = $productId;
+		}
+
+		if (count(array_unique($importedProductIds)) !== count($expectedIds)) {
+			WP_CLI::error('Fixture product import created duplicate WooCommerce product IDs.');
+		}
 	}
 }
 
