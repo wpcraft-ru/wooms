@@ -73,7 +73,7 @@ class Settings
 		add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 5, $accepted_args = 1);
 		add_action('admin_init', array(__CLASS__, 'settings_other'), $priority = 100, $accepted_args = 1);
 
-		add_action('wooms_settings_after_header', [__CLASS__, 'render_nav_menu']);
+		add_action('wooms_settings_after_header', callback: [__CLASS__, 'render_nav_menu']);
 	}
 
 	/**
@@ -109,6 +109,8 @@ class Settings
 	{
 
 		$nav_items = [
+
+			"mng" => sprintf('<a href="%s">Управление синхронизацией</a>', admin_url('admin.php?page=moysklad')),
 			'dev' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/', 'Разработка и решение проблем'),
 			'docs' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://github.com/wpcraft-ru/wooms/wiki', 'Документация'),
 
@@ -286,7 +288,6 @@ class Settings
 
 		<?php
 
-		printf('<p><a href="%s">Управление синхронизацией</a></p>', admin_url('admin.php?page=moysklad'));
 		printf('<p><a href="%s" target="_blank">Помощь с настройкой</a></p>', "https://wpcraft.ru/wooms/?utm_source=wooms_plugin_settings_page");
 	}
 }
