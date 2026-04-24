@@ -499,7 +499,11 @@ class ProductStocks {
 			$title = 'Учитывать остатки с резервом',
 			$callback = function ($args) {
 				printf( '<input type="checkbox" name="%s" value="1" %s />', $args['name'], $args['value'] );
-
+				echo '<p class="description">'
+					. '⚠️ Внимание: название настройки может вводить в заблуждение.<br>'
+					. '<strong>Включено</strong> — используется поле <code>quantity</code> (доступные остатки <em>за вычетом</em> резервов).<br>'
+					. '<strong>Выключено</strong> — используется поле <code>stock</code> (все остатки <em>включая</em> резервы).'
+					. '</p>';
 			},
 			$page = 'mss-settings',
 			$section,
