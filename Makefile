@@ -1,14 +1,17 @@
 # Makefile для управления окружением разработки и инструментами
 
-up: ## Запуск окружения
+## Запуск окружения
+up:
 	wp-env start
 	echo "login: admin:password"
 
-update: ## Запуск с обновлением плагинов (Playground)
+## Запуск с обновлением плагинов (Playground)
+update:
 	npx wp-env stop
 	npx wp-env start --update
 
-stop: ## Остановка окружения
+## Остановка окружения
+stop:
 	npx wp-env stop
 
 
@@ -19,31 +22,6 @@ status: ## Показать статус wp-env окружения
 
 restart: ## Перезапуск окружения с обновлением
 	npx wp-env start --update
-
-# Action Scheduler в фоне (каждую минуту, без логов)
-as-daemon: ## Запустить Action Scheduler в фоне (каждые 60 сек)
-	@echo "🚀 Запускаем Action Scheduler как daemon (каждые 60 сек, без логов)..."
-	@nohup bash -c 'while true; do \
-		wp-env run cli -- wp action-scheduler run \
-			--batch-size=400 \
-			--batches=15 \
-			--force \
-			--quiet > /dev/null 2>&1 || true; \
-		sleep 60; \
-	done' > /dev/null 2>&1 &
-	@echo "✅ Action Scheduler запущен в фоне."
-	@echo "   Интервал: 60 секунд"
-	@echo "   Чтобы остановить: make as-stop"
-
-# Остановить Action Scheduler daemon
-as-stop: ## Остановить фоновый Action Scheduler
-	@pkill -f "action-scheduler run" || echo "ℹ️  Процессы Action Scheduler не найдены"
-	@echo "✅ Action Scheduler остановлен"
-
-## danger commands
-
-destroy: ## Полное удаление окружения
-	npx wp-env destroy
 
 
 # Инструменты
@@ -69,3 +47,35 @@ test-fixtures-prepare: ## Подготовка фикстур (wp test:wooms:fix
 
 lint: ## Запуск PHPCS в окружении wp-env
 	npx wp-env run cli --env-cwd=wp-content/plugins/wooms phpcs
+
+
+# Action Scheduler
+
+## Старт в фоне (повтор каждую минуту, без логов)
+as-daemon:
+	@echo "🚀 Запускаем Action Scheduler как daemon (каждые 60 сек, без логов)..."
+	@nohup bash -c 'while true; do \
+		wp-env run cli -- wp action-scheduler run \
+			--batch-size=400 \
+			--batches=15 \
+			--force \
+			--quiet > /dev/null 2>&1 || true; \
+		sleep 60; \
+	done' > /dev/null 2>&1 &
+	@echo "✅ Action Scheduler запущен в фоне."
+	@echo "   Интервал: 60 секунд"
+	@echo "   Чтобы остановить: make as-stop"
+
+## Остановить Action Scheduler daemon
+as-stop:
+	@pkill -f "action-scheduler run" || echo "ℹ️  Процессы Action Scheduler не найдены"
+	@echo "✅ Action Scheduler остановлен"
+
+
+
+# danger commands
+
+## Полное удаление окружения
+destroy:
+	npx wp-env destroy
+
