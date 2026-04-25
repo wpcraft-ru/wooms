@@ -62,6 +62,10 @@ class ProductVariableImage
 
     /**
      * download_img_for_product
+     *
+     * Phase 2 fixes:
+     * - Clear malformed wooms_miniature meta (missing/invalid downloadHref) to prevent infinite loops
+     * - Only set image ID if attachment download was successful
      */
     public static function download_img_for_product($variation_id)
     {
@@ -69,26 +73,55 @@ class ProductVariableImage
         $img_meta = get_post_meta($variation_id, self::$image_meta_key, true);
         $img_meta = json_decode($img_meta, true);
 
-
+        // Phase 2a: Clear malformed task meta if downloadHref is missing or invalid
         if (empty($img_meta['meta']['downloadHref'])) {
+            $variation = wc_get_product($variation_id);
+            if ($variation) {
+                $variation->delete_meta_data(self::$image_meta_key);
+                $variation->save();
+            }
+
+            do_action(
+                'wooms_logger_error',
+                __CLASS__,
+                sprintf('Malformed wooms_miniature meta for variation %d: missing downloadHref', $variation_id),
+                $img_meta
+            );
             return false;
         }
 
         $url_download = $img_meta['meta']['downloadHref'];
+        $image_name = $img_meta['filename'] ?? 'image.jpg';
 
-        $image_name = $img_meta['filename'];
-
+        // Phase 2b: Guard against failed image download before clearing task meta
         $check_id = self::uploadRemoteImageAndAttach($url_download, $variation_id, $image_name);
 
+        if (empty($check_id)) {
+            // Log failure but do NOT clear meta — allow retry on next worker cycle
+            do_action(
+                'wooms_logger_error',
+                __CLASS__,
+                sprintf('Failed to download image for variation %d from %s', $variation_id, $url_download)
+            );
+            return false;
+        }
+
         $variation = wc_get_product($variation_id);
-        $variation->set_image_id($check_id);
-        $variation->delete_meta_data(self::$image_meta_key);
-        $variation->save();
+        if ($variation) {
+            $variation->set_image_id($check_id);
+            $variation->delete_meta_data(self::$image_meta_key);
+            $variation->save();
+        }
     }
 
 
     /**
      * add_image_task
+     *
+     * Phase 1 fix: Guard against re-queuing variation images that already have matching thumbnail.
+     * Only set wooms_miniature meta if:
+     * - No current thumbnail exists, OR
+     * - Current thumbnail.wooms_url differs from new downloadHref
      *
      * use hook $variation = apply_filters('wooms_variation_save', $variation, $variant_data, $product_id);
      */
@@ -107,8 +140,22 @@ class ProductVariableImage
         }
 
         $img_metadata = $img_metadata['rows'][0];
-        $img_metadata = json_encode($img_metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
+        // Phase 1: Check if current thumbnail already matches the new downloadHref
+        $variation_id = $variation->get_id();
+        $current_thumb_id = get_post_thumbnail_id($variation_id);
+
+        if (!empty($current_thumb_id)) {
+            $current_wooms_url = get_post_meta($current_thumb_id, 'wooms_url', true);
+            $new_download_href = $img_metadata['meta']['downloadHref'] ?? '';
+
+            // If URLs match, skip re-queueing — thumbnail already matches MoySklad state
+            if (!empty($current_wooms_url) && !empty($new_download_href) && $current_wooms_url === $new_download_href) {
+                return $variation;
+            }
+        }
+
+        $img_metadata = json_encode($img_metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $variation->update_meta_data(self::$image_meta_key, $img_metadata);
 
         return $variation;

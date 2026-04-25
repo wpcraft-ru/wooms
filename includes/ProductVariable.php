@@ -651,7 +651,7 @@ class ProductVariable {
 				printf( '<p><strong>%s</strong></p>', 'Синхронизация модификаций продуктов из МойСклад на Сайт' );
 			},
 			$page = 'mss-settings',
-			$section = 'woomss_section_other',
+			$section = 'wooms_products_and_attributes',
 			$args = [
 				'name' => $option_name,
 				'value' => get_option( $option_name ),

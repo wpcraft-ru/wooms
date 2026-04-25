@@ -77,7 +77,7 @@ class UseCodeAsArticle
                 printf('<p>%s</p>', 'Подробнее: <a href="https://github.com/wpcraft-ru/wooms/issues/98" target="_blank">https://github.com/wpcraft-ru/wooms/issues/98</a>');
             },
             $page = 'mss-settings',
-            $section = 'woomss_section_other',
+            $section = 'wooms_products_and_attributes',
             $args = [
                 'key' => $option_key,
                 'value' => get_option($option_key),
