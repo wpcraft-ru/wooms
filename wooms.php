@@ -13,12 +13,12 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * PHP requires at least: 7.0
- * WP requires at least: 5.0
- * Tested up to: 6.4.2
- * WC requires at least: 7.0
- * WC tested up to: 8.4.0
+ * WP requires at least: 6.0
+ * Tested up to: 6.9.4
+ * WC requires at least: 9.0
+ * WC tested up to: 10.7.0
  *
- * Version: 9.14
+ * Version: 9.15
  */
 
 namespace WooMS;

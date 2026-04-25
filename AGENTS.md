@@ -18,6 +18,10 @@ WordPress доступен на http://localhost:8888
 
 > **Skill:** При работе с WooCommerce backend используй скилл `woocommerce-backend-dev` (`.agents/skills/woocommerce-backend-dev/SKILL.md`).
 
+### Changelog
+
+> **Skill:** При подготовке release notes и обновлении `readme.txt` используй скилл `changelog` (`.agents/skills/changelog/SKILL.md`).
+
 
 ## 📦 Окружение
 

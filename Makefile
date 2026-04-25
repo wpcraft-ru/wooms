@@ -51,24 +51,49 @@ lint: ## Запуск PHPCS в окружении wp-env
 
 # Action Scheduler
 
+AS_DAEMON_PID_FILE := .as-daemon.pid
+AS_DAEMON_INTERVAL ?= 60
+
 ## Старт в фоне (повтор каждую минуту, без логов)
 as-daemon:
+	@if [ -f $(AS_DAEMON_PID_FILE) ] && kill -0 $$(cat $(AS_DAEMON_PID_FILE)) 2>/dev/null; then \
+		echo "ℹ️  Action Scheduler уже запущен (PID: $$(cat $(AS_DAEMON_PID_FILE)))"; \
+		exit 0; \
+	fi
+	@if ! npx wp-env status >/dev/null 2>&1; then \
+		echo "ℹ️  wp-env не запущен, запускаем окружение..."; \
+		npx wp-env start >/dev/null; \
+	fi
 	@echo "🚀 Запускаем Action Scheduler как daemon (каждые 60 сек, без логов)..."
-	@nohup bash -c 'while true; do \
-		wp-env run cli -- wp action-scheduler run \
+	@nohup npx wp-env run cli -- sh -lc 'while true; do \
+		wp action-scheduler run \
 			--batch-size=400 \
 			--batches=15 \
 			--force \
 			--quiet > /dev/null 2>&1 || true; \
-		sleep 60; \
-	done' > /dev/null 2>&1 &
+		sleep $(AS_DAEMON_INTERVAL); \
+	done' > /dev/null 2>&1 & echo $$! > $(AS_DAEMON_PID_FILE)
 	@echo "✅ Action Scheduler запущен в фоне."
-	@echo "   Интервал: 60 секунд"
+	@echo "   PID: $$(cat $(AS_DAEMON_PID_FILE))"
+	@echo "   Интервал: $(AS_DAEMON_INTERVAL) секунд"
 	@echo "   Чтобы остановить: make as-stop"
 
 ## Остановить Action Scheduler daemon
 as-stop:
-	@pkill -f "action-scheduler run" || echo "ℹ️  Процессы Action Scheduler не найдены"
+	@if [ -f $(AS_DAEMON_PID_FILE) ]; then \
+		pid=$$(cat $(AS_DAEMON_PID_FILE)); \
+		if kill -0 $$pid 2>/dev/null; then \
+			kill $$pid; \
+			echo "🛑 Остановлен daemon PID: $$pid"; \
+		else \
+			echo "ℹ️  PID из файла не найден: $$pid"; \
+		fi; \
+		rm -f $(AS_DAEMON_PID_FILE); \
+	else \
+		pkill -f "wp-env run cli -- sh -lc.*action-scheduler run" >/dev/null 2>&1 || true; \
+		pkill -f "wp-env run cli -- wp action-scheduler run" >/dev/null 2>&1 || true; \
+		echo "ℹ️  PID-файл не найден, выполнена очистка по сигнатуре процесса"; \
+	fi
 	@echo "✅ Action Scheduler остановлен"
 
 

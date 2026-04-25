@@ -379,7 +379,7 @@ function add_settings() {
 			);
 		},
 		$page = 'mss-settings',
-		$section = 'woomss_section_other',
+		$section = 'wooms_products_and_attributes',
 		$args = [
 			'key' => $option_name,
 			'value' => get_option( $option_name, 20 ),
@@ -405,7 +405,7 @@ function add_settings() {
 			);
 		},
 		$page = 'mss-settings',
-		$section = 'woomss_section_other',
+		$section = 'wooms_products_and_attributes',
 		$args = [
 			'key' => $option_name,
 			'value' => get_option( $option_name, 20 ),
