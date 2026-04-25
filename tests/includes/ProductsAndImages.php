@@ -6,9 +6,6 @@
  * ProductVariableImage.php
  */
 
-use function WooMS\Tests\getProductsRows;
-use function WooMS\Tests\get_variant;
-
 beforeEach(function (): void {
 	global $wpdb;
 	$wpdb->query('START TRANSACTION');
