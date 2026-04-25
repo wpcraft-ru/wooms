@@ -35,6 +35,9 @@ tdd: ## Запуск отладочного TDD-теста
 test: ## Запуск только тестов (wp test:wooms)
 	npx wp-env run cli wp test:wooms
 
+test-only: ## Запуск конкретного теста (make test-only filter="uses global attribute")
+	npx wp-env run cli wp test:wooms --filter="$(filter)"
+
 test-with-seeding: ## Запуск тестов в окружении wp-env
 	npx wp-env run cli wp test:wooms:data-seeding
 	npx wp-env run cli wp test:wooms
@@ -103,4 +106,3 @@ as-stop:
 ## Полное удаление окружения
 destroy:
 	npx wp-env destroy
-

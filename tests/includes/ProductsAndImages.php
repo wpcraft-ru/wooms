@@ -19,15 +19,17 @@ afterEach(function (): void {
 	remove_all_filters('pre_http_request');
 });
 
-function getProductsFixtureRows(): array
-{
-	$fixtureFile = __DIR__ . '/../data/fixtures-v1/products/first-100.json';
-	$payload = json_decode((string) file_get_contents($fixtureFile), true);
+if (! function_exists('getProductsFixtureRows')) {
+	function getProductsFixtureRows(): array
+	{
+		$fixtureFile = __DIR__ . '/../data/fixtures-v1/products/first-100.json';
+		$payload = json_decode((string) file_get_contents($fixtureFile), true);
 
-	expect($payload)->toBeArray();
-	expect($payload['rows'] ?? [])->not->toBeEmpty();
+		expect($payload)->toBeArray();
+		expect($payload['rows'] ?? [])->not->toBeEmpty();
 
-	return $payload['rows'];
+		return $payload['rows'];
+	}
 }
 
 function getVariantFixtureRows(): array
