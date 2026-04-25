@@ -10,9 +10,9 @@ use const WooMS\OPTION_KEY as OPTION_KEY;
 
 add_action('wooms_monitoring', __NAMESPACE__ . '\\check_schedule');
 
-add_action('admin_init', function () {
-  if (!wp_next_scheduled('wooms_monitoring')) {
-    wp_schedule_event(time(), 'every_minute', 'wooms_monitoring');
+add_action('init', function () {
+  if (!as_next_scheduled_action('wooms_monitoring')) {
+    as_schedule_recurring_action(time(), 60, 'wooms_monitoring', [], 'WooMS');
   }
 });
 
@@ -29,11 +29,7 @@ function check_schedule(){
     return false;
   }
 
-  $end_timestamp = \WooMS\Products\get_state('end_timestamp');
-  if (empty($end_timestamp)) {
-
-    return false;
-  }
+  $end_timestamp = \WooMS\Products\get_state('end_timestamp') ?? 0;
 
   $timer = 60 * 60 * intval(get_config('walker_cron_timer') ?? 12);
   $time_has_passed = time() - $end_timestamp;
