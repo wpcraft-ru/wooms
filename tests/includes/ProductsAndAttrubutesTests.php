@@ -194,13 +194,16 @@ it('uses global WooCommerce attribute when label already exists', function (): v
 	$existingId = \WooMS\ProductAttributes::get_attribute_id_by_label((string) $attributeName);
 
 	if (empty($existingId)) {
-		$attributeTaxonomyId = (int) wc_create_attribute([
+		$createdAttribute = wc_create_attribute([
 			'name' => (string) $attributeName,
 			'slug' => sanitize_title((string) $attributeName),
 			'type' => 'select',
 			'order_by' => 'menu_order',
 			'has_archives' => true,
 		]);
+
+		expect(is_wp_error($createdAttribute))->toBeFalse();
+		$attributeTaxonomyId = (int) $createdAttribute;
 	} else {
 		$attributeTaxonomyId = (int) $existingId;
 	}
