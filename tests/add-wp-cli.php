@@ -26,9 +26,8 @@ class RunWoomsTestsCommand
 {
 	public function __invoke($args, $assoc_args)
 	{
-		$plugin_path = dirname(__DIR__.'..');
-		$pest_binary = $plugin_path.'/vendor/bin/pest';
-
+		$plugin_path = dirname(__DIR__);
+		$pest_binary = $plugin_path . '/vendor/bin/pest';
 		if (! file_exists($pest_binary)) {
 			WP_CLI::error(sprintf('Pest binary was not found at %s.', $pest_binary));
 		}
@@ -174,7 +173,7 @@ class WarehouseSeedCommand
 		}
 
 		if (class_exists('WC_Cache_Helper')) {
-			WC_Cache_Helper::incr_cache_prefix('orders');
+			WC_Cache_Helper::invalidate_cache_group('orders');
 		}
 	}
 
@@ -306,18 +305,13 @@ class WarehouseSeedCommand
 
 		if (! ($existingZone instanceof WC_Shipping_Zone)) {
 			$zone->set_zone_name($zoneName);
-			$zone->set_zone_locations([
-				[
-					'code' => 'RU',
-					'type' => 'country',
-				],
-			]);
+			$zone->add_location('RU', 'country');
 			$zone->save();
 		}
 
-		$methods = $zone->get_shipping_methods(true, 'values');
-		$flatRateExists = false;
+		$flatRateExists     = false;
 		$freeShippingExists = false;
+		$methods            = $zone->get_shipping_methods();
 
 		foreach ($methods as $method) {
 			if (isset($method->id) && $method->id === 'flat_rate') {
@@ -670,4 +664,3 @@ class FixturePrepare
 		return (string) end($parts);
 	}
 }
-

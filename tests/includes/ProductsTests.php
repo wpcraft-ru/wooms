@@ -1,13 +1,19 @@
 <?php
 
-function getProductsFixtureRows(): array {
-	$fixtureFile = __DIR__.'/../data/fixtures-v1/products/first-100.json';
-	$payload = json_decode((string) file_get_contents($fixtureFile), true);
+/* 
+ * Мы используем проверку function_exists, так как Pest подгружает файлы 
+ * один за другим, и глобальные функции могут конфликтовать.
+ */
+if (! function_exists('getProductsFixtureRows')) {
+	function getProductsFixtureRows(): array {
+		$fixtureFile = __DIR__.'/../data/fixtures-v1/products/first-100.json';
+		$payload = json_decode((string) file_get_contents($fixtureFile), true);
 
-	expect($payload)->toBeArray();
-	expect($payload['rows'] ?? [])->not->toBeEmpty();
+		expect($payload)->toBeArray();
+		expect($payload['rows'] ?? [])->not->toBeEmpty();
 
-	return $payload['rows'];
+		return $payload['rows'];
+	}
 }
 
 it('has at least one product in catalog', function (): void {

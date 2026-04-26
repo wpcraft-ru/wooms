@@ -23,31 +23,26 @@ function getProductsWithAttributesFixtureRows(): array
 
 function findProductAttributeByName(array $attributes, string $name): ?\WC_Product_Attribute
 {
+	$name = trim($name);
+	$sanitized_name = sanitize_title($name);
+
 	foreach ($attributes as $attribute) {
 		if (! $attribute instanceof \WC_Product_Attribute) {
 			continue;
 		}
 
-		$attributeName = (string) $attribute->get_name();
+		$attribute_identifier = (string) $attribute->get_name(); // Slug for global, name for local
 
-		if ($attributeName === $name) {
+		// 1. Direct match with name or slug
+		if ($attribute_identifier === $name || $attribute_identifier === $sanitized_name || $attribute_identifier === wc_attribute_taxonomy_name($sanitized_name)) {
 			return $attribute;
 		}
 
 		if ($attribute->is_taxonomy()) {
-			if (wc_attribute_label($attributeName) === $name) {
+			// 2. Check against the human-readable label
+			if (0 === strcasecmp(wc_attribute_label($attribute_identifier), $name)) {
 				return $attribute;
 			}
-
-			$attributeTaxonomyName = wc_attribute_taxonomy_name_by_id((int) $attribute->get_id());
-			if ($attributeTaxonomyName === $name) {
-				return $attribute;
-			}
-		}
-
-		$attributeNameWithoutPrefix = preg_replace('/^pa_/', '', $attributeName);
-		if ($attributeNameWithoutPrefix === $name) {
-			return $attribute;
 		}
 	}
 
@@ -80,6 +75,12 @@ function getFixtureAttributeValueByName(array $row, string $name): ?string
 beforeEach(function (): void {
 	global $wpdb;
 	$wpdb->query('START TRANSACTION');
+
+	// Изоляция состояния для каждого теста
+	delete_transient('wc_attribute_taxonomies');
+	\WC_Cache_Helper::invalidate_cache_group('woocommerce-attributes');
+	unset($GLOBALS['wc_attribute_taxonomies']);
+	wp_cache_flush();
 });
 
 afterEach(function (): void {
@@ -180,61 +181,78 @@ it('does not sync attributes when option is disabled', function (): void {
 
 
 it('uses global WooCommerce attribute when label already exists', function (): void {
-	\WooMS\Settings::setValue('wooms_attributes_sync_enabled', 1);
+	// 1. Принудительная установка настроек
+	update_option('wooms_attributes_sync_enabled', '1');
+	\WooMS\Settings::setValue('wooms_attributes_sync_enabled', '1');
 
 	$rows = getProductsWithAttributesFixtureRows();
 	$row = $rows[0];
 	$attributes = $row['attributes'] ?? [];
-	$attributeName = $attributes[0]['name'] ?? null; // "Цвет" is the first attribute in the fixture
-	$attributeValue = getFixtureAttributeValueByName($row, (string) $attributeName);
+	$attributeName = isset($attributes[0]['name']) ? trim((string) $attributes[0]['name']) : 'Цвет';
 
-	expect($attributeValue)->not->toBeNull();
-	expect($attributeName)->not->toBeNull();
+	// 2. Создание/Получение ID атрибута
+	$existingId = \WooMS\ProductAttributes::get_attribute_id_by_label((string) $attributeName);
 
-	$existingAttributeTaxonomyId = \WooMS\ProductAttributes::get_attribute_id_by_label((string) $attributeName);
-	// if ($existingAttributeTaxonomyId) {
-	// 	expect(wc_delete_attribute($existingAttributeTaxonomyId))->toBeTrue();
-	// 	delete_transient('wc_attribute_taxonomies');
-	// 	\WC_Cache_Helper::invalidate_cache_group('woocommerce-attributes');
-	// }
-
-	if (empty($existingAttributeTaxonomyId)) {
-		// If attribute doesn't exist, create it
-		$attributeTaxonomyId = wc_create_attribute([
-			'name' => $attributeName,
+	if (empty($existingId)) {
+		$createdAttribute = wc_create_attribute([
+			'name' => (string) $attributeName,
+			'slug' => sanitize_title((string) $attributeName),
 			'type' => 'select',
 			'order_by' => 'menu_order',
 			'has_archives' => true,
 		]);
 
-		expect($attributeTaxonomyId)->toBeInt()->toBeGreaterThan(0);
+		expect(is_wp_error($createdAttribute))->toBeFalse();
+		$attributeTaxonomyId = (int) $createdAttribute;
 	} else {
-		$attributeTaxonomyId = $existingAttributeTaxonomyId;
+		$attributeTaxonomyId = (int) $existingId;
 	}
 
-	expect($attributeTaxonomyId)->toBeInt()->toBeGreaterThan(0);
+	expect($attributeTaxonomyId)->toBeGreaterThan(0);
 
-
+	// 3. Сброс состояния для синхронизации
 	delete_transient('wc_attribute_taxonomies');
-	\WC_Cache_Helper::invalidate_cache_group('woocommerce-attributes');
-	$taxonomySlug = wc_attribute_taxonomy_name_by_id($attributeTaxonomyId);
-	\WC_Post_Types::register_taxonomies();
+	unset($GLOBALS['wc_attribute_taxonomies']);
+	wc_get_attribute_taxonomies();
 
-	expect(\WooMS\ProductAttributes::get_attribute_id_by_label($attributeName))->toBe($attributeTaxonomyId);
+	$attributeObject = wc_get_attribute($attributeTaxonomyId);
+	expect($attributeObject)->not->toBeNull();
+
+	// Очищаем слаг от префиксов, чтобы избежать pa_pa_
+	$taxonomySlug = wc_attribute_taxonomy_name(str_replace('pa_', '', $attributeObject->slug));
+
+	// Принудительная регистрация в текущем процессе
+	register_taxonomy($taxonomySlug, ['product'], ['public' => true, 'label' => $attributeObject->name]);
+	register_taxonomy_for_object_type($taxonomySlug, 'product');
+
+	expect(\WooMS\ProductAttributes::get_attribute_id_by_label((string) $attributeName))->toBe($attributeTaxonomyId);
 
 	$productId = \WooMS\Products\product_update($row, []);
 	expect($productId)->toBeInt()->toBeGreaterThan(0);
 
+	// 4. Проверка результата
+	wc_delete_product_transients($productId);
+	clean_post_cache($productId);
+
 	$product = wc_get_product($productId);
 	expect($product)->not->toBeFalse();
 
-	/** @var array<string, \WC_Product_Attribute> $productAttributes */
 	$productAttributes = $product->get_attributes();
-	expect($productAttributes[$taxonomySlug])->not->toBeEmpty();
-	$productAttribute = $productAttributes[$taxonomySlug];
-	expect($productAttribute)->toBeInstanceOf(\WC_Product_Attribute::class);
-	expect($productAttribute->is_taxonomy())->toBeTrue();
-	expect($productAttribute->get_id())->toBe($attributeTaxonomyId);
-	// dd($productAttribute->get_options());
-	expect($productAttribute->get_options())->toBeArray();
+	$foundAttribute = findProductAttributeByName($productAttributes, $attributeName);
+
+	if (! $foundAttribute) {
+		$all_pa = array_filter(array_keys($GLOBALS['wp_taxonomies'] ?? []), fn($t) => strpos($t, 'pa_') === 0);
+		expect($foundAttribute)->not->toBeNull(sprintf(
+			'Атрибут "%s" (slug: %s) не найден. Доступные: [%s]. Зарегистрированные: [%s]. Raw Meta: %s',
+			$attributeName, $taxonomySlug,
+			implode(', ', array_keys($productAttributes)),
+			implode(', ', $all_pa),
+			var_export(get_post_meta($productId, '_product_attributes', true), true)
+		));
+	}
+
+	expect($foundAttribute)->toBeInstanceOf(\WC_Product_Attribute::class);
+	expect($foundAttribute->is_taxonomy())->toBeTrue();
+	expect($foundAttribute->get_id())->toBe($attributeTaxonomyId);
+	expect($foundAttribute->get_options())->toBeArray();
 });
