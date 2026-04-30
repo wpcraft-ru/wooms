@@ -1,0 +1,21 @@
+{
+  "context" : {
+    "employee" : {
+      "meta" : {
+        "href" : "https://api.moysklad.ru/api/remap/1.2/context/employee",
+        "metadataHref" : "https://api.moysklad.ru/api/remap/1.2/entity/employee/metadata",
+        "type" : "employee",
+        "mediaType" : "application/json"
+      }
+    }
+  },
+  "meta" : {
+    "href" : "https://api.moysklad.ru/api/remap/1.2/entity/webhook",
+    "type" : "webhook",
+    "mediaType" : "application/json",
+    "size" : 0,
+    "limit" : 1000,
+    "offset" : 0
+  },
+  "rows" : [ ]
+}
