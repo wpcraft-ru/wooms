@@ -79,6 +79,56 @@ function wooms_request($url = '', $data = array(), $type = 'GET')
   return $response;
 }
 
+/**
+ * Download image file from moysklad.ru
+ *
+ * MoySklad answers downloadHref with a redirect to a temporary URL in the file storage.
+ * That URL must be requested without authorization: if the Authorization header
+ * is sent there too, the storage answers 400 Unsupported Authorization Type
+ * and the XML error ends up saved as the image.
+ *
+ * @link https://dev.moysklad.ru/doc/api/remap/1.2/#/dictionaries/images
+ *
+ * @param string $url downloadHref
+ * @return string|WP_Error image body
+ */
+function wooms_download_image($url)
+{
+  $response = wp_remote_get($url, array(
+    'timeout'     => 45,
+    'redirection' => 0,
+    'headers'     => array(
+      'Authorization' => 'Basic ' .
+        base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
+    ),
+  ));
+
+  if (is_wp_error($response)) {
+    return $response;
+  }
+
+  $location = wp_remote_retrieve_header($response, 'location');
+  if ($location) {
+    $response = wp_remote_get($location, array('timeout' => 45));
+
+    if (is_wp_error($response)) {
+      return $response;
+    }
+  }
+
+  $code = wp_remote_retrieve_response_code($response);
+  $body = wp_remote_retrieve_body($response);
+
+  if (200 != $code || !@getimagesizefromstring($body)) {
+    return new WP_Error(
+      'wooms_image_download',
+      sprintf('HTTP %s, %s', $code, wp_remote_retrieve_header($response, 'content-type'))
+    );
+  }
+
+  return $body;
+}
+
 
 function wooms_get_wooms_id_from_href($href = '')
 {
