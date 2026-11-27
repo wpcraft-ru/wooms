@@ -168,3 +168,60 @@ it('clears malformed variation image task when downloadHref is missing (fixture)
 	// After fix, malformed task must be removed and logged as error.
 	expect(get_post_meta($variationId, 'wooms_miniature', true))->toBe('');
 });
+
+it('downloads image from storage redirect without Authorization header', function (): void {
+	$downloadHref = 'https://api.moysklad.ru/api/remap/1.2/download/fixture-image';
+	$storageUrl = 'https://s3.example.com/fixture-image?X-Amz-Signature=fixture';
+	$png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+	$requests = [];
+
+	add_filter('pre_http_request', function ($preempt, $args, $url) use ($downloadHref, $storageUrl, $png, &$requests) {
+		$requests[$url] = $args;
+
+		if ($url === $downloadHref) {
+			return [
+				'headers' => ['location' => $storageUrl],
+				'body' => '',
+				'response' => ['code' => 302, 'message' => 'Found'],
+				'cookies' => [],
+				'filename' => null,
+			];
+		}
+
+		if ($url === $storageUrl) {
+			return [
+				'headers' => ['content-type' => 'image/png'],
+				'body' => $png,
+				'response' => ['code' => 200, 'message' => 'OK'],
+				'cookies' => [],
+				'filename' => null,
+			];
+		}
+
+		return $preempt;
+	}, 10, 3);
+
+	expect(wooms_download_image($downloadHref))->toBe($png);
+	expect($requests[$downloadHref]['headers'])->toHaveKey('Authorization');
+	expect($requests[$storageUrl]['headers'] ?? [])->not->toHaveKey('Authorization');
+});
+
+it('does not accept storage error as image', function (): void {
+	$downloadHref = 'https://api.moysklad.ru/api/remap/1.2/download/fixture-image';
+
+	add_filter('pre_http_request', function ($preempt, $args, $url) use ($downloadHref) {
+		if ($url !== $downloadHref) {
+			return $preempt;
+		}
+
+		return [
+			'headers' => ['content-type' => 'text/xml; charset=utf-8'],
+			'body' => '<?xml version="1.0" encoding="UTF-8"?><Error><Code>InvalidArgument</Code><Message>Unsupported Authorization Type</Message></Error>',
+			'response' => ['code' => 400, 'message' => 'Bad Request'],
+			'cookies' => [],
+			'filename' => null,
+		];
+	}, 10, 3);
+
+	expect(wooms_download_image($downloadHref))->toBeInstanceOf(\WP_Error::class);
+});

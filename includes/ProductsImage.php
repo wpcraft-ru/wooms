@@ -90,45 +90,20 @@ function uploadRemoteImageAndAttach($image_url, $product_id, $filename = 'image.
     $filename = sanitize_file_name($filename);
     $filename = wp_unique_filename($uploads_dir['path'], $filename);
 
-    $header_array = [
-        'Authorization' => 'Basic ' . base64_encode(get_option('woomss_login') . ':' . get_option('woomss_pass')),
-    ];
+    $image = wooms_download_image($image_url);
 
-    $args = [
-        'headers'  => $header_array,
-    ];
-
-    $get = wp_remote_get($image_url, $args);
-
-    if (is_wp_error($get)) {
+    if (is_wp_error($image)) {
         do_action(
             'wooms_logger_error',
             __NAMESPACE__,
-            sprintf('Ошибка загрузки картинки: %s', $get->get_error_message()),
-            $get->get_error_code()
+            sprintf('Ошибка загрузки картинки: %s', $image->get_error_message()),
+            $image->get_error_code()
         );
 
         return false;
     }
 
-    if (empty($get['response']['code'])) {
-        return false;
-    }
-
-    if (403 == $get['response']['code']) {
-        $http_response = $get['http_response'];
-
-        if ($http_response->get_status() == 403) {
-            $response = $http_response->get_response_object();
-            $url_image = $http_response->get_response_object()->url;
-
-            $get2 = wp_remote_get($url_image);
-            $mirror = wp_upload_bits($filename, '', wp_remote_retrieve_body($get2));
-        }
-    } else {
-
-        $mirror = wp_upload_bits($filename, '', wp_remote_retrieve_body($get));
-    }
+    $mirror = wp_upload_bits($filename, '', $image);
 
     $type = $filename_data['type'];
 
