@@ -583,6 +583,11 @@ class OrderUpdateFromMoySklad
                     continue;
                 }
 
+				// Skip webhooks that don't belong to this specific site
+				if ($row['url'] !== rest_url('/wooms/v1/order-update/')) {
+					continue;
+				}
+
                 $webhooks[$row['id']] = array(
                     'entityType' => $row['entityType'],
                     'url'        => $row['url'],

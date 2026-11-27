@@ -1,0 +1,72 @@
+opencollection: 1.0.0
+info:
+  name: moysklad
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ''
+      port: ''
+      auth:
+        username: ''
+        password: ''
+      bypassProxy: ''
+items:
+  - info:
+      name: update webhook
+      type: http
+      seq: 1
+    http:
+      method: POST
+      url: '{{base_url}}/entity/webhook?url=https://wooms-other-app.com/webhook&action=UPDATE&entityType=customerorder'
+      headers:
+        - name: Content-Type
+          value: application/json
+      params:
+        - name: url
+          value: https://wooms-other-app.com/webhook
+          type: query
+        - name: action
+          value: UPDATE
+          type: query
+        - name: entityType
+          value: customerorder
+          type: query
+      auth:
+        type: basic
+        username: '{{login}}'
+        password: '{{password}}'
+    settings:
+      encodeUrl: true
+      timeout: 0
+      followRedirects: true
+      maxRedirects: 5
+  - info:
+      name: get webhooks
+      type: http
+      seq: 2
+    http:
+      method: GET
+      url: '{{base_url}}/entity/webhook'
+      auth:
+        type: basic
+        username: '{{login}}'
+        password: '{{password}}'
+    settings:
+      encodeUrl: true
+      timeout: 0
+      followRedirects: true
+      maxRedirects: 5
+  - info:
+      name: moysklad
+      type: script
+    script: ''
+bundled: true
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
+    exportedAt: '2026-04-30T15:40:09.953Z'
+    exportedUsing: Bruno
